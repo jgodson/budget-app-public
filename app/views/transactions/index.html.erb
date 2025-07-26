@@ -1,0 +1,193 @@
+<div class="container mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Transactions</h1>
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        Actions
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
+        <li><%= link_to "Add Transaction", new_transaction_path, class: "dropdown-item" %></li>
+        <li><%= link_to "Import Transactions", import_form_transactions_path, class: "dropdown-item" %></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <%= form_with url: transactions_path, method: :get, local: true do %>
+    <div class="row mb-3 justify-content-evenly">
+      <div class="col-md-2 pb-2">
+        <%= label_tag :year, "Select Year:" %>
+        <%= select_tag :year, options_for_select(@available_years, @selected_year.to_i), class: "form-select", onchange: "this.form.submit();" %>
+      </div>
+      <div class="col-md-3 pb-2">
+        <%= label_tag :month, "Select Month:" %>
+        <%= select_tag :month, options_for_select([['', '']] + Date::MONTHNAMES.compact.each_with_index.map { |name, index| [name, index + 1] }, @selected_month.to_i), class: "form-select", onchange: "this.form.submit();" %>
+      </div>
+      <div class="col-md-5 pb-2">
+        <%= label_tag :category, "Select Category:" %>
+        <%= select_tag :category, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @selected_category.to_i), class: "form-select", onchange: "this.form.submit();" %>
+      </div>
+      <div class="col-md-6 pb-2">
+        <%= label_tag :description, "Filter by Description:" %>
+        <%= text_field_tag :description, params[:description], class: "form-control", oninput: "filterDescription()", onkeydown: "if (event.key === 'Enter') event.preventDefault()" %>
+      </div>
+      <div class="col-md-4 pb-2">
+        <%= label_tag :group_by, "Group by:" %>
+        <%= select_tag :group_by, options_for_select(@group_by_options.map { |g| [g.titleize, g] }, @selected_group_by), class: "form-select", onchange: "this.form.submit();" %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="table-responsive mt-4">
+    <table class="table table-bordered table-hover align-middle">
+      <% @grouped_transactions.each do |date, transactions| %>
+          <% header = @selected_group_by.include?('month') ? date.strftime("%B %Y") : "#{@selected_month.present? ? Date::MONTHNAMES[@selected_month] : ""} #{date}" %>
+          <tr class="parent-<%= header.parameterize %> parent-group highlight">
+            <td colspan="2"><h3 class="m-0"><%= header %></h3></td>
+            <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
+            <td>
+              <h5 class="parent-total-amount fw-bold m-0">
+                <% if @selected_group_by.include?('category') %>
+                  <%= number_to_currency(transactions.values.flatten.sum(&:amount) / 100.0) %>
+                <% else %>
+                  <%= number_to_currency(transactions.sum(&:amount) / 100.0) %>
+                <% end %>
+              </h5>
+            </td>
+          </tr>
+            <% if @selected_group_by.include?('category') %>
+              <% transactions.each do |category, transactions| %>
+                <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
+                  <tr class="highlight">
+                    <td colspan="2"><h5 class="fw-bold m-0 text-center"><%= category.name %></h5></td>
+                    <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
+                    <td><h5 class="child-total-amount fw-bold m-0"><%= number_to_currency(transactions.sum(&:amount) / 100.0) %></h5></td>
+                  </tr>
+                  <tr class="text-center highlight">
+                    <td><strong>Date</strong></td>
+                    <td><strong>Description</strong></td>
+                    <td><strong>Amount</strong></td>
+                    <td><strong>Actions</strong></td>
+                  </tr>
+                  <% transactions.each do |transaction| %>
+                    <tr class="transaction-row">
+                      <td><%= transaction.date.strftime("%d %B %Y") %></td>
+                      <td class="transaction-description"><%= transaction.description %></td>
+                      <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
+                      <td class="text-center">
+                        <%= link_to 'Details', transaction_path(transaction), class: 'btn btn-info btn-sm' %>
+                        <%= link_to 'Edit', edit_transaction_path(transaction), class: 'btn btn-warning btn-sm' %>
+                        <%= link_to 'Delete', transaction, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              <% end %>
+            <% else %>
+              <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
+                <tr class="text-center highlight">
+                  <td><strong>Date</strong></td>
+                  <td><strong>Description</strong></td>
+                  <td><strong>Amount</strong></td>
+                  <td><strong>Actions</strong></td>
+                </tr>
+                <% transactions.each do |transaction| %>
+                  <tr class="transaction-row">
+                    <td><%= transaction.date.strftime("%d %B %Y") %></td>
+                    <td class="transaction-description"><%= transaction.description %></td>
+                    <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
+                    <td>
+                      <%= link_to 'Details', transaction_path(transaction), class: 'btn btn-info btn-sm' %>
+                      <%= link_to 'Edit', edit_transaction_path(transaction), class: 'btn btn-warning btn-sm' %>
+                      <%= link_to 'Delete', transaction, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            <% end %>
+        <% end %>
+    </table>
+  </div>
+
+  <div id="empty-state" class="text-center mt-4" style="<% if @transactions.present?%>display: none;<% end %>">
+    <h3>No transactions found</h3>
+    <p>Try adjusting your filters or adding new transactions.</p>
+  </div>
+</div>
+
+<script>
+  function filterDescription() {
+    const input = document.querySelector('input[name="description"]');
+    const filter = input.value.toLowerCase();
+    const allParentGroups = document.querySelectorAll('tr.parent-group');
+    const parentGroups = Array.from(allParentGroups).reduce((acc, group) => {
+      const parentGroup = document.querySelector(`tr.${group.classList[0]}`);
+      if (!acc.includes(group)) {
+        acc.push(group);
+      }
+      return acc;
+    }, []);
+    let hasVisibleTransactions = false;
+
+    parentGroups.forEach((parentGroup) => {
+      const childGroups = document.querySelectorAll(`tbody.${parentGroup.classList[0]}`);
+      let hasVisibleTransactionsInParent = false;
+      let parentTotal = 0;
+
+      childGroups.forEach((childGroup) => {
+        const rows = childGroup.querySelectorAll('tr.transaction-row');
+        let hasVisibleTransactionsInChild = false;
+        let childTotal = 0;
+
+        rows.forEach((row) => {
+          const description = row.querySelector('.transaction-description')?.textContent.toLowerCase();
+          const amount = parseFloat(row.querySelector('.transaction-amount')?.textContent.replace(/[^0-9.-]+/g, ""));
+
+          if (description && description.includes(filter)) {
+            row.style.display = '';
+            hasVisibleTransactionsInChild = true;
+            childTotal += amount;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        parentTotal += childTotal;
+
+        // Update the total amounts
+        const childTotalElement = childGroup.querySelector('.child-total-amount');
+        if (childTotalElement) {
+          childTotalElement.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(childTotal);
+        }
+
+        // Hide or show the child + parent based on the visibility of transactions
+        if (hasVisibleTransactionsInChild) {
+          childGroup.style.display = '';
+          hasVisibleTransactionsInParent = true;
+        } else {
+          childGroup.style.display = 'none';
+        }
+      });
+
+      // Update the total amounts
+      const parentTotalElement = parentGroup.querySelector('.parent-total-amount');
+      parentTotalElement.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parentTotal);
+
+      // Hide or show the parent based on the visibility of transactions
+      if (hasVisibleTransactionsInParent) {
+        parentGroup.style.display = '';
+        hasVisibleTransactions = true;
+      } else {
+        parentGroup.style.display = 'none';
+      }
+    });
+
+    // Show or hide the empty state based on the visibility of transactions
+    const emptyState = document.getElementById('empty-state');
+    if (hasVisibleTransactions) {
+      emptyState.style.display = 'none';
+    } else {
+      emptyState.style.display = '';
+    }
+  }
+</script>

@@ -1,0 +1,64 @@
+<%= turbo_stream.replace "import_preview" do %>
+  <div class="container mt-4">
+    <%= form_with url: import_transactions_path, local: true do |form| %>
+      <% if @preview_data[:new_categories].present? %>
+        <div class="mb-3">
+          <h2>Expense categories to create</h2>
+          <ul>
+            <% @preview_data[:new_categories].each do |category| %>
+              <li><%= category.name %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="mb-3">
+        <% @preview_data[:items].group_by { |t| t[:date].beginning_of_month }.each_with_index do |(month, transactions_by_month), month_index| %>
+          <h3>Transactions for <%= month.strftime("%B %Y") %></h3>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSelectAll('<%= month_index %>', true)">Select All</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSelectAll('<%= month_index %>', false)">Select None</button>
+          <div class="table-responsive mt-2">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Select</th>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-<%= month_index %>">
+                <% transactions_by_month.each_with_index do |transaction, transaction_index| %>
+                  <tr>
+                    <td>
+                      <%= check_box_tag "selected_transactions[]", transaction.to_json, transaction[:status] == :new, class: "transaction-checkbox" %>
+                    </td>
+                    <td><%= transaction[:date].strftime("%d %B %Y") %></td>
+                    <td><%= transaction[:description] %></td>
+                    <td><%= number_to_currency(transaction[:amount] / 100.0) %></td>
+                    <td>
+                      <%= select_tag "transaction_category_#{transaction[:unique_id]}",
+                        options_for_select(@categories.map { |c| ["#{c.name}#{c.new_record? ? ' (new)' : ''}", c.name] }, transaction[:category].name),
+                        class: "form-select" %>
+                    </td>
+                    <td>
+                      <span class="badge <%= status_class(transaction[:status]) %>">
+                        <%= transaction[:status].to_s.humanize %>
+                      </span>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mb-3 text-end">
+        <%= form.submit "Import Selected", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

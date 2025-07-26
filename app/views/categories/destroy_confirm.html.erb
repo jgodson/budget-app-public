@@ -1,0 +1,42 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+          <div class="card-header">
+            <h1>Delete <%= @category.name %></h1>
+          </div>
+          <div class="card-body">
+            <% if @category.subcategories.present? %>
+              <div class="alert alert-danger" role="alert">
+                You cannot delete a category that has subcategories. Please delete the subcategories first.
+              </div>
+
+              <h2>Subcategories of <%= @category.name %></h2>
+              <ul>
+                <% @category.subcategories.each do |subcategory| %>
+                  <p><i class="bi bi-dot"></i><%= link_to subcategory.name, destroy_category_path(subcategory) %></p>
+                <% end %>
+              </ul>
+            <% else %>
+              <div class="alert alert-danger" role="alert">
+                If you delete the category without assigning a new category to the transactions, the transactions will be deleted.
+              </div> 
+
+              <p>Confirm deletion and optionally assign associatied transactions to a new category</p>
+              <%= form_with(url: category_path(@category), method: :delete, local: true, html: { class: 'form-horizontal' }) do |form| %>
+                <div class="mb-3">
+                  <%= form.label :new_category_id, "Category to assign transactions to (optional)", class: "form-label" %>
+                  <%= form.collection_select :new_category_id, Category.where.not(id: @category.id), :id, :name, { include_blank: true }, { class: "form-select" } %>
+                </div>
+  
+                <div class="text-end">
+                  <%= link_to 'Back', categories_path, class: 'btn btn-secondary' %>
+                  <%= form.submit "Delete Category", class: 'btn btn-danger' %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card">
+        <div class="card-header">
+          <h1>Category: <%= @category.name %></h1>
+        </div>
+        <div class="card-body">
+          <p>
+            <strong>Category Type:</strong>
+            <%= @category.category_type.humanize %>
+          </p>
+
+          <% if @category.parent_category %>
+            <p>
+              <strong>Parent Category:</strong>
+              <%= link_to @category.parent_category.name, category_path(@category.parent_category) %>
+            </p>
+          <% end %>
+
+          <% if @category.subcategories.any? %>
+            <h2>Subcategories</h2>
+            <ul class="list-group mb-3">
+              <% @category.subcategories.each do |subcategory| %>
+                <li class="list-group-item">
+                  <%= link_to subcategory.name, category_path(subcategory) %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+
+          <% if @category.transactions.any? %>
+            <h2>Transactions</h2>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @category.transactions.each do |transaction| %>
+                  <tr>
+                    <td><%= transaction.date %></td>
+                    <td><%= number_to_currency(transaction.amount / 100.0) %></td>
+                    <td><%= transaction.description %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% end %>
+        </div>
+        <div class="card-footer text-end">
+          <button class="btn btn-secondary" onclick="history.back()">Back</button>
+          <%= link_to 'Edit', edit_category_path(@category), class: 'btn btn-warning' %>
+          <%= link_to 'Delete', destroy_category_path(@category), class: 'btn btn-danger' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

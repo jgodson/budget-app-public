@@ -1,0 +1,324 @@
+<div class="container-fluid mb-4">
+  <div class="d-flex align-items-center mb-4">
+    <h1>Overview</h1>
+    <% if @available_years.present? %>
+      <%= form_with url: dashboard_path, method: :get, local: true, class: "m-0 ps-2" do %>
+          <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select fs-3", onchange: "this.form.submit();" %>
+      <% end %>
+    <% end %>
+    <%= link_to 'View Monthly Overview', monthly_overview_path(year: @selected_year), class: 'btn btn-secondary ms-auto' %>
+  </div>
+
+  <div class="horizontal-scroll">
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th>
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Category</span>
+              <div class="dropdown">
+                <button class="btn btn-link p-0" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-plus header-icon"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                  <li><%= link_to 'Add Category', new_category_path, class: 'dropdown-item' %></li>
+                </ul>
+              </div>
+            </div>
+          </th>
+          <th class="bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>Budget Amount</span>
+              <div class="dropdown">
+                <button class="btn btn-link p-0" type="button" id="budgetDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-plus header-icon"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="budgetDropdown">
+                  <li><%= link_to 'Add Budget Item', new_budget_path(year: @selected_year), class: 'dropdown-item' %></li>
+                </ul>
+              </div>
+            </div>
+          </th>
+          <% (1..12).each do |month| %>
+            <th>
+              <div class="d-flex justify-content-between align-items-center">
+                <span><%= Date::MONTHNAMES[month] %></span>
+                <div class="dropdown">
+                  <button class="btn btn-link p-0" type="button" id="monthDropdown<%= month %>" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus header-icon"></i>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="monthDropdown<%= month %>">
+                    <li><%= link_to 'Add Transaction', new_transaction_path(date: Date.new(@selected_year.to_i, month, 1)), class: 'dropdown-item' %></li>
+                  </ul>
+                </div>
+              </div>
+            </th>
+          <% end %>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Income -->
+        <tr class="highlight">
+          <td colspan="15"><h3 class="m-0">Income</h3></td>
+        </tr>
+        <!-- Income Rows -->
+        <% @category_data.each do |category_id, category_hash| %>
+          <% next unless category_hash[:category_type] == "income" %>
+          <!-- Top-Level Category -->
+          <tr>
+            <td>
+              <% if category_hash[:subcategories].any? %>
+                <i class="bi bi-chevron-right toggle-subcategories" data-category-id="<%= category_hash[:category].id %>"></i>
+              <% else %>
+                <i class="bi bi-dot"></i>
+              <% end %>
+              <%= category_hash[:category].name %>
+            </td>
+            <td class="bg-light"><%= number_to_currency(category_hash[:budgeted_amount] / 100.0) %></td>
+            <% (1..12).each do |month| %>
+              <% actual = category_hash[:monthly_transactions][month] %>
+              <% budgeted = category_hash[:budgeted_amount] %>
+              <td class="<%= income_status_class(actual, budgeted) %>">
+                <%= number_to_currency(actual / 100.0) %>
+              </td>
+            <% end %>
+            <% actual_total = category_hash[:total_transactions] %>
+            <% budgeted_total = category_hash[:budgeted_amount] * 12 %>
+            <td class="<%= income_status_class(actual_total, budgeted_total) %>">
+              <%= number_to_currency(actual_total / 100.0) %>
+            </td>
+          </tr>
+
+          <!-- Subcategory Rows -->
+          <% category_hash[:subcategories].each do |sub_hash| %>
+            <tr class="subcategory-row hidden-row" data-parent-id="<%= category_hash[:category].id %>">
+              <td class="pl-4">
+                <i class="bi bi-arrow-right"></i> <%= sub_hash[:category].name %>
+              </td>
+              <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
+              <% (1..12).each do |month| %>
+                <% actual = sub_hash[:monthly_transactions][month] %>
+                <% budgeted = sub_hash[:budgeted_amount] %>
+                <td class="<%= income_status_class(actual, budgeted) %>">
+                  <%= number_to_currency(actual / 100.0) %>
+                </td>
+              <% end %>
+              <% actual_total = sub_hash[:total_transactions] %>
+              <% budgeted_total = sub_hash[:budgeted_amount] * 12 %>
+              <td class="<%= income_status_class(actual_total, budgeted_total) %>">
+                <%= number_to_currency(actual_total / 100.0) %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+
+        <!-- Expenses -->
+        <tr class="highlight">
+          <td colspan="15"><h3 class="m-0">Expenses</h3></td>
+        </tr>
+        <!-- Expense Rows -->
+        <% @category_data.each do |category_id, category_hash| %>
+          <% next unless category_hash[:category_type] == "expense" %>
+          <!-- Top-Level Category -->
+          <tr>
+            <td>
+              <% if category_hash[:subcategories].any? %>
+                <i class="bi bi-chevron-right toggle-subcategories" data-category-id="<%= category_hash[:category].id %>"></i>
+              <% else %>
+                <i class="bi bi-dot"></i>
+              <% end %>
+              <%= category_hash[:category].name %>
+            </td>
+            <td class="bg-light"><%= number_to_currency(category_hash[:budgeted_amount] / 100.0) %></td>
+            <% (1..12).each do |month| %>
+              <% actual = category_hash[:monthly_transactions][month] %>
+              <% budgeted = category_hash[:budgeted_amount] %>
+              <td class="<%= expense_status_class(actual, budgeted) %>">
+                <%= number_to_currency(actual / 100.0) %>
+              </td>
+            <% end %>
+            <% actual_total = category_hash[:total_transactions] %>
+            <% budgeted_total = category_hash[:budgeted_amount] * 12 %>
+            <td class="<%= expense_status_class(actual_total, budgeted_total) %>">
+              <%= number_to_currency(actual_total / 100.0) %>
+            </td>
+          </tr>
+
+          <!-- Subcategory Rows -->
+          <% category_hash[:subcategories].each do |sub_hash| %>
+            <tr class="subcategory-row hidden-row" data-parent-id="<%= category_hash[:category].id %>">
+              <td class="pl-4">
+                <i class="bi bi-arrow-right"></i> <%= sub_hash[:category].name %>
+              </td>
+              <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
+              <% (1..12).each do |month| %>
+                <% actual = sub_hash[:monthly_transactions][month] %>
+                <% budgeted = sub_hash[:budgeted_amount] %>
+                <td class="<%= expense_status_class(actual, budgeted) %>">
+                  <%= number_to_currency(actual / 100.0) %>
+                </td>
+              <% end %>
+              <% actual_total = sub_hash[:total_transactions] %>
+              <% budgeted_total = sub_hash[:budgeted_amount] %>
+              <td class="<%= expense_status_class(actual_total, budgeted_total) %>">
+                <%= number_to_currency(actual_total / 100.0) %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+        <!-- Savings -->
+        <tr class="highlight">
+          <td colspan="15"><h3 class="m-0">Savings</h3></td>
+        </tr>
+        <!-- Savings Rows -->
+        <% @category_data.each do |category_id, category_hash| %>
+          <% next unless category_hash[:category_type] == "savings" %>
+          <!-- Top-Level Category -->
+          <tr>
+            <td>
+              <% if category_hash[:subcategories].any? %>
+                <i class="bi bi-chevron-right toggle-subcategories" data-category-id="<%= category_hash[:category].id %>"></i>
+              <% else %>
+                <i class="bi bi-dot"></i>
+              <% end %>
+              <%= category_hash[:category].name %>
+            </td>
+            <td class="bg-light"><%= number_to_currency(category_hash[:budgeted_amount] / 100.0) %></td>
+            <% (1..12).each do |month| %>
+              <% actual = category_hash[:monthly_transactions][month] %>
+              <% budgeted = category_hash[:budgeted_amount] %>
+              <td class="<%= income_status_class(actual, budgeted) %>">
+                <%= number_to_currency(actual / 100.0) %>
+              </td>
+            <% end %>
+            <% actual_total = category_hash[:total_transactions] %>
+            <% budgeted_total = category_hash[:budgeted_amount] * 12 %>
+            <td class="<%= income_status_class(actual_total, budgeted_total) %>">
+              <%= number_to_currency(actual_total / 100.0) %>
+            </td>
+          </tr>
+
+          <!-- Subcategory Rows -->
+          <% category_hash[:subcategories].each do |sub_hash| %>
+            <tr class="subcategory-row hidden-row" data-parent-id="<%= category_hash[:category].id %>">
+              <td class="pl-4">
+                <i class="bi bi-arrow-right"></i> <%= sub_hash[:category].name %>
+              </td>
+              <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
+              <% (1..12).each do |month| %>
+                <% actual = sub_hash[:monthly_transactions][month] %>
+                <% budgeted = sub_hash[:budgeted_amount] %>
+                <td class="<%= income_status_class(actual, budgeted) %>">
+                  <%= number_to_currency(actual / 100.0) %>
+                </td>
+              <% end %>
+              <% actual_total = sub_hash[:total_transactions] %>
+              <% budgeted_total = sub_hash[:budgeted_amount] * 12 %>
+              <td class="<%= income_status_class(actual_total, budgeted_total) %>">
+                <%= number_to_currency(actual_total / 100.0) %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+
+      </tbody>
+      <tfoot class="table-group-divider">
+      <!-- Total Income -->
+        <tr>
+          <td><strong>Total Income</strong></td>
+          <td class="bg-light">
+            <%= number_to_currency(@budgeted_income_total / 100.0) %>
+          </td>
+          <% (1..12).each do |month| %>
+            <td class="<%= income_status_class(@monthly_income_totals[month], @budgeted_income_total) %>">
+              <%= number_to_currency(@monthly_income_totals[month] / 100.0) %>
+            </td>
+          <% end %>
+          <td class="<%= income_status_class(@monthly_income_totals.values.sum, @budgeted_income_total) %>">
+            <%= number_to_currency(@monthly_income_totals.values.sum / 100.0) %>
+          </td>
+        </tr>
+        <!-- Total Expenses -->
+        <tr>
+          <td><strong>Total Expenses</strong></td>
+          <td class="bg-light">
+            <%= number_to_currency(@budgeted_expense_total / 100.0) %>
+          </td>
+          <% (1..12).each do |month| %>
+            <td class="<%= expense_status_class(@monthly_expense_totals[month], @budgeted_expense_total) %>">
+              <%= number_to_currency(@monthly_expense_totals[month] / 100.0) %>
+            </td>
+          <% end %>
+          <td class="<%= expense_status_class(@monthly_expense_totals.values.sum, @budgeted_expense_total) %>">
+            <%= number_to_currency(@monthly_expense_totals.values.sum / 100.0) %>
+          </td>
+        </tr>
+        <!-- Net Total -->
+        <tr>
+          <td><strong>Net Total</strong></td>
+          <td class="bg-light"><%= number_to_currency(@budgeted_net_total / 100.0) %></td>
+          <% (1..12).each do |month| %>
+            <% net_monthly_total = @monthly_income_totals[month] - @monthly_expense_totals[month] %>
+            <td class="<%= income_status_class(net_monthly_total, @budgeted_net_total) %>">
+              <%= number_to_currency(net_monthly_total / 100.0).gsub('-', '&#8209;').html_safe %>
+            </td>
+          <% end %>
+          <% net_total = @monthly_income_totals.values.sum - @monthly_expense_totals.values.sum %>
+          <td class="<%= income_status_class(net_total, @budgeted_net_total) %>">
+            <%= number_to_currency(net_total / 100.0).gsub('-', '&#8209;').html_safe %>
+          </td>
+        </tr>
+        <!-- Total Savings -->
+        <tr>
+          <td><strong>Total Savings</strong></td>
+          <td class="bg-light">
+            <%= number_to_currency(@budgeted_savings_total / 100.0) %>
+          </td>
+          <% (1..12).each do |month| %>
+            <td class="<%= income_status_class(@monthly_savings_totals[month], @budgeted_savings_total) %>">
+              <%= number_to_currency(@monthly_savings_totals[month] / 100.0) %>
+            </td>
+          <% end %>
+          <td class="<%= income_status_class(@monthly_savings_totals.values.sum, @budgeted_savings_total) %>">
+            <%= number_to_currency(@monthly_savings_totals.values.sum / 100.0) %>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+    <%= render 'loans/index', loans: @loans, active_loans: @active_loans, paid_off_loans: @paid_off_loans, dashboard: true %>
+    <%= render 'goals/index', goals: @goals, dashboard: true %>
+</div>
+
+<style>
+  .hidden-row {
+    display: none;
+  }
+
+  .toggle-subcategories {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  function initializeSubcategoryToggles() {
+    document.querySelectorAll('.toggle-subcategories').forEach(function(toggle) {
+      toggle.removeEventListener('click', toggleSubcategories);
+      toggle.addEventListener('click', toggleSubcategories);
+    });
+  }
+
+  function toggleSubcategories() {
+    const categoryId = this.getAttribute('data-category-id');
+    const subcategoryRows = document.querySelectorAll(`.subcategory-row[data-parent-id="${categoryId}"]`);
+    subcategoryRows.forEach(function(row) {
+      row.classList.toggle('hidden-row');
+    });
+    this.classList.toggle('bi-chevron-right');
+    this.classList.toggle('bi-chevron-down');
+  }
+
+  document.addEventListener('turbo:render', initializeSubcategoryToggles);
+</script>

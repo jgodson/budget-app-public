@@ -1,0 +1,13 @@
+<% if flash[:model_errors].present? %>
+  <div class="container mt-4">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <h4 class="alert-heading">Changes could not be saved due to the following issues:</h4>
+      <ul>
+        <% flash[:model_errors].each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+<% end %>

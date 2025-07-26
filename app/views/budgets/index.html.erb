@@ -1,0 +1,274 @@
+<div class="container-fluid mb-4">
+  <div class="d-flex align-items-center mb-4">
+    <h1>Budgets</h1>
+    <% if @available_years.present? %>
+      <%= form_with url: budgets_path, method: :get, local: true, class: "m-0 ps-2" do %>
+          <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select fs-3", onchange: "this.form.submit();" %>
+      <% end %>
+    <% end %>
+    <div class="dropdown ms-auto">
+      <button class="btn btn-primary dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        Actions
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
+        <li><%= link_to "Add Budget", new_budget_path(year: @selected_year), class: "dropdown-item" %></li>
+        <li><%= link_to "Import Budgets", import_form_budgets_path, class: "dropdown-item" %></li>
+        <li><%= button_to "Copy Yearly Budgets to #{@next_year}", copy_yearly_budgets_budgets_path(year: @selected_year), method: :post, class: "dropdown-item", data: { confirm: "Are you sure you want to copy all yearly budgets to #{@next_year}?" } %></li>
+      </ul>
+    </div>
+  </div>
+
+  <% if @budgets.present? %>
+    <div class="horizontal-scroll">
+      <table class="table table-bordered table-hover align-middle">
+        <tbody>
+          <% income_categories = @categories.select { |c| c.category_type == 'income' && c.parent_category.nil? } %>
+          <% expense_categories = @categories.select { |c| c.category_type == 'expense' && c.parent_category.nil? } %>
+          <% savings_categories = @categories.select { |c| c.category_type == 'savings' && c.parent_category.nil? } %>
+
+          <% if income_categories.any? %>
+            <tr class="highlight">
+              <td colspan="14"><h3 class="m-0">Income</h3></td>
+            </tr>
+            <tr class="highlight">
+              <td class="text-center"><strong>Category</strong></td>
+              <% (1..12).each do |month| %>
+                <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
+              <% end %>
+              <td class="text-center"><strong>Actions</strong></td>
+            </tr>
+            <% income_categories.each do |category| %>
+              <tr>
+                <td>
+                  <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                  <i class="bi bi-dot"></i> <%= yearly_budget ? link_to(category.name, budget_path(yearly_budget)) : category.name %>
+                </td>
+                <% (1..12).each do |month_index| %>
+                  <td>
+                    <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
+                    <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                    <% subcategory_budgets = category.subcategories.sum do |subcategory| %>
+                      <% subcategory_monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                      <% subcategory_yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                      <% subcategory_monthly_budget ? subcategory_monthly_budget.budgeted_amount : (subcategory_yearly_budget ? subcategory_yearly_budget.budgeted_amount : 0) %>
+                    <% end %>
+                    <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
+                    <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
+                    <% if monthly_budget %>
+                      <%= link_to number_to_currency(total_budgeted_amount / 100.0), budget_path(monthly_budget), class: "text-warning" %>
+                    <% else %>
+                      <%= number_to_currency(total_budgeted_amount / 100.0) %>
+                    <% end %>
+                  </td>
+                <% end %>
+                <td>
+                  <% if yearly_budget %>
+                    <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
+                    <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                  <% else %>
+                    <%= link_to 'Add Budget', new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
+                  <% end %>
+                </td>
+              </tr>
+              <% category.subcategories.each do |subcategory| %>
+                <tr>
+                  <td class="pl-4">
+                    <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                    <i class="bi bi-arrow-right"></i> <%= yearly_budget ? link_to(subcategory.name, budget_path(yearly_budget)) : subcategory.name %>
+                  </td>
+                  <% (1..12).each do |month_index| %>
+                    <td>
+                      <% monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                      <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                      <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
+                      <% if monthly_budget %>
+                        <%= link_to number_to_currency(budgeted_amount / 100.0), budget_path(monthly_budget), class: "text-warning" %>
+                      <% else %>
+                        <%= number_to_currency(budgeted_amount / 100.0) %>
+                      <% end %>
+                    </td>
+                  <% end %>
+                  <td>
+                    <% if yearly_budget %>
+                      <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
+                      <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                    <% else %>
+                      <%= link_to 'Add Budget', new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="14">No income categories found</td>
+            </tr>
+          <% end %>
+
+          <% if expense_categories.any? %>
+            <tr class="highlight">
+              <td colspan="14"><h3 class="m-0">Expenses</h3></td>
+            </tr>
+            <tr class="highlight">
+              <td class="text-center"><strong>Category</strong></td>
+              <% (1..12).each do |month| %>
+                <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
+              <% end %>
+              <td class="text-center"><strong>Actions</strong></td>
+            </tr>
+            <% expense_categories.each do |category| %>
+              <tr>
+                <td>
+                  <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                  <i class="bi bi-dot"></i> <%= yearly_budget ? link_to(category.name, budget_path(yearly_budget)) : category.name %>
+                </td>
+                <% (1..12).each do |month_index| %>
+                  <td>
+                    <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
+                    <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                    <% subcategory_budgets = category.subcategories.sum do |subcategory| %>
+                      <% subcategory_monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                      <% subcategory_yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                      <% subcategory_monthly_budget ? subcategory_monthly_budget.budgeted_amount : (subcategory_yearly_budget ? subcategory_yearly_budget.budgeted_amount : 0) %>
+                    <% end %>
+                    <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
+                    <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
+                    <% if monthly_budget %>
+                      <%= link_to number_to_currency(total_budgeted_amount / 100.0), budget_path(monthly_budget), class: "text-warning" %>
+                    <% else %>
+                      <%= number_to_currency(total_budgeted_amount / 100.0) %>
+                    <% end %>
+                  </td>
+                <% end %>
+                <td>
+                  <% if yearly_budget %>
+                    <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
+                    <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                  <% else %>
+                    <%= link_to 'Add Budget', new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
+                  <% end %>
+                </td>
+              </tr>
+              <% category.subcategories.each do |subcategory| %>
+                <tr>
+                  <td class="pl-4">
+                    <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                    <i class="bi bi-arrow-right"></i> <%= yearly_budget ? link_to(subcategory.name, budget_path(yearly_budget)) : subcategory.name %>
+                  </td>
+                  <% (1..12).each do |month_index| %>
+                    <td>
+                      <% monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                      <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                      <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
+                      <% if monthly_budget %>
+                        <%= link_to number_to_currency(budgeted_amount / 100.0), budget_path(monthly_budget), class: "text-warning" %>
+                      <% else %>
+                        <%= number_to_currency(budgeted_amount / 100.0) %>
+                      <% end %>
+                    </td>
+                  <% end %>
+                  <td>
+                    <% if yearly_budget %>
+                      <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
+                      <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                    <% else %>
+                      <%= link_to 'Add Budget', new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="14">No expense categories found</td>
+            </tr>
+          <% end %>
+
+          <% if savings_categories.any? %>
+            <tr class="highlight">
+              <td colspan="14"><h3 class="m-0">Savings</h3></td>
+            </tr>
+            <tr class="highlight">
+              <td class="text-center"><strong>Category</strong></td>
+              <% (1..12).each do |month| %>
+                <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
+              <% end %>
+              <td class="text-center"><strong>Actions</strong></td>
+            </tr>
+            <% savings_categories.each do |category| %>
+              <tr>
+                <td>
+                  <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                  <i class="bi bi-dot"></i> <%= yearly_budget ? link_to(category.name, budget_path(yearly_budget)) : category.name %>
+                </td>
+                <% (1..12).each do |month_index| %>
+                  <td>
+                    <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
+                    <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                    <% subcategory_budgets = category.subcategories.sum do |subcategory| %>
+                      <% subcategory_monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                      <% subcategory_yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                      <% subcategory_monthly_budget ? subcategory_monthly_budget.budgeted_amount : (subcategory_yearly_budget ? subcategory_yearly_budget.budgeted_amount : 0) %>
+                    <% end %>
+                    <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
+                    <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
+                    <% if monthly_budget %>
+                      <%= link_to number_to_currency(total_budgeted_amount / 100.0), budget_path(monthly_budget), class: "text-warning" %>
+                    <% else %>
+                      <%= number_to_currency(total_budgeted_amount / 100.0) %>
+                    <% end %>
+                  </td>
+                <% end %>
+                <td>
+                  <% if yearly_budget %>
+                    <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
+                    <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                  <% else %>
+                    <%= link_to 'Add Budget', new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
+                  <% end %>
+                </td>
+              </tr>
+              <% category.subcategories.each do |subcategory| %>
+                <tr>
+                  <td class="pl-4">
+                    <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                    <i class="bi bi-arrow-right"></i> <%= yearly_budget ? link_to(subcategory.name, budget_path(yearly_budget)) : subcategory.name %>
+                  </td>
+                  <% (1..12).each do |month_index| %>
+                    <td>
+                      <% monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                      <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
+                      <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
+                      <% if monthly_budget %>
+                        <%= link_to number_to_currency(budgeted_amount / 100.0), budget_path(monthly_budget), class: "text-warning" %>
+                      <% else %>
+                        <%= number_to_currency(budgeted_amount / 100.0) %>
+                      <% end %>
+                    </td>
+                  <% end %>
+                  <td>
+                    <% if yearly_budget %>
+                      <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
+                      <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                    <% else %>
+                      <%= link_to 'Add Budget', new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="14">No savings categories found</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="text-center mt-4">
+      <h3>No budgets found</h3>
+      <p>Try adjusting your filters or adding new budgets.</p>
+    </div>
+  <% end %>
+</div>

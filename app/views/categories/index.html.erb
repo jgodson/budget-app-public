@@ -1,0 +1,49 @@
+<div class="container mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Categories</h1>
+    <%= link_to 'Add New Category', new_category_path, class: 'btn btn-primary' %>
+  </div>
+
+  <% if @categories.empty? %>
+    <div class="text-center mt-4">
+      <h3>No categories found</h3>
+    </div>
+  <% else %>
+    <table class="table table-bordered table-hover mt-4 align-middle">
+      <tbody>
+        <% CategoryTypes::CATEGORY_TYPES.keys.map(&:to_s).each do |type| %>
+          <% if @categories.select { |category| category.category_type == type }.empty? %>
+            <% next %>
+          <% end %>
+          <tr class="highlight"><td colspan="2"><h3 class="m-0"><%= type.capitalize %> Categories</td></tr>
+          <tr class="highlight">
+            <td><strong>Name</strong></td>
+            <td><strong>Actions</strong></td>
+          </tr>
+          <% @categories.select { |category| category.category_type == type }.each do |category| %>
+            <tr>
+              <td><i class="bi bi-dot"></i><%= link_to category.name, category_path(category) %></td>
+              <td>
+                <%= link_to 'Details', category_path(category), class: 'btn btn-info btn-sm' %>
+                <%= link_to 'Edit', edit_category_path(category), class: 'btn btn-warning btn-sm' %>
+                <%= link_to 'Delete', destroy_category_path(category), class: 'btn btn-danger btn-sm' %>
+              </td>
+            </tr>
+            <% category.subcategories.each do |subcategory| %>
+              <tr>
+                <td class="pl-4">
+                  <i class="bi bi-arrow-right"></i> <%= link_to subcategory.name, category_path(subcategory) %>
+                </td>
+                <td>
+                  <%= link_to 'Details', category_path(subcategory), class: 'btn btn-info btn-sm' %>
+                  <%= link_to 'Edit', edit_category_path(subcategory), class: 'btn btn-warning btn-sm' %>
+                  <%= link_to 'Delete', destroy_category_path(subcategory), class: 'btn btn-danger btn-sm' %>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div>

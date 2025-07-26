@@ -1,0 +1,71 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card">
+        <div class="card-header h4 d-flex justify-content-between align-items-center">
+          Goal: <%= @goal.goal_name %>
+          <div class="d-flex align-items-center">
+            <% if @goal.archived? %>
+              <span class="badge bg-secondary m-0">Archived <%= @goal.archived_at.year %></span>
+            <% end %>
+
+            <% if @goal.total_contributed >= @goal.amount %>
+              <span class="badge bg-success ms-o ms-2">Goal Complete</span>
+            <% end %>
+
+            <span class="badge bg-primary m-0 ms-2">
+              <%= number_to_percentage(@goal.percent_complete, precision: 2) %>
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p>
+            <strong>Category: </strong>
+            <%= link_to @goal.category.name, category_path(@goal.category) %>
+          </p>
+          <p>
+            <strong>Total Contributions: </strong>
+            <%= number_to_currency(@goal.total_contributed_dollars) %>
+            <strong> / </strong>
+            <%= number_to_currency(@goal.amount / 100.0) %>
+          </p>
+
+          <% if @goal.total_contributed_dollars > 0 %>
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @goal.total_contributed_by_year.each do |year, amount| %>
+                  <tr>
+                    <td><%= year %></td>
+                    <td><%= number_to_currency(amount / 100.0) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% else %>
+            <p>
+              No contributions towards this goal yet.
+            </p>
+          <% end %>
+
+          <div class="text-end">
+            <button class="btn btn-secondary" onclick="history.back()">Back</button>
+            <%= link_to 'Edit', edit_goal_path(@goal), class: 'btn btn-warning' %>
+            <%= link_to 'Delete', goal_path(@goal), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+            <% if @goal.archived? %>
+              <%= link_to 'Unarchive', unarchive_goal_path(@goal), data: { turbo_method: :patch, turbo_confirm: "Are you sure you want to unarchive #{@goal.goal_name}?" }, class: 'btn btn-secondary' %>
+            <% else %>
+              <%= link_to 'Add Contribution', new_transaction_path({category_id: @goal.category, description: "Contribution to #{@goal.goal_name} goal"}), class: 'btn btn-success' %>
+              <%= link_to 'Archive', archive_goal_path(@goal), data: { turbo_method: :patch, turbo_confirm: "Are you sure you want to archive #{@goal.goal_name}?" }, class: 'btn btn-secondary' %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="container<%= dashboard ? "-fluid" : "" %> mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Loans</h1>
+    <% unless dashboard %>
+      <%= link_to 'Add New Loan', new_loan_path, class: 'btn btn-primary' %>
+    <% end %>
+  </div>
+
+  <% if @loans.empty? %>
+    <div class="alert alert-warning" role="alert">
+      No loans found.
+    </div> 
+  <% end %>
+  
+  <% if @loans.any? %>
+    <table class="table table-bordered table-hover mt-4 align-middle">
+      <thead>
+        <tr class="text-center">
+          <th>Loan Name </th>
+          <th>Loan Balance</th>
+          <th>Last Payment</th>
+          <th>Total Paid</th>
+          <th>Principal Paid</th>
+          <th>Interest Paid</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @active_loans.any? %>
+          <tr class="highlight"><td colspan="7"><strong>Active Loans</strong></td></tr>
+          <% @active_loans.each do |loan| %>
+            <tr>
+              <td>
+                <div class="d-flex justify-content-between">
+                  <%= loan.loan_name %>
+                  <span class="badge bg-primary m-0">
+                    <%= number_to_percentage(loan.percent_complete, precision: 2) %>
+                  </span>
+                </div>
+              </td>
+              <td><%= number_to_currency(loan.balance_dollars) %></td>
+              <td>
+                <% if loan.loan_payments.any? %>
+                  <%= loan.last_payment.payment_date.strftime("%Y-%m-%d") %>
+                <% else %>
+                  No payments
+                <% end %>
+              </td>
+              <td><%= number_to_currency(loan.total_paid_dollars) %></td>
+              <td><%= number_to_currency(loan.total_principal_paid_dollars) %></td>
+              <td><%= number_to_currency(loan.total_interest_paid_dollars) %></td>
+              <td>
+                <%= link_to 'Details', loan_path(loan), class: 'btn btn-info btn-sm' %>
+                <%= link_to 'Edit', edit_loan_path(loan), class: 'btn btn-warning btn-sm' %>
+                <%= link_to 'Delete', loan_path(loan), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                <%= link_to 'Add Payment', new_loan_payment_path(loan_id: loan), class: 'btn btn-success btn-sm' %>
+                <% if loan.loan_payments.any? %>
+                  <%= link_to 'Recent Payments', '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+
+        <% if @paid_off_loans.any? %>
+          <tr class="highlight"><td colspan="7"><strong>Paid off Loans</strong></td></tr>
+          <% @paid_off_loans.each do |loan| %>
+            <tr>
+              <td>
+                <div class="d-flex justify-content-between">
+                  <%= loan.loan_name %>
+                  <span class="badge bg-success m-0">100%</span>
+                </div>
+              </td>
+              <td><%= number_to_currency(loan.balance_dollars) %></td>
+              <td>
+                <% if loan.loan_payments.any? %>
+                  <%= loan.last_payment.payment_date.strftime("%Y-%m-%d") %>
+                <% else %>
+                  No payments
+                <% end %>
+              </td>
+              <td><%= number_to_currency(loan.total_paid_dollars) %></td>
+              <td><%= number_to_currency(loan.total_principal_paid_dollars) %></td>
+              <td><%= number_to_currency(loan.total_interest_paid_dollars) %></td>
+              <td>
+                <%= link_to 'Details', loan_path(loan), class: 'btn btn-info btn-sm' %>
+                <%= link_to 'Edit', edit_loan_path(loan), class: 'btn btn-warning btn-sm' %>
+                <%= link_to 'Delete', loan_path(loan), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                <% if loan.loan_payments.any? %>
+                  <%= link_to 'Recent Payments', '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div>
+
+<% @loans.each do |loan| %>
+  <% if loan.loan_payments.any? %>
+    <!-- Modal for Recent Payments -->
+    <div class="modal fade" id="recentPaymentsModal-<%= loan.id %>" tabindex="-1" aria-labelledby="recentPaymentsModalLabel-<%= loan.id %>" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="recentPaymentsModalLabel-<%= loan.id %>">Recent Payments for <%= loan.loan_name %></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount Paid</th>
+                  <th>Interest Paid</th>
+                  <th>Principal Paid</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% loan.loan_payments.order(payment_date: :desc).limit(5).each do |payment| %>
+                  <tr>
+                    <td><%= payment.payment_date.strftime("%Y-%m-%d") %></td>
+                    <td><%= number_to_currency(payment.paid_amount / 100.0) %></td>
+                    <td><%= number_to_currency(payment.interest_amount / 100.0) %></td>
+                    <td><%= number_to_currency((payment.paid_amount - payment.interest_amount) / 100.0) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

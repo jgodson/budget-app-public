@@ -1,0 +1,26 @@
+<%= form_with model: @goal, local: true, html: { class: 'form-horizontal', onsubmit: 'BudgetApp.processNumberInputs(event)'} do |form| %>
+  <div class="form-group mb-3">
+      <%= form.label :goal_name, class: "form-label" %>
+      <%= form.text_field :goal_name, class: "form-control" %>
+  </div>
+
+  <div class="form-group mb-3">
+      <%= form.label :category_id, "Select Transaction Category", class: "form-label" %>
+      <%= form.collection_select :category_id, @categories, :id, :name, { prompt: "Choose a category" }, { class: "form-select" } %>
+  </div>
+
+  <div class="form-group mb-3">
+    <%= form.label :amount_dollars, "Goal Amount", class: 'form-label' %>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <span class="input-group-text">$</span>
+      </div>
+      <%= form.text_field :amount_dollars, class: 'form-control', data: { type: 'number' }, onblur: "BudgetApp.formatNumberInput(this)" %>
+    </div>
+  </div>
+  
+  <div class="form-group text-end">
+    <button class="btn btn-secondary" onclick="history.back()">Back</button>
+    <%= form.submit(@goal.persisted? ? "Update" : "Create", class: 'btn btn-primary') %>
+  </div>
+<% end %>

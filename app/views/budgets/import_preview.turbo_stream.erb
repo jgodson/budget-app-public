@@ -1,0 +1,71 @@
+<%= turbo_stream.replace "import_preview" do %>
+  <div class="container mt-4">
+    <%= form_with url: import_budgets_path, local: true do |form| %>
+      <% grouped_categories = @preview_data[:new_categories].group_by(&:category_type) %>
+
+      <% if grouped_categories['income'].present? %>
+        <div class="mb-3">
+          <h2>Income Categories to Create</h2>
+          <ul>
+            <% grouped_categories['income'].each do |category| %>
+              <li><%= category.name %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <% if grouped_categories['expense'].present? %>
+        <div class="mb-3">
+          <h2>Expense Categories to Create</h2>
+          <ul>
+            <% grouped_categories['expense'].each do |category| %>
+              <li><%= category.name %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="mb-3">
+        <h3>Budgets found for <%= @preview_data[:items][0][:year] %></h3>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSelectAll(true)">Select All</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSelectAll(false)">Select None</button>
+        <div class="table-responsive mt-2">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="budgets">
+              <% @preview_data[:items].each_with_index do |budget_data, index| %>
+                <tr>
+                  <td>
+                    <%= check_box_tag "selected_budgets[]", budget_data.to_json, budget_data[:status] == :new, class: "budget-checkbox" %>
+                  </td>
+                  <td>
+                    <%= select_tag "budget_category_#{budget_data[:unique_id]}",
+                      options_for_select(@categories.map { |c| ["#{c.name}#{c.new_record? ? ' (new)' : ''}", c.name] }, budget_data[:category].name),
+                      class: "form-select" %>
+                  </td>
+                  <td><%= number_to_currency(budget_data[:amount] / 100.0) %></td>
+                  <td>
+                    <span class="badge <%= status_class(budget_data[:status]) %>">
+                      <%= budget_data[:status].to_s.humanize %>
+                    </span>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mb-3 text-end">
+        <%= form.submit "Import Selected", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

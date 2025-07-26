@@ -1,0 +1,37 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header h4 fw-bold">
+          Transaction Details
+        </div>
+        <div class="card-body">
+          <p><strong>Category:</strong> <%= @transaction.category.name %></p>
+          <p><strong>Amount:</strong> <%= number_to_currency(@transaction.amount / 100.0) %></p>
+          <p><strong>Date:</strong> <%= @transaction.date.strftime("%B %d, %Y") %></p>
+          <p><strong>Description:</strong> <%= @transaction.description %></p>
+          
+          <% if @transaction.loan_payment.present? %>
+            <hr>
+            <h5>Associated Loan Payment</h5>
+            <p><strong>Loan:</strong> <%= link_to @transaction.loan_payment.loan.loan_name, loan_path(@transaction.loan_payment.loan) %></p>
+            <p><strong>Paid Amount:</strong> <%= number_to_currency(@transaction.loan_payment.paid_amount / 100.0) %></p>
+            <p><strong>Interest Amount:</strong> <%= number_to_currency(@transaction.loan_payment.interest_amount / 100.0) %></p>
+            <p><strong>Principal Amount:</strong> <%= number_to_currency((@transaction.loan_payment.paid_amount - @transaction.loan_payment.interest_amount) / 100.0) %></p>
+            <p><strong>Payment Date:</strong> <%= @transaction.loan_payment.payment_date.strftime("%B %d, %Y") %></p>
+          <% end %>
+        </div>
+        <div class="card-footer text-end">
+          <button class="btn btn-secondary" onclick="history.back()">Back</button>
+          <% if @transaction.loan_payment.present? %>
+            <button class="btn btn-primary" disabled>Edit</button>
+            <button class="btn btn-danger" disabled>Delete</button>
+          <% else %>
+            <%= link_to 'Edit', edit_transaction_path(@transaction), class: 'btn btn-primary' %>
+            <%= link_to 'Delete', transaction_path(@transaction), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
