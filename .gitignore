@@ -34,6 +34,3 @@
 node_modules
 
 .DS_Store
-
-# Users should customize these files with their own patterns
-# We include example versions instead
