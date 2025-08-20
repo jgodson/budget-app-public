@@ -55,7 +55,7 @@ class Loan < ApplicationRecord
   def percent_complete
     return 100 if balance == 0
 
-    (total_paid.to_f / (total_paid.to_f + balance.to_f) * 100).round(2)
+    (total_principal_paid.to_f / (balance.to_f + total_principal_paid.to_f) * 100).round(2)
   end
 
   private
