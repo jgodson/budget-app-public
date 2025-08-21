@@ -1,7 +1,8 @@
-## Sync - 2025-08-21 08:05:25
+## Sync - 2025-08-21 08:07:20
 
-- 7038e6d Test: verify changelog append functionality
+- 64eefcc Fix changelog to preserve all previous sync entries
 
 # Changelog
 
 This file tracks changes synced from the private repository.
+
