@@ -9,8 +9,9 @@ class DashboardController < ApplicationController
     @categories = Category.includes(:subcategories).order(:name)
 
     # Fetch budgets and transactions for the selected year
+    year_range = Date.new(@selected_year, 1, 1)..Date.new(@selected_year, 12, 31)
     @budgets = Budget.where(year: @selected_year).includes(:category)
-    @transactions = Transaction.where("strftime('%Y', date) = ?", @selected_year.to_s).includes(:category)
+    @transactions = Transaction.where(date: year_range).includes(:category)
 
     # Category data
     @category_data = prepare_category_data(@categories, @budgets, @transactions)
@@ -30,7 +31,7 @@ class DashboardController < ApplicationController
   end
 
   def monthly_overview
-    @categories = Category.all
+    @categories = Category.all.order(:name)
     @income_categories = @categories.select { |c| c.category_type == 'income' && c.parent_category.nil? }
     @expense_categories = @categories.select { |c| c.category_type == 'expense' && c.parent_category.nil? }
     @savings_categories = @categories.select { |c| c.category_type == 'savings' && c.parent_category.nil? }
@@ -39,7 +40,8 @@ class DashboardController < ApplicationController
     @selected_year = params[:year].nil? ? Date.today.year : params[:year].to_i
 
     # Fetch transactions and budgets for the selected year
-    @transactions = Transaction.where("strftime('%Y', date) = ?", @selected_year.to_s).includes(:category)
+    year_range = Date.new(@selected_year, 1, 1)..Date.new(@selected_year, 12, 31)
+    @transactions = Transaction.where(date: year_range).includes(:category)
     @budgets = Budget.where(year: @selected_year).includes(:category)
 
     # Group transactions by month, then by category_type and category

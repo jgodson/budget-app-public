@@ -9,7 +9,7 @@ class CategoriesController < ApplicationController
 
   def new
     @category = Category.new
-    @parent_categories = Category.where(parent_category_id: nil)
+    @parent_categories = Category.where(parent_category_id: nil).order(:name)
   end
 
   def create
@@ -24,7 +24,7 @@ class CategoriesController < ApplicationController
 
   def edit
     @category = Category.find(params[:id])
-    @parent_categories = Category.where(parent_category_id: nil).where.not(id: @category.id)
+    @parent_categories = Category.where(parent_category_id: nil).where.not(id: @category.id).order(:name)
   end
 
   def update
@@ -65,6 +65,7 @@ class CategoriesController < ApplicationController
 
   def destroy_confirm
     @category = Category.find(params[:id])
+    @categories = Category.where.not(id: @category.id).order(:name)
   end
 
   private

@@ -25,7 +25,7 @@ class LoansController < ApplicationController
 
   def new
     @loan = Loan.new
-    @categories = Category.expenses
+    @categories = Category.expenses.order(:name)
   end
 
   def create
@@ -41,7 +41,7 @@ class LoansController < ApplicationController
 
   def edit
     @loan = Loan.find(params[:id])
-    @categories = Category.expenses
+    @categories = Category.expenses.order(:name)
   end
 
   def update

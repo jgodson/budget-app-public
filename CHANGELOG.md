@@ -1,3 +1,9 @@
+## Sync - 2025-11-18 15:22:28
+
+- 4048535 postgres compatible + dockerfile tweaks
+- c90723d Sory categories in dropdowns
+- a7da87a Fix list ordering for payment goals and categories
+
 ## Sync - 2025-10-25 14:39:35
 
 - a5b27cd add/change category patterns

@@ -36,7 +36,8 @@ class Goal < ApplicationRecord
   end
 
   def total_contributed_by_year
-    category.transactions.group_by { |transaction| transaction.date.year }.transform_values { |transactions| transactions.sum(&:amount) }
+    grouped = category.transactions.group_by { |transaction| transaction.date.year }.transform_values { |transactions| transactions.sum(&:amount) }
+    grouped.sort_by { |year, _| -year }.to_h
   end
 
   def amount_left

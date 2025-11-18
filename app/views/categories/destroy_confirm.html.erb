@@ -26,7 +26,7 @@
               <%= form_with(url: category_path(@category), method: :delete, local: true, html: { class: 'form-horizontal' }) do |form| %>
                 <div class="mb-3">
                   <%= form.label :new_category_id, "Category to assign transactions to (optional)", class: "form-label" %>
-                  <%= form.collection_select :new_category_id, Category.where.not(id: @category.id), :id, :name, { include_blank: true }, { class: "form-select" } %>
+                  <%= form.collection_select :new_category_id, @categories, :id, :name, { include_blank: true }, { class: "form-select" } %>
                 </div>
   
                 <div class="text-end">

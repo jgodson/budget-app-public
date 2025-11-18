@@ -2,7 +2,7 @@ class BudgetsController < ApplicationController
   include Import
 
   def index
-    @categories = Category.all
+    @categories = Category.all.order(:name)
     @selected_year = params[:year].nil? ? Date.today.year : params[:year].to_i
     @budgets = Budget.where(year: @selected_year)
     @next_year = @selected_year >= Date.today.year ? @selected_year + 1 : Date.today.year + 1
@@ -11,19 +11,20 @@ class BudgetsController < ApplicationController
 
   def show
     @budget = Budget.find(params[:id])
-    @transactions = @budget.category.transactions.where("strftime('%Y', date) = ?", @budget.year.to_s).order(date: :asc)
+    year_range = Date.new(@budget.year, 1, 1)..Date.new(@budget.year, 12, 31)
+    @transactions = @budget.category.transactions.where(date: year_range).order(date: :asc)
   end
 
   def edit
     @budget = Budget.find(params[:id])
-    @categories = Category.all
+    @categories = Category.all.order(:name)
   end
 
   def new
     @selected_year = params[:year].nil? ? Date.today.year : params[:year].to_i
     category = params[:category_id].nil? ? nil : Category.find(params[:category_id].to_i)
     @budget = Budget.new(year: @selected_year, category:)
-    @categories = Category.all
+    @categories = Category.all.order(:name)
   end
 
   def create
@@ -121,7 +122,7 @@ class BudgetsController < ApplicationController
       return
     end
 
-    @categories = Category.all + @preview_data[:new_categories]
+    @categories = (Category.all.order(:name) + @preview_data[:new_categories]).sort_by(&:name)
 
     respond_to do |format|
       format.turbo_stream

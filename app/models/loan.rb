@@ -45,7 +45,8 @@ class Loan < ApplicationRecord
   end
 
   def payments_by_year
-    loan_payments.group_by { |payment| payment.payment_date.year }
+    grouped = loan_payments.order(payment_date: :desc).group_by { |payment| payment.payment_date.year }
+    grouped.sort_by { |year, _| -year }.to_h
   end
 
   def last_payment

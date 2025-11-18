@@ -16,7 +16,7 @@ class GoalsController < ApplicationController
       @goal.amount = (params[:amount_dollars].to_f * 100).round
     end
 
-    @categories = Category.savings
+    @categories = Category.savings.order(:name)
   end
 
   def create
@@ -31,7 +31,7 @@ class GoalsController < ApplicationController
   end
 
   def edit
-    @categories = Category.savings
+    @categories = Category.savings.order(:name)
   end
 
   def update

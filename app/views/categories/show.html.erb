@@ -40,7 +40,7 @@
                 </tr>
               </thead>
               <tbody>
-                <% @category.transactions.each do |transaction| %>
+                <% @category.transactions.order(date: :desc).each do |transaction| %>
                   <tr>
                     <td><%= transaction.date %></td>
                     <td><%= number_to_currency(transaction.amount / 100.0) %></td>

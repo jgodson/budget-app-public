@@ -12,12 +12,15 @@ class TransactionsController < ApplicationController
 
     @available_years = Transaction.distinct.pluck(:date).map { |date| date.year }.uniq.sort.reverse
 
-    @transactions = Transaction.where("strftime('%Y', date) = ?", @selected_year.to_s)
+    year_range = Date.new(@selected_year, 1, 1)..Date.new(@selected_year, 12, 31)
+    @transactions = Transaction.where(date: year_range)
                                .includes(:category)
                                .order(:date)
 
     if @selected_month.present?
-      @transactions = @transactions.where("strftime('%m', date) = ?", format('%02d', @selected_month))
+      month_start = Date.new(@selected_year, @selected_month, 1)
+      month_range = month_start..month_start.end_of_month
+      @transactions = @transactions.where(date: month_range)
     end
 
     if @selected_category.present?
@@ -37,7 +40,7 @@ class TransactionsController < ApplicationController
       end
     end
 
-    @categories = Category.all
+    @categories = Category.all.order(:name)
   end
 
   def show
@@ -47,7 +50,7 @@ class TransactionsController < ApplicationController
   def new
     @transaction = Transaction.new(any_params)
     @transaction.date = @transaction.date.presence || Date.today
-    @categories = Category.all
+    @categories = Category.all.order(:name)
   end
 
   def create
@@ -57,7 +60,7 @@ class TransactionsController < ApplicationController
     if @transaction.save
       redirect_to transactions_path, notice: 'Transaction was successfully created.'
     else
-      @categories = Category.all
+      @categories = Category.all.order(:name)
       flash[:model_errors] = @transaction.errors.full_messages
       redirect_to new_transaction_path
     end
@@ -65,7 +68,7 @@ class TransactionsController < ApplicationController
 
   def edit
     @transaction = Transaction.find(params[:id])
-    @categories = Category.all
+    @categories = Category.all.order(:name)
   end
 
   def update
@@ -74,7 +77,7 @@ class TransactionsController < ApplicationController
     if @transaction.update(transaction_params)
       redirect_to transactions_path, notice: 'Transaction was successfully updated.'
     else
-      @categories = Category.all
+      @categories = Category.all.order(:name)
       render :edit
     end
   end
@@ -135,7 +138,7 @@ class TransactionsController < ApplicationController
       return
     end
 
-    @categories = Category.all + @preview_data[:new_categories]
+    @categories = (Category.all.order(:name) + @preview_data[:new_categories]).sort_by(&:name)
 
     respond_to do |format|
       format.turbo_stream
