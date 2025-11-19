@@ -1,3 +1,8 @@
+## Sync - 2025-11-18 20:21:45
+
+- 1c73ac6 remove liveness probe, tweak manifest for missing font
+- a35fc54 fix non existant things
+
 ## Sync - 2025-11-18 16:05:59
 
 - b7fbbc6 fix pid issue, and POST http issue

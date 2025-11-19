@@ -16,10 +16,13 @@ spec:
     spec:
       imagePullSecrets:
         - name: gitea-regcred
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: budget-app
           image: gitea.home.jasongodson.com/homelab/budget-app:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: RAILS_ENV
               value: production
@@ -45,14 +48,15 @@ spec:
             httpGet:
               path: /up
               port: http
-            periodSeconds: 10
+            initialDelaySeconds: 30
+            periodSeconds: 20
             failureThreshold: 6
-          livenessProbe:
-            httpGet:
-              path: /up
-              port: http
-            initialDelaySeconds: 60
-            periodSeconds: 30
+          # livenessProbe:
+          #   httpGet:
+          #     path: /up
+          #     port: http
+          #   initialDelaySeconds: 90
+          #   periodSeconds: 30
           resources:
             requests:
               cpu: 250m
@@ -62,6 +66,9 @@ spec:
               memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 1000

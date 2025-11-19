@@ -53,15 +53,6 @@ Rails.application.configure do
     redirect: { exclude: ->(request) { request.path == "/up" } }
   }
 
-  config.action_controller.default_url_options = {
-    host: "budget.home.jasongodson.com",
-    protocol: "https"
-  }
-
-  config.action_controller.allowed_request_origins = [
-    "https://budget.home.jasongodson.com"
-  ]
-
   # Log to STDOUT by default
   config.logger = ActiveSupport::Logger.new(STDOUT)
     .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
