@@ -26,6 +26,12 @@ spec:
           env:
             - name: RAILS_ENV
               value: production
+            - name: WEB_CONCURRENCY
+              value: "2"
+            - name: RAILS_MAX_THREADS
+              value: "3"
+            - name: RAILS_MIN_THREADS
+              value: "3"
             - name: RAILS_MASTER_KEY
               valueFrom:
                 secretKeyRef:
@@ -51,19 +57,19 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 20
             failureThreshold: 6
-          # livenessProbe:
-          #   httpGet:
-          #     path: /up
-          #     port: http
-          #   initialDelaySeconds: 90
-          #   periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 90
+            periodSeconds: 30
           resources:
             requests:
               cpu: 250m
-              memory: 256Mi
+              memory: 512Mi
             limits:
               cpu: 500m
-              memory: 512Mi
+              memory: 1Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

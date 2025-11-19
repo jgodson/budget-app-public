@@ -1,3 +1,7 @@
+## Sync - 2025-11-18 20:56:43
+
+- 598485d moar memory
+
 ## Sync - 2025-11-18 20:21:45
 
 - 1c73ac6 remove liveness probe, tweak manifest for missing font
