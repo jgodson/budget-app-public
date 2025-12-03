@@ -1,3 +1,7 @@
+## Sync - 2025-12-03 13:57:34
+
+- 537fd60 Fix EROFS on file upload by mounting /tmp volume in k8s
+
 ## Sync - 2025-11-18 20:56:43
 
 - 598485d moar memory

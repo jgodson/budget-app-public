@@ -82,6 +82,8 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /rails/tmp
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: tmp
           emptyDir: {}
