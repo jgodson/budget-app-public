@@ -1,3 +1,7 @@
+## Sync - 2025-12-03 20:49:03
+
+- 3b8fc89 Fix tmp directory permissions in k8s deployment
+
 ## Sync - 2025-12-03 13:57:34
 
 - 537fd60 Fix EROFS on file upload by mounting /tmp volume in k8s

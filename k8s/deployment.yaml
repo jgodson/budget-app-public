@@ -17,8 +17,23 @@ spec:
       imagePullSecrets:
         - name: gitea-regcred
       securityContext:
+        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000
+          command: ["sh", "-c", "mkdir -p /rails/tmp/work && chmod 700 /rails/tmp/work"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /rails/tmp
       containers:
         - name: budget-app
           image: gitea.home.jasongodson.com/homelab/budget-app:latest
@@ -26,6 +41,8 @@ spec:
           env:
             - name: RAILS_ENV
               value: production
+            - name: TMPDIR
+              value: /rails/tmp/work
             - name: WEB_CONCURRENCY
               value: "2"
             - name: RAILS_MAX_THREADS
@@ -81,9 +98,9 @@ spec:
             runAsGroup: 1000
           volumeMounts:
             - name: tmp
-              mountPath: /rails/tmp
-            - name: tmp
               mountPath: /tmp
+            - name: tmp
+              mountPath: /rails/tmp
       volumes:
         - name: tmp
           emptyDir: {}
