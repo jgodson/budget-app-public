@@ -1,3 +1,7 @@
+## Sync - 2025-12-03 21:01:41
+
+- c7d0495 fix boostrap-icons path
+
 ## Sync - 2025-12-03 20:49:03
 
 - 3b8fc89 Fix tmp directory permissions in k8s deployment
