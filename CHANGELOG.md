@@ -1,3 +1,7 @@
+## Sync - 2025-12-04 07:24:04
+
+- 52df6a4 Fix bootstrap-icons font path variable in SCSS
+
 ## Sync - 2025-12-03 21:01:41
 
 - c7d0495 fix boostrap-icons path
