@@ -1,3 +1,7 @@
+## Sync - 2025-12-22 09:42:54
+
+- 2f31991 remove extra CLEAN var, fix seed-data doc
+
 ## Sync - 2025-12-22 09:35:25
 
 - 6224b2d fix local setup. add seeding

@@ -4,7 +4,7 @@ This project includes a utility script to populate the database with realistic s
 
 ## Usage
 
-The script is located at the root of the project: `seed-data.sh`.
+The script is located in the `scripts` folder: `./scripts/seed-data.sh`.
 
 ```bash
 ./scripts/seed-data.sh <duration>

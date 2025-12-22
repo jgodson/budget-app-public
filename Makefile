@@ -29,7 +29,7 @@ start:
 
 # Seed data
 seed:
-	@./scripts/seed-data.sh 2y CLEAN=true
+	@./scripts/seed-data.sh 2y
 
 # Open Rails console
 console:
