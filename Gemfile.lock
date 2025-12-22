@@ -104,9 +104,15 @@ GEM
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    dotenv (3.2.0)
+    dotenv-rails (3.2.0)
+      dotenv (= 3.2.0)
+      railties (>= 6.1)
     drb (2.2.1)
     erubi (1.12.0)
     execjs (2.10.0)
+    faker (3.5.3)
+      i18n (>= 1.8.11, < 2)
     ffi (1.17.0-aarch64-linux-gnu)
     ffi (1.17.0-arm-linux-gnu)
     ffi (1.17.0-arm64-darwin)
@@ -288,6 +294,8 @@ DEPENDENCIES
   bootstrap (~> 5.3.0)
   capybara
   debug
+  dotenv-rails
+  faker
   importmap-rails
   jbuilder
   pg (~> 1.5)

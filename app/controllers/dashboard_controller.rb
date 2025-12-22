@@ -1,9 +1,10 @@
 class DashboardController < ApplicationController
   def index
     @selected_year = params[:year]&.to_i || Date.current.year
-    @available_years = Transaction.distinct.pluck(:date).map { |date| date.year }.uniq
+    @available_years = Transaction.distinct.pluck(:date).map { |date| date.year }
     @available_years += Budget.select(:year).distinct.pluck(:year)
-    @available_years.uniq!.sort!.reverse!
+    @available_years << Date.current.year
+    @available_years = @available_years.uniq.sort.reverse
 
     # Fetch all categories including their subcategories
     @categories = Category.includes(:subcategories).order(:name)
@@ -46,9 +47,10 @@ class DashboardController < ApplicationController
 
     # Group transactions by month, then by category_type and category
     @transactions_by_month_and_type = @transactions.group_by { |t| [t.date.strftime("%B"), t.category.category_type] }
-    @available_years = Transaction.distinct.pluck(:date).map { |date| date.year }.uniq
+    @available_years = Transaction.distinct.pluck(:date).map { |date| date.year }
     @available_years += Budget.select(:year).distinct.pluck(:year)
-    @available_years.uniq!.sort!.reverse!
+    @available_years << Date.current.year
+    @available_years = @available_years.uniq.sort.reverse
 
     # Prepare monthly category summaries
     @monthly_category_summaries = prepare_monthly_category_summaries(@transactions_by_month_and_type, @selected_year)

@@ -11,7 +11,13 @@ default: &default
 
 development:
   <<: *default
-  database: storage/development.sqlite3
+  adapter: postgresql
+  encoding: unicode
+  database: budget_app
+  username: budget_app
+  password: budget_app_dev
+  host: 127.0.0.1
+  port: 5434
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

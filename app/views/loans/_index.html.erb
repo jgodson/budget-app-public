@@ -7,9 +7,9 @@
   </div>
 
   <% if @loans.empty? %>
-    <div class="alert alert-warning" role="alert">
-      No loans found.
-    </div> 
+    <div id="empty-state" class="text-center mt-4">
+      <h3>No loans found</h3>
+    </div>
   <% end %>
   
   <% if @loans.any? %>

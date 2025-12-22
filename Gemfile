@@ -9,7 +9,7 @@ gem "rails", "~> 7.1.3", ">= 7.1.3.3"
 gem "sprockets-rails"
 
 # PostgreSQL adapter for production
-gem "pg", "~> 1.5", group: :production
+gem "pg", "~> 1.5"
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
@@ -46,8 +46,10 @@ gem "bootsnap", require: false
 
 gem 'bootstrap', '~> 5.3.0'
 gem 'sassc-rails'
+gem 'dotenv-rails', groups: [:development, :test]
 
 group :development, :test do
+  gem "faker"
   # Use sqlite3 as the database for Active Record in dev/test
   gem "sqlite3", "~> 1.4"
 

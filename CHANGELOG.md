@@ -1,3 +1,7 @@
+## Sync - 2025-12-22 09:35:25
+
+- 6224b2d fix local setup. add seeding
+
 ## Sync - 2025-12-21 21:05:46
 
 - b7bea25 manifest placeholders

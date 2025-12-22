@@ -16,7 +16,8 @@ A comprehensive personal finance management application built with Ruby on Rails
 
 * Ruby 3.3.0
 * Rails 7.1.3
-* SQLite 3
+* Docker (or Podman)
+* PostgreSQL (via Docker)
 
 ## Setup and Installation
 
@@ -25,43 +26,58 @@ A comprehensive personal finance management application built with Ruby on Rails
 Make sure you have the following installed:
 - Ruby 3.3.0
 - Bundler
-- Node.js and Yarn (for JavaScript dependencies)
-- SQLite3
+- Node.js and npm (for JavaScript dependencies)
+- Docker (or Podman)
 
-### Installation
+### Quick Start
 
-1. Clone the repository
-   ```
-   git clone https://github.com/yourusername/budget-app.git
+This project uses a `Makefile` to simplify common development tasks.
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/jgodson/budget-app-public.git
    cd budget-app
    ```
 
-2. Install dependencies
-   ```
-   bundle install
-   ```
-
-3. Initialize the database
-   ```
-   rails db:create
-   rails db:migrate
-   rails db:seed
+2. **Setup the project**
+   This will install gems, start the database container, and prepare the database.
+   ```bash
+   make setup
    ```
 
-4. **Set up your personal transaction patterns** (Important!)
+3. **Seed Data (Optional)**
+   Populate the database with realistic sample data (2 years worth).
+   ```bash
+   make seed
+   ```
+
+4. **Set up your personal transaction patterns**
    ```
    cp lib/shared/transaction_category_patterns_example.rb lib/shared/transaction_category_patterns.rb
    cp lib/shared/transaction_skip_patterns_example.rb lib/shared/transaction_skip_patterns.rb
    ```
-   
+
    Edit these files to match your bank's transaction descriptions and personal preferences.
 
 5. Start the server
    ```
-   rails server
+   make start
    ```
 
 6. Access the application at `http://localhost:3000`
+
+   Visit `http://localhost:3000` to see the app.
+
+## Development Commands
+
+| Command | Description |
+|---------|-------------|
+| `make setup` | Installs dependencies, starts Docker, and prepares the DB. |
+| `make start` | Starts the database container and the Rails server. |
+| `make seed` | Runs the seed script to generate 2 years of sample data. |
+| `make console` | Opens the Rails console. |
+| `make test` | Runs the test suite. |
+| `make stop` | Stops Docker containers |
 
 ## Privacy & Security
 
