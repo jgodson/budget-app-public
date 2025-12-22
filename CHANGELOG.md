@@ -1,3 +1,7 @@
+## Sync - 2025-12-21 21:05:46
+
+- b7bea25 manifest placeholders
+
 ## Sync - 2025-12-04 07:24:04
 
 - 52df6a4 Fix bootstrap-icons font path variable in SCSS

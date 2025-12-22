@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: budget-app
+  name: "{{APP_NAME}}"
   labels:
-    app: budget-app
+    app: "{{APP_NAME}}"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: budget-app
+      app: "{{APP_NAME}}"
   template:
     metadata:
       labels:
-        app: budget-app
+        app: "{{APP_NAME}}"
     spec:
       imagePullSecrets:
         - name: gitea-regcred
@@ -35,8 +35,8 @@ spec:
             - name: tmp
               mountPath: /rails/tmp
       containers:
-        - name: budget-app
-          image: gitea.home.jasongodson.com/homelab/budget-app:latest
+        - name: "{{APP_NAME}}"
+          image: "{{IMAGE}}"
           imagePullPolicy: Always
           env:
             - name: RAILS_ENV
@@ -52,12 +52,12 @@ spec:
             - name: RAILS_MASTER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: budget-app-rails
+                  name: "{{APP_NAME}}"-rails
                   key: master-key
             - name: SECRET_KEY_BASE
               valueFrom:
                 secretKeyRef:
-                  name: budget-app-rails
+                  name: "{{APP_NAME}}"-rails
                   key: secret-key-base
             - name: DATABASE_URL
               valueFrom:
@@ -108,12 +108,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: budget-app
+  name: "{{APP_NAME}}"
   labels:
-    app: budget-app
+    app: "{{APP_NAME}}"
 spec:
   selector:
-    app: budget-app
+    app: "{{APP_NAME}}"
   ports:
     - name: http
       protocol: TCP
@@ -123,19 +123,19 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: budget-app
+  name: "{{APP_NAME}}"
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
   rules:
-    - host: budget.home.jasongodson.com
+    - host: "{{HOSTNAME}}"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: budget-app
+                name: "{{APP_NAME}}"
                 port:
                   number: 80
