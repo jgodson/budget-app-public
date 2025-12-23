@@ -36,7 +36,7 @@
             <tr>
               <td>
                 <% if category.subcategories.any? %>
-                  <i class="bi bi-chevron-right toggle-subcategories" data-category-id="<%= category.id %>"></i>
+                  <i class="bi bi-chevron-right toggle-subcategories" data-controller="toggle" data-action="click->toggle#toggle" data-category-id="<%= category.id %>"></i>
                 <% else %>
                   <i class="bi bi-dot"></i>
                 <% end %>
@@ -93,7 +93,7 @@
             <tr>
               <td>
                 <% if category.subcategories.any? %>
-                  <i class="bi bi-chevron-right toggle-subcategories" data-category-id="<%= category.id %>"></i>
+                  <i class="bi bi-chevron-right toggle-subcategories" data-controller="toggle" data-action="click->toggle#toggle" data-category-id="<%= category.id %>"></i>
                 <% else %>
                   <i class="bi bi-dot"></i>
                 <% end %>
@@ -150,7 +150,7 @@
             <tr>
               <td>
                 <% if category.subcategories.any? %>
-                  <i class="bi bi-chevron-right toggle-subcategories" data-category-id="<%= category.id %>"></i>
+                  <i class="bi bi-chevron-right toggle-subcategories" data-controller="toggle" data-action="click->toggle#toggle" data-category-id="<%= category.id %>"></i>
                 <% else %>
                   <i class="bi bi-dot"></i>
                 <% end %>
@@ -206,34 +206,3 @@
   <% end %>
 </div>
 
-<style>
-  .hidden-row {
-    display: none;
-  }
-
-  .toggle-subcategories {
-    cursor: pointer;
-  }
-</style>
-
-<script>
-  function initializeSubcategoryToggles() {
-    document.querySelectorAll('.toggle-subcategories').forEach(function(toggle) {
-      toggle.removeEventListener('click', toggleSubcategories);
-      toggle.addEventListener('click', toggleSubcategories);
-    });
-  }
-
-  function toggleSubcategories() {
-    const categoryId = this.getAttribute('data-category-id');
-    const subcategoryRows = document.querySelectorAll(`.subcategory-row[data-parent-id="${categoryId}"]`);
-    subcategoryRows.forEach(function(row) {
-      row.classList.toggle('hidden-row');
-    });
-    this.classList.toggle('bi-chevron-right');
-    this.classList.toggle('bi-chevron-down');
-  }
-
-  document.addEventListener('turbo:load', initializeSubcategoryToggles);
-  document.addEventListener('turbo:render', initializeSubcategoryToggles);
-</script>

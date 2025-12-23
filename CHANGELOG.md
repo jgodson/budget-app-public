@@ -1,3 +1,7 @@
+## Sync - 2025-12-23 10:13:50
+
+- f0cd8b6 Refactor assets and JS controllers
+
 ## Sync - 2025-12-23 08:17:12
 
 - 9304fb8 Fix deployment.yaml

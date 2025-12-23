@@ -1,9 +1,11 @@
 //= link_tree ../images
 //= link_directory ../stylesheets .css
 //= link flatpickr/dist/themes/dark.css
-//= link bootstrap-icons/font/bootstrap-icons.css
 //= link bootstrap-icons/font/fonts/bootstrap-icons.woff2
 //= link bootstrap-icons/font/fonts/bootstrap-icons.woff
 //= link_tree ../../javascript .js
 //= link_tree ../../../vendor/javascript .js
 //= link flatpickr/dist/flatpickr.min.js
+//= link chart.js/dist/chart.js
+//= link @kurkle/color/dist/color.esm.js
+//= link_tree ../../../node_modules/chart.js/dist/chunks

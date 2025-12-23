@@ -1,4 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import { Chart, registerables } from "chart.js"
+
+Chart.register(...registerables)
+
 // Connects to data-controller="charts"
 export default class extends Controller {
   static values = {
@@ -12,11 +16,6 @@ export default class extends Controller {
   }
 
   renderChart() {
-    if (typeof Chart === 'undefined') {
-      console.error("Chart.js is not loaded")
-      return
-    }
-
     const ctx = this.element.getContext('2d')
 
     // Default options

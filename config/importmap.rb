@@ -8,3 +8,5 @@ pin_all_from "app/javascript/controllers", under: "controllers"
 pin "@popperjs/core", to: 'popper.js', preload: true
 pin "bootstrap", to: 'bootstrap.min.js', preload: true
 pin "flatpickr", to: "flatpickr/dist/flatpickr.min.js", preload: true
+pin "chart.js", to: "chart.js/dist/chart.js"
+pin "@kurkle/color", to: "@kurkle/color/dist/color.esm.js"
