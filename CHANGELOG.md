@@ -1,3 +1,8 @@
+## Sync - 2025-12-23 08:17:12
+
+- 9304fb8 Fix deployment.yaml
+- 6035bf9 Add charts to dashboard prototype
+
 ## Sync - 2025-12-22 09:42:54
 
 - 2f31991 remove extra CLEAN var, fix seed-data doc

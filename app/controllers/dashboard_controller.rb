@@ -29,6 +29,9 @@ class DashboardController < ApplicationController
 
     # Calculate Totals
     calculate_totals
+
+    # Prepare chart data
+    prepare_chart_data
   end
 
   def monthly_overview
@@ -242,5 +245,51 @@ class DashboardController < ApplicationController
       .group_by { |t| t.category }
       .transform_values { |transactions| { actual: transactions.sum(&:amount), budgeted: get_budgeted_amount(transactions.first.category, year, month) } }
       .reject { |category, _| category.parent_category.nil? }
+  end
+
+  private
+
+  def prepare_chart_data
+    # 1. Income vs Expense vs Savings (Yearly Total - Stacked)
+    @income_expense_savings_data = {
+      labels: ['Yearly Overview'],
+      datasets: [
+        {
+          label: 'Income',
+          data: [@monthly_income_totals.values.sum / 100.0],
+          backgroundColor: '#198754',
+          stack: 'Income'
+        },
+        {
+          label: 'Expenses',
+          data: [@monthly_expense_totals.values.sum / 100.0],
+          backgroundColor: '#dc3545',
+          stack: 'Outflow'
+        },
+        {
+          label: 'Savings',
+          data: [@monthly_savings_totals.values.sum / 100.0],
+          backgroundColor: '#0d6efd',
+          stack: 'Outflow'
+        }
+      ]
+    }
+
+    # 2. Monthly Income vs Expenses
+    @monthly_income_expense_data = {
+      labels: Date::MONTHNAMES.compact,
+      datasets: [
+        {
+          label: 'Income',
+          data: (1..12).map { |m| (@monthly_income_totals[m] || 0) / 100.0 },
+          backgroundColor: '#198754'
+        },
+        {
+          label: 'Expenses',
+          data: (1..12).map { |m| (@monthly_expense_totals[m] || 0) / 100.0 },
+          backgroundColor: '#dc3545'
+        }
+      ]
+    }
   end
 end

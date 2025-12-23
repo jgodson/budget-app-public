@@ -52,12 +52,12 @@ spec:
             - name: RAILS_MASTER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: "{{APP_NAME}}"-rails
+                  name: "{{APP_NAME}}-rails"
                   key: master-key
             - name: SECRET_KEY_BASE
               valueFrom:
                 secretKeyRef:
-                  name: "{{APP_NAME}}"-rails
+                  name: "{{APP_NAME}}-rails"
                   key: secret-key-base
             - name: DATABASE_URL
               valueFrom:

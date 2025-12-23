@@ -9,6 +9,50 @@
     <%= link_to 'View Monthly Overview', monthly_overview_path(year: @selected_year), class: 'btn btn-secondary ms-auto' %>
   </div>
 
+  <!-- Charts Section -->
+  <div class="row mb-4">
+    <!-- Chart.js CDN (Prototype: For production, please pin using importmap or install via package.json) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-header">
+          Yearly Overview
+        </div>
+        <div class="card-body" style="height: 300px;">
+          <canvas
+            data-controller="charts"
+            data-charts-type-value="bar"
+            data-charts-data-value="<%= @income_expense_savings_data.to_json %>"
+            data-charts-options-value="<%= {
+              plugins: { legend: { position: 'bottom' } },
+              scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+              maintainAspectRatio: false
+            }.to_json %>"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-header">
+          Monthly Income vs Expenses
+        </div>
+        <div class="card-body" style="height: 300px;">
+          <canvas
+            data-controller="charts"
+            data-charts-type-value="bar"
+            data-charts-data-value="<%= @monthly_income_expense_data.to_json %>"
+            data-charts-options-value="<%= {
+              scales: { y: { beginAtZero: true } },
+              maintainAspectRatio: false
+            }.to_json %>"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="horizontal-scroll">
     <table class="table table-bordered table-hover">
       <thead>
