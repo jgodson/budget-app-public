@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 12:42:15
+
+- 3079649 avoid having to manually update with each no controller
+
 ## Sync - 2025-12-24 12:39:34
 
 - 1e04c8a fix charts
