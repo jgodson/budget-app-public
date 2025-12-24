@@ -50,7 +50,7 @@
           </div>
         </div>
         <div class="card-footer text-end">
-          <button class="btn btn-secondary" onclick="history.back()">Back</button>
+          <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
           <%= link_to 'Edit', edit_budget_path(@budget), class: 'btn btn-warning' %>
           <%= link_to 'Delete', budget_path(@budget), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
         </div>

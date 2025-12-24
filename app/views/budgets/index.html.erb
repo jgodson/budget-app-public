@@ -35,7 +35,7 @@
               <% (1..12).each do |month| %>
                 <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
               <% end %>
-              <td class="text-center"><strong>Actions</strong></td>
+              <td><strong>Actions</strong></td>
             </tr>
             <% income_categories.each do |category| %>
               <tr>
@@ -61,14 +61,21 @@
                     <% end %>
                   </td>
                 <% end %>
-                <td>
-                  <% if yearly_budget %>
-                    <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
-                    <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
-                  <% else %>
-                    <%= link_to 'Add Budget', new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
-                  <% end %>
-                </td>
+                                <td>
+  <% if yearly_budget %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-pencil"></i>
+    <% end %>
+    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+      <i class="bi bi-trash"></i>
+    <% end %>
+  <% else %>
+    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-plus-lg"></i>
+    <% end %>
+  <% end %>
+</td>
+
               </tr>
               <% category.subcategories.each do |subcategory| %>
                 <tr>
@@ -88,14 +95,21 @@
                       <% end %>
                     </td>
                   <% end %>
-                  <td>
-                    <% if yearly_budget %>
-                      <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
-                      <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
-                    <% else %>
-                      <%= link_to 'Add Budget', new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
-                    <% end %>
-                  </td>
+                                  <td>
+  <% if yearly_budget %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-pencil"></i>
+    <% end %>
+    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+      <i class="bi bi-trash"></i>
+    <% end %>
+  <% else %>
+    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-plus-lg"></i>
+    <% end %>
+  <% end %>
+</td>
+
                 </tr>
               <% end %>
             <% end %>
@@ -114,7 +128,7 @@
               <% (1..12).each do |month| %>
                 <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
               <% end %>
-              <td class="text-center"><strong>Actions</strong></td>
+              <td><strong>Actions</strong></td>
             </tr>
             <% expense_categories.each do |category| %>
               <tr>
@@ -140,14 +154,21 @@
                     <% end %>
                   </td>
                 <% end %>
-                <td>
-                  <% if yearly_budget %>
-                    <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
-                    <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
-                  <% else %>
-                    <%= link_to 'Add Budget', new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
-                  <% end %>
-                </td>
+                                <td>
+  <% if yearly_budget %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-pencil"></i>
+    <% end %>
+    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+      <i class="bi bi-trash"></i>
+    <% end %>
+  <% else %>
+    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-plus-lg"></i>
+    <% end %>
+  <% end %>
+</td>
+
               </tr>
               <% category.subcategories.each do |subcategory| %>
                 <tr>
@@ -167,14 +188,21 @@
                       <% end %>
                     </td>
                   <% end %>
-                  <td>
-                    <% if yearly_budget %>
-                      <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
-                      <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
-                    <% else %>
-                      <%= link_to 'Add Budget', new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
-                    <% end %>
-                  </td>
+                                  <td>
+  <% if yearly_budget %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-pencil"></i>
+    <% end %>
+    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+      <i class="bi bi-trash"></i>
+    <% end %>
+  <% else %>
+    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-plus-lg"></i>
+    <% end %>
+  <% end %>
+</td>
+
                 </tr>
               <% end %>
             <% end %>
@@ -193,7 +221,7 @@
               <% (1..12).each do |month| %>
                 <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
               <% end %>
-              <td class="text-center"><strong>Actions</strong></td>
+              <td><strong>Actions</strong></td>
             </tr>
             <% savings_categories.each do |category| %>
               <tr>
@@ -219,14 +247,21 @@
                     <% end %>
                   </td>
                 <% end %>
-                <td>
-                  <% if yearly_budget %>
-                    <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
-                    <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
-                  <% else %>
-                    <%= link_to 'Add Budget', new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
-                  <% end %>
-                </td>
+                                <td>
+  <% if yearly_budget %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-pencil"></i>
+    <% end %>
+    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+      <i class="bi bi-trash"></i>
+    <% end %>
+  <% else %>
+    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-plus-lg"></i>
+    <% end %>
+  <% end %>
+</td>
+
               </tr>
               <% category.subcategories.each do |subcategory| %>
                 <tr>
@@ -246,14 +281,21 @@
                       <% end %>
                     </td>
                   <% end %>
-                  <td>
-                    <% if yearly_budget %>
-                      <%= link_to 'Edit', edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm' %>
-                      <%= link_to 'Delete', yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
-                    <% else %>
-                      <%= link_to 'Add Budget', new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm' %>
-                    <% end %>
-                  </td>
+                                  <td>
+  <% if yearly_budget %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-pencil"></i>
+    <% end %>
+    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+      <i class="bi bi-trash"></i>
+    <% end %>
+  <% else %>
+    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+      <i class="bi bi-plus-lg"></i>
+    <% end %>
+  <% end %>
+</td>
+
                 </tr>
               <% end %>
             <% end %>

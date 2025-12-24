@@ -6,7 +6,7 @@
           New Loan Payment
         </div>
         <div class="card-body">
-          <%= form_with model: @loan_payment, local: true, html: { class: 'form-horizontal', onsubmit: 'BudgetApp.processNumberInputs(event)' } do |form| %>
+          <%= form_with model: @loan_payment, local: true, html: { class: 'form-horizontal', data: { controller: 'form', action: 'submit->form#submit' } } do |form| %>
             <div class="mb-3">
               <%= form.label :loan_id, "Select Loan", class: "form-label" %>
               <%= form.collection_select :loan_id, @loans, :id, :loan_name, { prompt: "Choose a loan" }, { class: "form-select" } %>
@@ -24,7 +24,7 @@
               <%= form.label :new_balance_dollars, "New Balance", class: "form-label" %>
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <%= form.text_field :new_balance_dollars, class: 'form-control', id: 'new-balance', data: { type: 'number' }, onblur: "BudgetApp.formatNumberInput(this)" %>
+                <%= form.text_field :new_balance_dollars, class: 'form-control', id: 'new-balance', data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
               </div>
             </div>
 
@@ -32,17 +32,17 @@
               <%= form.label :paid_amount_dollars, "Amount Paid", class: "form-label" %>
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <%= form.text_field :paid_amount_dollars, class: 'form-control', id: 'paid-amount', data: { type: 'number' }, onblur: "BudgetApp.formatNumberInput(this)" %>
+                <%= form.text_field :paid_amount_dollars, class: 'form-control', id: 'paid-amount', data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
               </div>
             </div>
 
             <div class="mb-3">
               <%= form.label :payment_date, "Payment Date", class: "form-label" %>
-              <%= form.date_field :payment_date, class: "form-control datepicker-day" %>
+              <%= form.date_field :payment_date, class: "form-control", data: { controller: "datepicker", datepicker_type_value: "day" } %>
             </div>
 
             <div class="text-end">
-              <button class="btn btn-secondary" onclick="history.back()">Back</button>
+              <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
               <%= form.submit "Record Payment", class: "btn btn-primary" %>
             </div>
           <% end %>

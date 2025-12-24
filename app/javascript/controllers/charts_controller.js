@@ -1,7 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { Chart, registerables } from "chart.js"
-
-Chart.register(...registerables)
+import "chart.js"
 
 // Connects to data-controller="charts"
 export default class extends Controller {
@@ -26,7 +24,7 @@ export default class extends Controller {
 
     const options = { ...defaultOptions, ...this.optionsValue }
 
-    new Chart(ctx, {
+    new window.Chart(ctx, {
       type: this.typeValue,
       data: this.dataValue,
       options: options

@@ -22,7 +22,7 @@
           <% end %>
         </div>
         <div class="card-footer text-end">
-          <button class="btn btn-secondary" onclick="history.back()">Back</button>
+          <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
           <% if @transaction.loan_payment.present? %>
             <button class="btn btn-primary" disabled>Edit</button>
             <button class="btn btn-danger" disabled>Delete</button>

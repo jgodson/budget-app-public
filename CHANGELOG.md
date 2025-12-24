@@ -1,3 +1,8 @@
+## Sync - 2025-12-24 12:39:34
+
+- 1e04c8a fix charts
+- 1f634a3 Use Icons instead of text in table actions, with tooltips
+
 ## Sync - 2025-12-23 10:13:50
 
 - f0cd8b6 Refactor assets and JS controllers

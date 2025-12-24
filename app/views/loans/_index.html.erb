@@ -50,12 +50,24 @@
               <td><%= number_to_currency(loan.total_principal_paid_dollars) %></td>
               <td><%= number_to_currency(loan.total_interest_paid_dollars) %></td>
               <td>
-                <%= link_to 'Details', loan_path(loan), class: 'btn btn-info btn-sm' %>
-                <%= link_to 'Edit', edit_loan_path(loan), class: 'btn btn-warning btn-sm' %>
-                <%= link_to 'Delete', loan_path(loan), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
-                <%= link_to 'Add Payment', new_loan_payment_path(loan_id: loan), class: 'btn btn-success btn-sm' %>
+                <%= link_to loan_path(loan), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+                <%= link_to edit_loan_path(loan), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                  <i class="bi bi-pencil"></i>
+                <% end %>
+                <%= link_to loan_path(loan), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+                  <i class="bi bi-trash"></i>
+                <% end %>
+                <%= link_to new_loan_payment_path(loan_id: loan), class: 'btn btn-success btn-sm', title: 'Add Payment', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                  <i class="bi bi-plus-lg"></i>
+                <% end %>
                 <% if loan.loan_payments.any? %>
-                  <%= link_to 'Recent Payments', '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } %>
+                  <span data-controller="tooltip" data-bs-toggle="tooltip" title="Recent Payments">
+                    <%= link_to '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } do %>
+                      <i class="bi bi-clock-history"></i>
+                    <% end %>
+                  </span>
                 <% end %>
               </td>
             </tr>
@@ -84,11 +96,21 @@
               <td><%= number_to_currency(loan.total_principal_paid_dollars) %></td>
               <td><%= number_to_currency(loan.total_interest_paid_dollars) %></td>
               <td>
-                <%= link_to 'Details', loan_path(loan), class: 'btn btn-info btn-sm' %>
-                <%= link_to 'Edit', edit_loan_path(loan), class: 'btn btn-warning btn-sm' %>
-                <%= link_to 'Delete', loan_path(loan), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                <%= link_to loan_path(loan), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+                <%= link_to edit_loan_path(loan), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                  <i class="bi bi-pencil"></i>
+                <% end %>
+                <%= link_to loan_path(loan), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+                  <i class="bi bi-trash"></i>
+                <% end %>
                 <% if loan.loan_payments.any? %>
-                  <%= link_to 'Recent Payments', '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } %>
+                  <span data-controller="tooltip" data-bs-toggle="tooltip" title="Recent Payments">
+                    <%= link_to '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } do %>
+                      <i class="bi bi-clock-history"></i>
+                    <% end %>
+                  </span>
                 <% end %>
               </td>
             </tr>

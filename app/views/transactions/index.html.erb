@@ -42,19 +42,21 @@
     <table class="table table-bordered table-hover align-middle">
       <% @grouped_transactions.each do |date, transactions| %>
           <% header = @selected_group_by.include?('month') ? date.strftime("%B %Y") : "#{@selected_month.present? ? Date::MONTHNAMES[@selected_month] : ""} #{date}" %>
-          <tr class="parent-<%= header.parameterize %> parent-group highlight">
-            <td colspan="2"><h3 class="m-0"><%= header %></h3></td>
-            <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
-            <td>
-              <h5 class="parent-total-amount fw-bold m-0">
-                <% if @selected_group_by.include?('category') %>
-                  <%= number_to_currency(transactions.values.flatten.sum(&:amount) / 100.0) %>
-                <% else %>
-                  <%= number_to_currency(transactions.sum(&:amount) / 100.0) %>
-                <% end %>
-              </h5>
-            </td>
-          </tr>
+          <tbody>
+            <tr class="parent-<%= header.parameterize %> parent-group highlight">
+              <td colspan="2"><h3 class="m-0"><%= header %></h3></td>
+              <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
+              <td>
+                <h5 class="parent-total-amount fw-bold m-0">
+                  <% if @selected_group_by.include?('category') %>
+                    <%= number_to_currency(transactions.values.flatten.sum(&:amount) / 100.0) %>
+                  <% else %>
+                    <%= number_to_currency(transactions.sum(&:amount) / 100.0) %>
+                  <% end %>
+                </h5>
+              </td>
+            </tr>
+          </tbody>
             <% if @selected_group_by.include?('category') %>
               <% transactions.each do |category, transactions| %>
                 <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
@@ -74,10 +76,16 @@
                       <td><%= transaction.date.strftime("%d %B %Y") %></td>
                       <td class="transaction-description"><%= transaction.description %></td>
                       <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
-                      <td class="text-center">
-                        <%= link_to 'Details', transaction_path(transaction), class: 'btn btn-info btn-sm' %>
-                        <%= link_to 'Edit', edit_transaction_path(transaction), class: 'btn btn-warning btn-sm' %>
-                        <%= link_to 'Delete', transaction, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                      <td>
+                        <%= link_to transaction_path(transaction), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                          <i class="bi bi-eye"></i>
+                        <% end %>
+                        <%= link_to edit_transaction_path(transaction), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                          <i class="bi bi-pencil"></i>
+                        <% end %>
+                        <%= link_to transaction, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+                          <i class="bi bi-trash"></i>
+                        <% end %>
                       </td>
                     </tr>
                   <% end %>
@@ -97,9 +105,15 @@
                     <td class="transaction-description"><%= transaction.description %></td>
                     <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
                     <td>
-                      <%= link_to 'Details', transaction_path(transaction), class: 'btn btn-info btn-sm' %>
-                      <%= link_to 'Edit', edit_transaction_path(transaction), class: 'btn btn-warning btn-sm' %>
-                      <%= link_to 'Delete', transaction, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                      <%= link_to transaction_path(transaction), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                        <i class="bi bi-eye"></i>
+                      <% end %>
+                      <%= link_to edit_transaction_path(transaction), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                        <i class="bi bi-pencil"></i>
+                      <% end %>
+                      <%= link_to transaction, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+                        <i class="bi bi-trash"></i>
+                      <% end %>
                     </td>
                   </tr>
                 <% end %>

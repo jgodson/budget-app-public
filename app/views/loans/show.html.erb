@@ -22,7 +22,7 @@
           <p><strong>Total Interest Paid:</strong> <%= number_to_currency(@loan.total_interest_paid_dollars) %></p>
 
           <div class="text-end">
-            <button class="btn btn-secondary" onclick="history.back()">Back</button>
+            <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
             <%= link_to 'Edit', edit_loan_path(@loan), class: 'btn btn-warning' %>
             <% unless @loan.paid_off? %>
               <%= link_to 'Add Payment', new_loan_payment_path(loan_id: @loan), class: 'btn btn-success' %>
@@ -57,7 +57,9 @@
                       <td><%= number_to_currency(payment.interest_amount / 100.0) %></td>
                       <td><%= number_to_currency((payment.paid_amount - payment.interest_amount) / 100.0) %></td>
                       <td>
-                        <%= link_to 'Delete', loan_payment_path(payment), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger btn-sm' %>
+                        <%= link_to loan_payment_path(payment), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+                          <i class="bi bi-trash"></i>
+                        <% end %>
                       </td>
                     </tr>
                   <% end %>

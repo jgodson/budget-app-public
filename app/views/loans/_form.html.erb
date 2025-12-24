@@ -1,4 +1,4 @@
-<%= form_with model: @loan, local: true, html: { class: 'form-horizontal', onsubmit: 'BudgetApp.processNumberInputs(event)' } do |form| %>
+<%= form_with model: @loan, local: true, html: { class: 'form-horizontal', data: { controller: 'form', action: 'submit->form#submit' } } do |form| %>
   <div class="form-group mb-3">
     <%= form.label :loan_name, class: "form-label" %>
     <%= form.text_field :loan_name, class: "form-control" %>
@@ -13,12 +13,12 @@
     <%= form.label :balance_dollars, "Current Balance", class: "form-label" %>
     <div class="input-group">
       <span class="input-group-text">$</span>
-      <%= form.text_field :balance_dollars, class: 'form-control', data: { type: 'number' }, onblur: "BudgetApp.formatNumberInput(this)" %>
+      <%= form.text_field :balance_dollars, class: 'form-control', data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
     </div>
   </div>
 
   <div class="form-group text-end">
-    <button class="btn btn-secondary" onclick="history.back()">Back</button>
+    <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
     <%= form.submit(@loan.persisted? ? "Update" : "Create", class: 'btn btn-primary mt-3') %>
   </div>
 <% end %>

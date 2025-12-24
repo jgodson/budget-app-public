@@ -124,3 +124,12 @@ body {
 .toggle-subcategories {
   cursor: pointer;
 }
+
+// Fix for Bootstrap Tooltips visibility
+.tooltip {
+  z-index: 100000 !important;
+}
+
+.tooltip.show {
+  opacity: 1 !important;
+}
