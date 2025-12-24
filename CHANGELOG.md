@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 12:59:02
+
+- e0bd43c fix popper import
+
 ## Sync - 2025-12-24 12:42:15
 
 - 3079649 avoid having to manually update with each no controller
