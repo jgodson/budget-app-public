@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 13:15:38
+
+- 097c24e fix application controller import
+
 ## Sync - 2025-12-24 12:59:02
 
 - e0bd43c fix popper import
