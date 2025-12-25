@@ -35,28 +35,113 @@ class DashboardController < ApplicationController
   end
 
   def monthly_overview
-    @categories = Category.all.order(:name)
-    @income_categories = @categories.select { |c| c.category_type == 'income' && c.parent_category.nil? }
-    @expense_categories = @categories.select { |c| c.category_type == 'expense' && c.parent_category.nil? }
-    @savings_categories = @categories.select { |c| c.category_type == 'savings' && c.parent_category.nil? }
+    year = params[:year]&.to_i || Date.current.year
+    month = params[:month]&.to_i || Date.current.month
+    @selected_date = Date.new(year, month, 1)
     
-    # Get the year parameter or default to the current year
-    @selected_year = params[:year].nil? ? Date.today.year : params[:year].to_i
+    @prev_month = @selected_date - 1.month
+    @next_month = @selected_date + 1.month
 
-    # Fetch transactions and budgets for the selected year
-    year_range = Date.new(@selected_year, 1, 1)..Date.new(@selected_year, 12, 31)
-    @transactions = Transaction.where(date: year_range).includes(:category)
-    @budgets = Budget.where(year: @selected_year).includes(:category)
+    @categories = Category.includes(:subcategories).order(:name)
+    
+    # Current Month Data
+    range = @selected_date.beginning_of_month..@selected_date.end_of_month
+    @transactions = Transaction.where(date: range).includes(:category)
+    @budgets = Budget.where(year: year, month: month).or(Budget.where(year: year, month: nil)).includes(:category)
+    
+    # Previous Year Comparison Data
+    prev_range = (@selected_date - 1.year).beginning_of_month..(@selected_date - 1.year).end_of_month
+    @prev_transactions = Transaction.where(date: prev_range).includes(:category)
 
-    # Group transactions by month, then by category_type and category
-    @transactions_by_month_and_type = @transactions.group_by { |t| [t.date.strftime("%B"), t.category.category_type] }
-    @available_years = Transaction.distinct.pluck(:date).map { |date| date.year }
-    @available_years += Budget.select(:year).distinct.pluck(:year)
-    @available_years << Date.current.year
-    @available_years = @available_years.uniq.sort.reverse
+    prepare_monthly_details
+    prepare_monthly_charts
+  end
 
-    # Prepare monthly category summaries
-    @monthly_category_summaries = prepare_monthly_category_summaries(@transactions_by_month_and_type, @selected_year)
+  private
+
+  def prepare_monthly_details
+    @monthly_details = {}
+    
+    # Helper to sum transactions for a category
+    sum_transactions = ->(transactions, category) {
+      transactions.select { |t| t.category_id == category.id }.sum(&:amount)
+    }
+
+    # Helper to find budget
+    find_budget = ->(category) {
+      b = @budgets.find { |b| b.category_id == category.id && b.month == @selected_date.month }
+      b ||= @budgets.find { |b| b.category_id == category.id && b.month.nil? }
+      b ? b.budgeted_amount : 0
+    }
+
+    @categories.each do |category|
+      next if category.parent_category_id.present?
+
+      # Process Subcategories First
+      sub_details = category.subcategories.map do |sub|
+        actual = sum_transactions.call(@transactions, sub)
+        prev_actual = sum_transactions.call(@prev_transactions, sub)
+        budget = find_budget.call(sub)
+        
+        {
+          category: sub,
+          actual: actual,
+          budget: budget,
+          prev_actual: prev_actual,
+          percent: budget > 0 ? (actual.to_f / budget * 100) : 0
+        }
+      end
+
+      # Process Main Category
+      actual = sum_transactions.call(@transactions, category)
+      prev_actual = sum_transactions.call(@prev_transactions, category)
+      budget = find_budget.call(category)
+
+      # Add Subcategory Totals
+      actual += sub_details.sum { |d| d[:actual] }
+      prev_actual += sub_details.sum { |d| d[:prev_actual] }
+      budget += sub_details.sum { |d| d[:budget] }
+
+      @monthly_details[category] = {
+        category: category,
+        actual: actual,
+        budget: budget,
+        prev_actual: prev_actual,
+        percent: budget > 0 ? (actual.to_f / budget * 100) : 0,
+        subcategories: sub_details
+      }
+    end
+  end
+
+  def prepare_monthly_charts
+    build_dataset = ->(type, color) {
+      categories = @monthly_details.values.select { |d| d[:category].category_type == type }
+                                  .sort_by { |d| -d[:actual] }
+      
+      {
+        labels: categories.map { |d| d[:category].name },
+        datasets: [
+          {
+            label: "Current (#{@selected_date.year})",
+            data: categories.map { |d| d[:actual] / 100.0 },
+            backgroundColor: color,
+            borderColor: color.gsub('0.4', '1.0'),
+            borderWidth: 1
+          },
+          {
+            label: "Prior (#{@selected_date.year - 1})",
+            data: categories.map { |d| d[:prev_actual] / 100.0 },
+            backgroundColor: 'rgba(201, 203, 207, 0.4)',
+            borderColor: '#c9cbcf',
+            borderWidth: 1
+          }
+        ]
+      }
+    }
+
+    @income_comparison_data = build_dataset.call('income', 'rgba(25, 135, 84, 0.4)')
+    @expense_comparison_data = build_dataset.call('expense', 'rgba(220, 53, 69, 0.4)')
+    @savings_comparison_data = build_dataset.call('savings', 'rgba(13, 110, 253, 0.4)')
   end
 
   private
@@ -250,46 +335,142 @@ class DashboardController < ApplicationController
   private
 
   def prepare_chart_data
-    # 1. Income vs Expense vs Savings (Yearly Total - Stacked)
-    @income_expense_savings_data = {
-      labels: ['Yearly Overview'],
+    # 1. Income vs Expense vs Savings (Yearly Total - Pie Chart)
+    total_income = @monthly_income_totals.values.sum / 100.0
+    total_expenses = @monthly_expense_totals.values.sum / 100.0
+    total_savings = @monthly_savings_totals.values.sum / 100.0
+    remaining = total_income - (total_expenses + total_savings)
+    @yearly_net_total = remaining
+
+    if remaining >= 0
+      @overview_chart_data = {
+        labels: ['Expenses', 'Savings', 'Remaining'],
+        datasets: [{
+          data: [total_expenses, total_savings, remaining],
+          backgroundColor: ['rgba(220, 53, 69, 0.4)', 'rgba(13, 110, 253, 0.4)', 'rgba(25, 135, 84, 0.4)'],
+          borderColor: ['#dc3545', '#0d6efd', '#198754'],
+          borderWidth: 1,
+          hoverOffset: 4
+        }]
+      }
+    else
+      @overview_chart_data = {
+        labels: ['Expenses', 'Savings'],
+        datasets: [{
+          data: [total_expenses, total_savings],
+          backgroundColor: ['rgba(220, 53, 69, 0.4)', 'rgba(13, 110, 253, 0.4)'],
+          borderColor: ['#dc3545', '#0d6efd'],
+          borderWidth: 1,
+          hoverOffset: 4
+        }]
+      }
+    end
+
+    # 2. Monthly Breakdown (Income, Expense, Savings - Line Chart)
+    current_year_totals = {
+      income: @monthly_income_totals,
+      expense: @monthly_expense_totals,
+      savings: @monthly_savings_totals
+    }
+    
+    # Fetch Previous Year Data
+    prev_year = @selected_year - 1
+    prev_year_transactions = Transaction.where(date: Date.new(prev_year, 1, 1)..Date.new(prev_year, 12, 31)).includes(:category)
+    prev_year_totals = { income: Hash.new(0), expense: Hash.new(0), savings: Hash.new(0) }
+    
+    prev_year_transactions.each do |t|
+      month = t.date.month
+      type = t.category.category_type
+      prev_year_totals[type.to_sym][month] += t.amount
+    end
+
+    @monthly_breakdown_data = {
+      labels: Date::MONTHNAMES.compact,
       datasets: [
+        # Current Year - Income
         {
-          label: 'Income',
-          data: [@monthly_income_totals.values.sum / 100.0],
-          backgroundColor: '#198754',
-          stack: 'Income'
+          label: "Income (#{@selected_year})",
+          data: (1..12).map { |m| (current_year_totals[:income][m] || 0) / 100.0 },
+          borderColor: 'rgba(25, 135, 84, 0.6)',
+          backgroundColor: 'rgba(25, 135, 84, 0.4)',
+          tension: 0.4,
+          fill: false
         },
+        # Current Year - Expenses
         {
-          label: 'Expenses',
-          data: [@monthly_expense_totals.values.sum / 100.0],
-          backgroundColor: '#dc3545',
-          stack: 'Outflow'
+          label: "Expenses (#{@selected_year})",
+          data: (1..12).map { |m| (current_year_totals[:expense][m] || 0) / 100.0 },
+          borderColor: 'rgba(220, 53, 69, 0.6)',
+          backgroundColor: 'rgba(220, 53, 69, 0.4)',
+          tension: 0.4,
+          fill: false
         },
+        # Current Year - Savings
         {
-          label: 'Savings',
-          data: [@monthly_savings_totals.values.sum / 100.0],
-          backgroundColor: '#0d6efd',
-          stack: 'Outflow'
+          label: "Savings (#{@selected_year})",
+          data: (1..12).map { |m| (current_year_totals[:savings][m] || 0) / 100.0 },
+          borderColor: 'rgba(13, 110, 253, 0.6)',
+          backgroundColor: 'rgba(13, 110, 253, 0.4)',
+          tension: 0.4,
+          fill: false
+        },
+        # Previous Year - Income (Dotted)
+        {
+          label: "Income (#{prev_year})",
+          data: (1..12).map { |m| (prev_year_totals[:income][m] || 0) / 100.0 },
+          borderColor: 'rgba(25, 135, 84, 0.4)',
+          backgroundColor: 'rgba(25, 135, 84, 0.1)',
+          borderDash: [5, 5],
+          tension: 0.4,
+          fill: false,
+          hidden: false
+        },
+        # Previous Year - Expenses (Dotted)
+        {
+          label: "Expenses (#{prev_year})",
+          data: (1..12).map { |m| (prev_year_totals[:expense][m] || 0) / 100.0 },
+          borderColor: 'rgba(220, 53, 69, 0.4)',
+          backgroundColor: 'rgba(220, 53, 69, 0.1)',
+          borderDash: [5, 5],
+          tension: 0.4,
+          fill: false,
+          hidden: false
+        },
+        # Previous Year - Savings (Dotted)
+        {
+          label: "Savings (#{prev_year})",
+          data: (1..12).map { |m| (prev_year_totals[:savings][m] || 0) / 100.0 },
+          borderColor: 'rgba(13, 110, 253, 0.4)',
+          backgroundColor: 'rgba(13, 110, 253, 0.1)',
+          borderDash: [5, 5],
+          tension: 0.4,
+          fill: false,
+          hidden: false
         }
       ]
     }
 
-    # 2. Monthly Income vs Expenses
-    @monthly_income_expense_data = {
-      labels: Date::MONTHNAMES.compact,
-      datasets: [
-        {
-          label: 'Income',
-          data: (1..12).map { |m| (@monthly_income_totals[m] || 0) / 100.0 },
-          backgroundColor: '#198754'
-        },
-        {
-          label: 'Expenses',
-          data: (1..12).map { |m| (@monthly_expense_totals[m] || 0) / 100.0 },
-          backgroundColor: '#dc3545'
-        }
-      ]
+    # 3. Category Breakdowns (Income, Expense, Savings)
+    bg_colors = ['rgba(255, 99, 132, 0.4)', 'rgba(54, 162, 235, 0.4)', 'rgba(255, 206, 86, 0.4)', 'rgba(75, 192, 192, 0.4)', 'rgba(153, 102, 255, 0.4)', 'rgba(255, 159, 64, 0.4)']
+    border_colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+
+    process_chart_data = ->(type) {
+      categories = @category_data.values.select { |data| data[:category_type] == type }
+                                        .sort_by { |data| -data[:total_transactions] }
+      {
+        labels: categories.map { |data| data[:category].name },
+        datasets: [{
+          label: type.capitalize,
+          data: categories.map { |data| data[:total_transactions] / 100.0 },
+          backgroundColor: categories.map.with_index { |_, i| bg_colors[i % bg_colors.length] },
+          borderColor: categories.map.with_index { |_, i| border_colors[i % border_colors.length] },
+          borderWidth: 1
+        }]
+      }
     }
+
+    @income_by_category_data = process_chart_data.call('income')
+    @expenses_by_category_data = process_chart_data.call('expense')
+    @savings_by_category_data = process_chart_data.call('savings')
   end
 end

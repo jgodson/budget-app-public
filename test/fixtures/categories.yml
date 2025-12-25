@@ -1,0 +1,11 @@
+income:
+  name: Salary
+  category_type: 0
+
+expense:
+  name: Rent
+  category_type: 1
+
+savings:
+  name: Emergency Fund
+  category_type: 2

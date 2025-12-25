@@ -1,208 +1,186 @@
 <div class="container-fluid mb-4">
+  <!-- Header & Navigation -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Monthly Overview</h1>
-    <% if @available_years.present? %>
-      <%= form_with url: budgets_path, method: :get, local: true, class: "m-0 ps-2" do %>
-          <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select fs-3", onchange: "this.form.submit();" %>
+    <div class="d-flex align-items-center">
+      <%= link_to monthly_overview_path(year: @prev_month.year, month: @prev_month.month), class: 'btn btn-outline-secondary me-3' do %>
+        <i class="bi bi-chevron-left"></i>
       <% end %>
-    <% end %>
-    <%= link_to 'Back to Overview', dashboard_path, class: 'btn btn-secondary ms-auto' %>
+      
+      <h2 class="m-0"><%= @selected_date.strftime("%B %Y") %></h2>
+      
+      <%= link_to monthly_overview_path(year: @next_month.year, month: @next_month.month), class: 'btn btn-outline-secondary ms-3' do %>
+        <i class="bi bi-chevron-right"></i>
+      <% end %>
+    </div>
+    
+    <div>
+      <%= link_to 'Back to Dashboard', dashboard_path, class: 'btn btn-secondary' %>
+    </div>
   </div>
 
-  <% if @monthly_category_summaries.present? %>
-  <div class="horizontal-scroll">
-    <table class="table table-bordered table-hover">
-      <thead>
-        <tr>
-          <th class="text-center">Category</th>
-          <% (1..12).each do |month| %>
-            <th colspan="2" class="text-center"><%= Date::MONTHNAMES[month] %></th>
-          <% end %>
-        </tr>
-        <tr>
-          <th></th>
-          <% (1..12).each do |month| %>
-            <th class="bg-light">Budgeted</th>
-            <th>Actual</th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody>
-        <% if @income_categories.any? %>
-          <tr class="highlight">
-            <td colspan="25"><h3 class="m-0">Income</h3></td>
-          </tr>
-          <% @income_categories.each do |category| %>
-            <tr>
-              <td>
-                <% if category.subcategories.any? %>
-                  <i class="bi bi-chevron-right toggle-subcategories" data-controller="toggle" data-action="click->toggle#toggle" data-category-id="<%= category.id %>"></i>
-                <% else %>
-                  <i class="bi bi-dot"></i>
-                <% end %>
-                <%= category.name %>
-              </td>
-              <% (1..12).each do |month_index| %>
-                <% month_name = Date::MONTHNAMES[month_index] %>
-                <% summary = @monthly_category_summaries.dig(month_name, 'income', category) || { actual: 0, budgeted: 0, subcategories: {} } %>
-                <!-- Swapped Budgeted and Actual Amounts -->
-                <td class="bg-light">
-                  <%= number_to_currency(summary[:budgeted] / 100.0) %>
-                </td>
-                <td>
-                  <span class="<%= summary[:actual] < summary[:budgeted] ? 'text-danger' : 'text-success' %>">
-                    <%= number_to_currency(summary[:actual] / 100.0) %>
-                  </span>
-                </td>
-              <% end %>
-            </tr>
-            <%# Subcategories %>
-            <% category.subcategories.each do |subcategory| %>
-              <tr class="subcategory-row hidden-row" data-parent-id="<%= category.id %>">
-                <td class="pl-4">
-                  <i class="bi bi-arrow-right"></i> <%= subcategory.name %>
-                </td>
-                <% (1..12).each do |month_index| %>
-                  <% month_name = Date::MONTHNAMES[month_index] %>
-                  <% parent_summary = @monthly_category_summaries.dig(month_name, 'income', category) || { subcategories: {} } %>
-                  <% sub_summary = parent_summary[:subcategories][subcategory] || { actual: 0, budgeted: 0 } %>
-                  <!-- Swapped Budgeted and Actual Amounts for Subcategories -->
-                  <td class="bg-light">
-                    <%= number_to_currency(sub_summary[:budgeted] / 100.0) %>
-                  </td>
-                  <td>
-                    <span class="<%= sub_summary[:actual] < sub_summary[:budgeted] ? 'text-danger' : 'text-success' %>">
-                      <%= number_to_currency(sub_summary[:actual] / 100.0) %>
-                    </span>
-                  </td>
-                <% end %>
-              </tr>
-            <% end %>
-          <% end %>
-        <% else %>
-          <tr>
-            <td colspan="25">No income categories found</td>
-          </tr>
-        <% end %>
+  <div class="row">
+    <!-- Charts Column (Left) -->
+    <div class="col-lg-5 mb-4">
+      <!-- Income Comparison -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+          <h5 class="card-title m-0">Income Comparison</h5>
+        </div>
+        <div class="card-body">
+          <div style="height: 250px;">
+            <canvas
+              data-controller="charts"
+              data-charts-type-value="bar"
+              data-charts-data-value="<%= @income_comparison_data.to_json %>"
+              data-charts-options-value="<%= {
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } },
+                plugins: { legend: { position: 'bottom' } }
+              }.to_json %>"
+            ></canvas>
+          </div>
+        </div>
+      </div>
 
-        <% if @expense_categories.any? %>
-          <tr class="highlight">
-            <td colspan="25"><h3 class="m-0">Expenses</h3></td>
-          </tr>
-          <% @expense_categories.each do |category| %>
-            <tr>
-              <td>
-                <% if category.subcategories.any? %>
-                  <i class="bi bi-chevron-right toggle-subcategories" data-controller="toggle" data-action="click->toggle#toggle" data-category-id="<%= category.id %>"></i>
-                <% else %>
-                  <i class="bi bi-dot"></i>
-                <% end %>
-                <%= category.name %>
-              </td>
-              <% (1..12).each do |month_index| %>
-                <% month_name = Date::MONTHNAMES[month_index] %>
-                <% summary = @monthly_category_summaries.dig(month_name, 'expense', category) || { actual: 0, budgeted: 0, subcategories: {} } %>
-                <!-- Swapped Budgeted and Actual Amounts -->
-                <td class="bg-light">
-                  <%= number_to_currency(summary[:budgeted] / 100.0) %>
-                </td>
-                <td>
-                  <span class="<%= summary[:actual] > summary[:budgeted] ? 'text-danger' : 'text-success' %>">
-                    <%= number_to_currency(summary[:actual] / 100.0) %>
-                  </span>
-                </td>
-              <% end %>
-            </tr>
-            <%# Subcategories %>
-            <% category.subcategories.each do |subcategory| %>
-              <tr class="subcategory-row hidden-row" data-parent-id="<%= category.id %>">
-                <td class="pl-4">
-                  <i class="bi bi-arrow-right"></i> <%= subcategory.name %>
-                </td>
-                <% (1..12).each do |month_index| %>
-                  <% month_name = Date::MONTHNAMES[month_index] %>
-                  <% parent_summary = @monthly_category_summaries.dig(month_name, 'expense', category) || { subcategories: {} } %>
-                  <% sub_summary = parent_summary[:subcategories][subcategory] || { actual: 0, budgeted: 0 } %>
-                  <!-- Swapped Budgeted and Actual Amounts for Subcategories -->
-                  <td class="bg-light">
-                    <%= number_to_currency(sub_summary[:budgeted] / 100.0) %>
-                  </td>
-                  <td>
-                    <span class="<%= sub_summary[:actual] > sub_summary[:budgeted] ? 'text-danger' : 'text-success' %>">
-                      <%= number_to_currency(sub_summary[:actual] / 100.0) %>
-                    </span>
-                  </td>
-                <% end %>
-              </tr>
-            <% end %>
-          <% end %>
-        <% else %>s
-          <tr>
-            <td colspan="25">No expense categories found</td>
-          </tr>
-        <% end %>
+      <!-- Expense Comparison -->
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+          <h5 class="card-title m-0">Expense Comparison</h5>
+        </div>
+        <div class="card-body">
+          <div style="height: 350px;">
+            <canvas
+              data-controller="charts"
+              data-charts-type-value="bar"
+              data-charts-data-value="<%= @expense_comparison_data.to_json %>"
+              data-charts-options-value="<%= {
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } },
+                plugins: { legend: { position: 'bottom' } }
+              }.to_json %>"
+            ></canvas>
+          </div>
+        </div>
+      </div>
 
-        <% if @savings_categories.any? %>
-          <tr class="highlight">
-            <td colspan="25"><h3 class="m-0">Savings</h3></td>
-          </tr>
-          <% @savings_categories.each do |category| %>
-            <tr>
-              <td>
-                <% if category.subcategories.any? %>
-                  <i class="bi bi-chevron-right toggle-subcategories" data-controller="toggle" data-action="click->toggle#toggle" data-category-id="<%= category.id %>"></i>
-                <% else %>
-                  <i class="bi bi-dot"></i>
+      <!-- Savings Comparison -->
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="card-title m-0">Savings Comparison</h5>
+        </div>
+        <div class="card-body">
+          <div style="height: 250px;">
+            <canvas
+              data-controller="charts"
+              data-charts-type-value="bar"
+              data-charts-data-value="<%= @savings_comparison_data.to_json %>"
+              data-charts-options-value="<%= {
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } },
+                plugins: { legend: { position: 'bottom' } }
+              }.to_json %>"
+            ></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Table Column (Right) -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="card-title m-0">Monthly Details</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th style="width: 30%;">Category</th>
+                  <th style="width: 25%;">Progress</th>
+                  <th class="text-end" style="width: 15%;">Actual</th>
+                  <th class="text-end" style="width: 15%;">Budget</th>
+                  <th class="text-end" style="width: 15%;">vs Last Year</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% ['income', 'expense', 'savings'].each do |type| %>
+                  <% categories = @monthly_details.values.select { |d| d[:category].category_type == type }.sort_by { |d| d[:category].name } %>
+                  
+                  <% if categories.any? %>
+                    <tr class="table-light no-hover-highlight">
+                      <td colspan="5" class="fw-bold text-uppercase text-muted ps-3"><%= type %></td>
+                    </tr>
+                    
+                    <% categories.each do |detail| %>
+                      <!-- Main Category Row -->
+                      <tr>
+                        <td class="fw-bold"><%= detail[:category].name %></td>
+                        <td>
+                          <% if detail[:budget] > 0 %>
+                            <% status_color = type == 'income' ? 'success' : (type == 'expense' ? (detail[:actual] > detail[:budget] ? 'danger' : 'success') : 'primary') %>
+                            <div class="d-flex align-items-center">
+                              <div class="progress flex-grow-1" style="height: 8px; background-color: rgba(0,0,0,0.03);">
+                                <div class="progress-bar bg-<%= status_color %> bg-opacity-50 border border-<%= status_color %>" 
+                                     role="progressbar" 
+                                     style="width: <%= [detail[:percent], 100].min %>%;" 
+                                     aria-valuenow="<%= detail[:percent] %>" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100"></div>
+                              </div>
+                              <small class="text-muted ms-2" style="font-size: 0.7rem; min-width: 30px;"><%= number_to_percentage(detail[:percent], precision: 0) %></small>
+                            </div>
+                          <% else %>
+                            <span class="text-muted small">No Budget</span>
+                          <% end %>
+                        </td>
+                        <td class="text-end fw-bold"><%= number_to_currency(detail[:actual] / 100.0) %></td>
+                        <td class="text-end text-muted"><%= number_to_currency(detail[:budget] / 100.0) %></td>
+                        <td class="text-end">
+                           <% diff = detail[:actual] - detail[:prev_actual] %>
+                           <span class="<%= diff >= 0 ? 'text-success' : 'text-danger' %>">
+                             <%= diff >= 0 ? '+' : '' %><%= number_to_currency(diff / 100.0) %>
+                           </span>
+                        </td>
+                      </tr>
+
+                      <!-- Subcategories -->
+                      <% detail[:subcategories].each do |sub| %>
+                        <tr style="font-size: 0.9rem;">
+                          <td class="ps-4 text-muted">
+                            <i class="bi bi-arrow-return-right me-2"></i><%= sub[:category].name %>
+                          </td>
+                          <td>
+                            <% if sub[:budget] > 0 %>
+                              <% sub_status_color = type == 'income' ? 'success' : (type == 'expense' ? (sub[:actual] > sub[:budget] ? 'danger' : 'success') : 'primary') %>
+                              <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1" style="height: 4px; background-color: rgba(0,0,0,0.03);">
+                                  <div class="progress-bar bg-<%= sub_status_color %> bg-opacity-50 border border-<%= sub_status_color %>" 
+                                       role="progressbar" 
+                                       style="width: <%= [sub[:percent], 100].min %>%;"></div>
+                                </div>
+                                <small class="text-muted ms-2" style="font-size: 0.7rem; min-width: 30px;"><%= number_to_percentage(sub[:percent], precision: 0) %></small>
+                              </div>
+                            <% end %>
+                          </td>
+                          <td class="text-end"><%= number_to_currency(sub[:actual] / 100.0) %></td>
+                          <td class="text-end text-muted"><%= number_to_currency(sub[:budget] / 100.0) %></td>
+                          <td class="text-end text-muted small">
+                            <%= number_to_currency((sub[:actual] - sub[:prev_actual]) / 100.0) %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    <% end %>
+                  <% end %>
                 <% end %>
-                <%= category.name %>
-              </td>
-              <% (1..12).each do |month_index| %>
-                <% month_name = Date::MONTHNAMES[month_index] %>
-                <% summary = @monthly_category_summaries.dig(month_name, 'savings', category) || { actual: 0, budgeted: 0, subcategories: {} } %>
-                <!-- Swapped Budgeted and Actual Amounts -->
-                <td class="bg-light">
-                  <%= number_to_currency(summary[:budgeted] / 100.0) %>
-                </td>
-                <td>
-                  <span class="<%= summary[:actual] < summary[:budgeted] ? 'text-danger' : 'text-success' %>">
-                    <%= number_to_currency(summary[:actual] / 100.0) %>
-                  </span>
-                </td>
-              <% end %>
-            </tr>
-            <%# Subcategories %>
-            <% category.subcategories.each do |subcategory| %>
-              <tr class="subcategory-row hidden-row" data-parent-id="<%= category.id %>">
-                <td class="pl-4">
-                  <i class="bi bi-arrow-right"></i> <%= subcategory.name %>
-                </td>
-                <% (1..12).each do |month_index| %>
-                  <% month_name = Date::MONTHNAMES[month_index] %>
-                  <% parent_summary = @monthly_category_summaries.dig(month_name, 'savings', category) || { subcategories: {} } %>
-                  <% sub_summary = parent_summary[:subcategories][subcategory] || { actual: 0, budgeted: 0 } %>
-                  <!-- Swapped Budgeted and Actual Amounts for Subcategories -->
-                  <td class="bg-light">
-                    <%= number_to_currency(sub_summary[:budgeted] / 100.0) %>
-                  </td>
-                  <td>
-                    <span class="<%= sub_summary[:actual] < sub_summary[:budgeted] ? 'text-danger' : 'text-success' %>">
-                      <%= number_to_currency(sub_summary[:actual] / 100.0) %>
-                    </span>
-                  </td>
-                <% end %>
-              </tr>
-            <% end %>
-          <% end %>
-        <% else %>
-          <tr>
-            <td colspan="25">No income categories found</td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <% else %>
-    <p>No transactions found for the selected year.</p>
-  <% end %>
 </div>
-

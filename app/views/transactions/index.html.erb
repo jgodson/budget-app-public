@@ -1,6 +1,6 @@
 <div class="container mb-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Transactions</h1>
+    <h2>Transactions</h2>
     <div class="dropdown">
       <button class="btn btn-primary dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
         Actions
@@ -43,7 +43,7 @@
       <% @grouped_transactions.each do |date, transactions| %>
           <% header = @selected_group_by.include?('month') ? date.strftime("%B %Y") : "#{@selected_month.present? ? Date::MONTHNAMES[@selected_month] : ""} #{date}" %>
           <tbody>
-            <tr class="parent-<%= header.parameterize %> parent-group highlight">
+            <tr class="parent-<%= header.parameterize %> parent-group table-light no-hover-highlight">
               <td colspan="2"><h3 class="m-0"><%= header %></h3></td>
               <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
               <td>
@@ -60,7 +60,7 @@
             <% if @selected_group_by.include?('category') %>
               <% transactions.each do |category, transactions| %>
                 <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
-                  <tr class="highlight">
+                  <tr class="table-light no-hover-highlight">
                     <td colspan="2"><h5 class="fw-bold m-0 text-center"><%= category.name %></h5></td>
                     <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
                     <td><h5 class="child-total-amount fw-bold m-0"><%= number_to_currency(transactions.sum(&:amount) / 100.0) %></h5></td>
@@ -69,7 +69,7 @@
                     <td><strong>Date</strong></td>
                     <td><strong>Description</strong></td>
                     <td><strong>Amount</strong></td>
-                    <td><strong>Actions</strong></td>
+                    <td class="text-center"><strong>Actions</strong></td>
                   </tr>
                   <% transactions.each do |transaction| %>
                     <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
@@ -90,11 +90,11 @@
               <% end %>
             <% else %>
               <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
-                <tr class="text-center highlight">
+                <tr class="text-center table-light no-hover-highlight">
                   <td><strong>Date</strong></td>
                   <td><strong>Description</strong></td>
                   <td><strong>Amount</strong></td>
-                  <td><strong>Actions</strong></td>
+                  <td class="text-center"><strong>Actions</strong></td>
                 </tr>
                 <% transactions.each do |transaction| %>
                   <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction) %>" data-action="click->clickable-row#click" style="cursor: pointer;">

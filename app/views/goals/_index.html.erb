@@ -1,6 +1,6 @@
 <div class="container<%= dashboard ? "-fluid" : "" %> mb-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Goals</h1>
+    <h2>Goals</h2>
     <% unless dashboard %>
       <%= link_to 'Add New Goal', new_goal_path, class: 'btn btn-primary' %>
     <% end %>
@@ -19,12 +19,12 @@
           <th>Goal Amount</th>
           <th>Total Contributed</th>
           <th>Amount Left</th>
-          <th>Actions</th>
+          <th class="text-center">Actions</th>
         </tr>
       </thead>
       <tbody>
         <% if @active_goals.any? %>
-          <tr class="highlight"><td colspan="6"><strong>Active Goals</strong></td></tr>
+          <tr class="table-light no-hover-highlight"><td colspan="6" class="fw-bold text-uppercase text-muted ps-3">Active Goals</td></tr>
           <% @active_goals.each do |goal| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= goal_path(goal) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
@@ -59,7 +59,7 @@
         <% end %>
 
         <% if @archived_goals.any? %>
-          <tr class="highlight"><td colspan="6"><strong>Archived Goals</strong></td></tr>
+          <tr class="table-light no-hover-highlight"><td colspan="6" class="fw-bold text-uppercase text-muted ps-3">Archived Goals</td></tr>
           <% @archived_goals.each do |goal| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= goal_path(goal) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>

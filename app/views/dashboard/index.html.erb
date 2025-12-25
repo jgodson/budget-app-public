@@ -1,6 +1,6 @@
 <div class="container-fluid mb-4">
   <div class="d-flex align-items-center mb-4">
-    <h1>Overview</h1>
+    <h2 class="m-0">Overview</h2>
     <% if @available_years.present? %>
       <%= form_with url: dashboard_path, method: :get, local: true, class: "m-0 ps-2" do %>
           <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select fs-3", onchange: "this.form.submit();" %>
@@ -14,37 +14,139 @@
 
 
     <div class="col-md-4">
-      <div class="card h-100">
-        <div class="card-header">
-          Yearly Overview
+      <div class="card h-100" data-controller="chart-switcher">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title m-0" data-chart-switcher-target="title">Yearly Overview</h5>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-secondary active" 
+                    data-chart-switcher-target="btn" 
+                    data-action="click->chart-switcher#switch" 
+                    data-view-name="overview" 
+                    data-title="Yearly Overview"
+                    data-bs-toggle="tooltip" 
+                    title="Overview">
+              <i class="bi bi-pie-chart-fill"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" 
+                    data-chart-switcher-target="btn" 
+                    data-action="click->chart-switcher#switch" 
+                    data-view-name="income" 
+                    data-title="Income By Category"
+                    data-bs-toggle="tooltip" 
+                    title="Income Breakdown">
+              <i class="bi bi-wallet2"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" 
+                    data-chart-switcher-target="btn" 
+                    data-action="click->chart-switcher#switch" 
+                    data-view-name="expenses" 
+                    data-title="Expenses By Category"
+                    data-bs-toggle="tooltip" 
+                    title="Expenses Breakdown">
+              <i class="bi bi-cart4"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" 
+                    data-chart-switcher-target="btn" 
+                    data-action="click->chart-switcher#switch" 
+                    data-view-name="savings" 
+                    data-title="Savings By Category"
+                    data-bs-toggle="tooltip" 
+                    title="Savings Breakdown">
+              <i class="bi bi-piggy-bank-fill"></i>
+            </button>
+          </div>
         </div>
         <div class="card-body" style="height: 300px;">
-          <canvas
-            data-controller="charts"
-            data-charts-type-value="bar"
-            data-charts-data-value="<%= @income_expense_savings_data.to_json %>"
-            data-charts-options-value="<%= {
-              plugins: { legend: { position: 'bottom' } },
-              scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
-              maintainAspectRatio: false
-            }.to_json %>"
-          ></canvas>
+          <!-- Overview Chart -->
+          <div data-chart-switcher-target="view" data-view-name="overview" style="position: relative; height: 100%; width: 100%;">
+            <canvas
+              data-controller="charts"
+              data-charts-type-value="doughnut"
+              data-charts-data-value="<%= @overview_chart_data.to_json %>"
+              data-charts-options-value="<%= {
+                plugins: { legend: { position: 'bottom' } },
+                maintainAspectRatio: false,
+                cutout: '80%'
+              }.to_json %>"
+            ></canvas>
+            <div class="text-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none;">
+              <h5 class="m-0 text-muted">Net Total</h5>
+              <div class="fw-bold <%= @yearly_net_total >= 0 ? 'text-success' : 'text-danger' %>" style="font-size: 1.3rem;">
+                <%= number_to_currency(@yearly_net_total) %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Income Chart -->
+          <div data-chart-switcher-target="view" data-view-name="income" class="d-none" style="height: 100%; width: 100%;">
+             <canvas
+              data-controller="charts"
+              data-charts-type-value="bar"
+              data-charts-data-value="<%= @income_by_category_data.to_json %>"
+              data-charts-options-value="<%= {
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } }
+              }.to_json %>"
+            ></canvas>
+          </div>
+
+          <!-- Expenses Chart -->
+          <div data-chart-switcher-target="view" data-view-name="expenses" class="d-none" style="height: 100%; width: 100%;">
+             <canvas
+              data-controller="charts"
+              data-charts-type-value="bar"
+              data-charts-data-value="<%= @expenses_by_category_data.to_json %>"
+              data-charts-options-value="<%= {
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } }
+              }.to_json %>"
+            ></canvas>
+          </div>
+
+          <!-- Savings Chart -->
+          <div data-chart-switcher-target="view" data-view-name="savings" class="d-none" style="height: 100%; width: 100%;">
+             <canvas
+              data-controller="charts"
+              data-charts-type-value="bar"
+              data-charts-data-value="<%= @savings_by_category_data.to_json %>"
+              data-charts-options-value="<%= {
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                maintainAspectRatio: false,
+                scales: { x: { beginAtZero: true } }
+              }.to_json %>"
+            ></canvas>
+          </div>
         </div>
       </div>
     </div>
     <div class="col-md-8">
       <div class="card h-100">
         <div class="card-header">
-          Monthly Income vs Expenses
+          <h5 class="card-title m-0">Monthly Breakdown</h5>
         </div>
         <div class="card-body" style="height: 300px;">
           <canvas
             data-controller="charts"
-            data-charts-type-value="bar"
-            data-charts-data-value="<%= @monthly_income_expense_data.to_json %>"
+            data-charts-type-value="line"
+            data-charts-data-value="<%= @monthly_breakdown_data.to_json %>"
             data-charts-options-value="<%= {
+              responsive: true,
+              maintainAspectRatio: false,
               scales: { y: { beginAtZero: true } },
-              maintainAspectRatio: false
+              interaction: {
+                mode: 'index',
+                intersect: false,
+              },
+              plugins: {
+                tooltip: {
+                  enabled: true
+                }
+              }
             }.to_json %>"
           ></canvas>
         </div>
@@ -102,8 +204,8 @@
       </thead>
       <tbody>
         <!-- Income -->
-        <tr class="highlight">
-          <td colspan="15"><h3 class="m-0">Income</h3></td>
+        <tr class="table-light no-hover-highlight">
+          <td colspan="15" class="fw-bold text-uppercase text-muted ps-3">Income</td>
         </tr>
         <!-- Income Rows -->
         <% @category_data.each do |category_id, category_hash| %>
@@ -136,8 +238,8 @@
           <!-- Subcategory Rows -->
           <% category_hash[:subcategories].each do |sub_hash| %>
             <tr class="subcategory-row hidden-row" data-parent-id="<%= category_hash[:category].id %>">
-              <td class="pl-4">
-                <i class="bi bi-arrow-right"></i> <%= sub_hash[:category].name %>
+              <td class="pl-4 text-muted">
+                <i class="bi bi-arrow-return-right me-2"></i> <%= sub_hash[:category].name %>
               </td>
               <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
               <% (1..12).each do |month| %>
@@ -157,8 +259,8 @@
         <% end %>
 
         <!-- Expenses -->
-        <tr class="highlight">
-          <td colspan="15"><h3 class="m-0">Expenses</h3></td>
+        <tr class="table-light no-hover-highlight">
+          <td colspan="15" class="fw-bold text-uppercase text-muted ps-3">Expenses</td>
         </tr>
         <!-- Expense Rows -->
         <% @category_data.each do |category_id, category_hash| %>
@@ -191,8 +293,8 @@
           <!-- Subcategory Rows -->
           <% category_hash[:subcategories].each do |sub_hash| %>
             <tr class="subcategory-row hidden-row" data-parent-id="<%= category_hash[:category].id %>">
-              <td class="pl-4">
-                <i class="bi bi-arrow-right"></i> <%= sub_hash[:category].name %>
+              <td class="pl-4 text-muted">
+                <i class="bi bi-arrow-return-right me-2"></i> <%= sub_hash[:category].name %>
               </td>
               <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
               <% (1..12).each do |month| %>
@@ -211,8 +313,8 @@
           <% end %>
         <% end %>
         <!-- Savings -->
-        <tr class="highlight">
-          <td colspan="15"><h3 class="m-0">Savings</h3></td>
+        <tr class="table-light no-hover-highlight">
+          <td colspan="15" class="fw-bold text-uppercase text-muted ps-3">Savings</td>
         </tr>
         <!-- Savings Rows -->
         <% @category_data.each do |category_id, category_hash| %>
@@ -245,8 +347,8 @@
           <!-- Subcategory Rows -->
           <% category_hash[:subcategories].each do |sub_hash| %>
             <tr class="subcategory-row hidden-row" data-parent-id="<%= category_hash[:category].id %>">
-              <td class="pl-4">
-                <i class="bi bi-arrow-right"></i> <%= sub_hash[:category].name %>
+              <td class="pl-4 text-muted">
+                <i class="bi bi-arrow-return-right me-2"></i> <%= sub_hash[:category].name %>
               </td>
               <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
               <% (1..12).each do |month| %>

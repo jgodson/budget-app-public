@@ -1,3 +1,10 @@
+## Sync - 2025-12-25 15:18:28
+
+- beaa3ef style tweaks for headers, categories, subcategories and in-table headers
+- d7da702 monthly overview revamp
+- 5f28191 Improve second 'monthly breakdown' chart
+- 777fe12 Improve first 'yearly overview' chart
+
 ## Sync - 2025-12-24 21:10:25
 
 - b0de0ff switch to bootstrap.min.js bundle

@@ -1,6 +1,6 @@
 <div class="container mb-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Categories</h1>
+    <h2>Categories</h2>
     <%= link_to 'Add New Category', new_category_path, class: 'btn btn-primary' %>
   </div>
 
@@ -15,14 +15,12 @@
           <% if @categories.select { |category| category.category_type == type }.empty? %>
             <% next %>
           <% end %>
-          <tr class="highlight"><td colspan="2"><h3 class="m-0"><%= type.capitalize %> Categories</td></tr>
-          <tr class="highlight">
-            <td><strong>Name</strong></td>
-            <td><strong>Actions</strong></td>
+          <tr class="table-light no-hover-highlight">
+            <td colspan="2" class="fw-bold text-uppercase text-muted ps-3"><%= type.capitalize %> Categories</td>
           </tr>
           <% @categories.select { |category| category.category_type == type }.each do |category| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= category_path(category) %>" data-action="click->clickable-row#click" class="clickable-row" style="cursor: pointer;">
-              <td><i class="bi bi-dot"></i><%= category.name %></td>
+              <td><%= category.name %></td>
               <td class="no-row-click">
                 <%= link_to edit_category_path(category), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                   <i class="bi bi-pencil"></i>
@@ -34,8 +32,8 @@
             </tr>
             <% category.subcategories.each do |subcategory| %>
               <tr data-controller="clickable-row" data-clickable-row-url-value="<%= category_path(subcategory) %>" data-action="click->clickable-row#click" class="clickable-row" style="cursor: pointer;">
-                <td class="pl-4">
-                  <i class="bi bi-arrow-right"></i> <%= subcategory.name %>
+                <td class="pl-4 text-muted">
+                  <i class="bi bi-arrow-return-right me-2"></i> <%= subcategory.name %>
                 </td>
                 <td class="no-row-click">
                   <%= link_to edit_category_path(subcategory), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>

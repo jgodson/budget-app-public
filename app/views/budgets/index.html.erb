@@ -1,6 +1,6 @@
 <div class="container-fluid mb-4">
   <div class="d-flex align-items-center mb-4">
-    <h1>Budgets</h1>
+    <h2>Budgets</h2>
     <% if @available_years.present? %>
       <%= form_with url: budgets_path, method: :get, local: true, class: "m-0 ps-2" do %>
           <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select fs-3", onchange: "this.form.submit();" %>
@@ -27,21 +27,21 @@
           <% savings_categories = @categories.select { |c| c.category_type == 'savings' && c.parent_category.nil? } %>
 
           <% if income_categories.any? %>
-            <tr class="highlight">
-              <td colspan="14"><h3 class="m-0">Income</h3></td>
+            <tr class="table-light no-hover-highlight">
+              <td colspan="14" class="fw-bold text-uppercase text-muted ps-3">Income</td>
             </tr>
             <tr class="highlight">
               <td class="text-center"><strong>Category</strong></td>
               <% (1..12).each do |month| %>
                 <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
               <% end %>
-              <td><strong>Actions</strong></td>
+              <td class="text-center"><strong>Actions</strong></td>
             </tr>
             <% income_categories.each do |category| %>
               <tr>
                 <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
                 <td <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
-                  <i class="bi bi-dot"></i> <%= category.name %>
+                  <%= category.name %>
                 </td>
                 <% (1..12).each do |month_index| %>
                   <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
@@ -81,8 +81,8 @@
               <% category.subcategories.each do |subcategory| %>
                 <tr>
                   <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
-                  <td class="pl-4" <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
-                    <i class="bi bi-arrow-right"></i> <%= subcategory.name %>
+                  <td class="pl-4 text-muted" <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
+                    <i class="bi bi-arrow-return-right me-2"></i> <%= subcategory.name %>
                   </td>
                   <% (1..12).each do |month_index| %>
                     <% monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
@@ -122,21 +122,21 @@
           <% end %>
 
           <% if expense_categories.any? %>
-            <tr class="highlight">
-              <td colspan="14"><h3 class="m-0">Expenses</h3></td>
+            <tr class="table-light no-hover-highlight">
+              <td colspan="14" class="fw-bold text-uppercase text-muted ps-3">Expenses</td>
             </tr>
             <tr class="highlight">
               <td class="text-center"><strong>Category</strong></td>
               <% (1..12).each do |month| %>
                 <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
               <% end %>
-              <td><strong>Actions</strong></td>
+              <td class="text-center"><strong>Actions</strong></td>
             </tr>
             <% expense_categories.each do |category| %>
               <tr>
                 <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
                 <td <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
-                  <i class="bi bi-dot"></i> <%= category.name %>
+                  <%= category.name %>
                 </td>
                 <% (1..12).each do |month_index| %>
                   <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
@@ -176,8 +176,8 @@
               <% category.subcategories.each do |subcategory| %>
                 <tr>
                   <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
-                  <td class="pl-4" <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
-                    <i class="bi bi-arrow-right"></i> <%= subcategory.name %>
+                  <td class="pl-4 text-muted" <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
+                    <i class="bi bi-arrow-return-right me-2"></i> <%= subcategory.name %>
                   </td>
                   <% (1..12).each do |month_index| %>
                     <% monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
@@ -217,21 +217,21 @@
           <% end %>
 
           <% if savings_categories.any? %>
-            <tr class="highlight">
-              <td colspan="14"><h3 class="m-0">Savings</h3></td>
+            <tr class="table-light no-hover-highlight">
+              <td colspan="14" class="fw-bold text-uppercase text-muted ps-3">Savings</td>
             </tr>
             <tr class="highlight">
               <td class="text-center"><strong>Category</strong></td>
               <% (1..12).each do |month| %>
                 <td class="text-center"><strong><%= Date::MONTHNAMES[month] %></strong></td>
               <% end %>
-              <td><strong>Actions</strong></td>
+              <td class="text-center"><strong>Actions</strong></td>
             </tr>
             <% savings_categories.each do |category| %>
               <tr>
                 <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
                 <td <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
-                  <i class="bi bi-dot"></i> <%= category.name %>
+                  <%= category.name %>
                 </td>
                 <% (1..12).each do |month_index| %>
                   <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
@@ -271,8 +271,8 @@
               <% category.subcategories.each do |subcategory| %>
                 <tr>
                   <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
-                  <td class="pl-4" <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
-                    <i class="bi bi-arrow-right"></i> <%= subcategory.name %>
+                  <td class="pl-4 text-muted" <% if yearly_budget %>data-controller="clickable-row" data-clickable-row-url-value="<%= budget_path(yearly_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;"<% end %>>
+                    <i class="bi bi-arrow-return-right me-2"></i> <%= subcategory.name %>
                   </td>
                   <% (1..12).each do |month_index| %>
                     <% monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>

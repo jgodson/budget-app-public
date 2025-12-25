@@ -1,6 +1,6 @@
 <div class="container<%= dashboard ? "-fluid" : "" %> mb-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Loans</h1>
+    <h2>Loans</h2>
     <% unless dashboard %>
       <%= link_to 'Add New Loan', new_loan_path, class: 'btn btn-primary' %>
     <% end %>
@@ -22,7 +22,7 @@
           <th>Total Paid</th>
           <th>Principal Paid</th>
           <th>Interest Paid</th>
-          <th>Actions</th>
+          <th class="text-center">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -72,7 +72,7 @@
         <% end %>
 
         <% if @paid_off_loans.any? %>
-          <tr class="highlight"><td colspan="7"><strong>Paid off Loans</strong></td></tr>
+          <tr class="table-light no-hover-highlight"><td colspan="7" class="fw-bold text-uppercase text-muted ps-3">Paid off Loans</td></tr>
           <% @paid_off_loans.each do |loan| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= loan_path(loan) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>

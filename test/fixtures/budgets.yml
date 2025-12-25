@@ -1,0 +1,4 @@
+budget_one:
+  category: expense
+  year: <%= Date.today.year %>
+  budgeted_amount: 100000
