@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 18:15:41
+
+- 868233d try to make popper work in production
+
 ## Sync - 2025-12-24 17:25:43
 
 - ea13223 fix css loading again. better clickable budget cells
