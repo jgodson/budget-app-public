@@ -1,3 +1,9 @@
+## Sync - 2025-12-24 17:25:43
+
+- ea13223 fix css loading again. better clickable budget cells
+- dc04009 make rows clickable, fix popper.js issues
+- 1cf45bd fix badges not centered
+
 ## Sync - 2025-12-24 13:15:38
 
 - 097c24e fix application controller import

@@ -1,0 +1,124 @@
+// Base Styles
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: rgb(252, 252, 252);
+  color: #000000;
+}
+
+.card {
+  background-color: #f3f3f3;
+  color: #000000;
+}
+
+.table {
+  background-color: #f3f3f3;
+  color: #000000;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table thead {
+  background-color: #f8f9fa;
+  color: #000000;
+}
+
+.dropdown-menu {
+  background-color: #f3f3f3;
+  color: #000000;
+}
+
+.bg-light {
+  background-color: rgb(242, 242, 242) !important;
+}
+
+.navbar {
+  background-color: #b5b5b5;
+}
+
+.highlight td {
+  background-color: rgb(242, 242, 242);
+}
+
+.highlight.parent-group td {
+  background-color: rgb(212, 243, 255);
+}
+
+// Dark Theme Styles
+[data-bs-theme="dark"] {
+  body {
+    background-color: #121212;
+    color: #f3f3f3;
+  }
+
+  .navbar {
+    background-color: #333333;
+  }
+
+  .card {
+    background-color: #1e1e1e;
+    color: #f3f3f3;
+  }
+
+  .dropdown-menu {
+    background-color: #333333;
+    color: #f3f3f3;
+  }
+
+  .bg-light {
+    background-color: rgb(45, 48, 52) !important;
+  }
+
+  .highlight td {
+    background-color: rgb(45, 48, 52);
+  }
+
+  .highlight.parent-group td {
+    background-color: rgb(48, 85, 100);
+  }
+}
+
+.horizontal-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.pl-4 {
+  padding-left: 1.5rem !important;
+}
+
+.horizontal-scroll table {
+  width: 100%;
+  min-width: 1200px;
+}
+
+.bi-arrow-right {
+  margin-right: 0.5rem;
+}
+
+.horizontal-scroll th, .horizontal-scroll td {
+  white-space: nowrap;
+}
+.hidden-row {
+  display: none;
+}
+
+.toggle-subcategories {
+  cursor: pointer;
+}
+
+// Fix for Bootstrap Tooltips visibility
+.tooltip {
+  z-index: 100000 !important;
+}
+
+.tooltip.show {
+  opacity: 1 !important;
+}
+
+// Fix for Badge vertical alignment
+.badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+}

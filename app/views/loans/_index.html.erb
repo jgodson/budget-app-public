@@ -29,7 +29,7 @@
         <% if @active_loans.any? %>
           <tr class="highlight"><td colspan="7"><strong>Active Loans</strong></td></tr>
           <% @active_loans.each do |loan| %>
-            <tr>
+            <tr data-controller="clickable-row" data-clickable-row-url-value="<%= loan_path(loan) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
                 <div class="d-flex justify-content-between">
                   <%= loan.loan_name %>
@@ -49,10 +49,7 @@
               <td><%= number_to_currency(loan.total_paid_dollars) %></td>
               <td><%= number_to_currency(loan.total_principal_paid_dollars) %></td>
               <td><%= number_to_currency(loan.total_interest_paid_dollars) %></td>
-              <td>
-                <%= link_to loan_path(loan), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
-                  <i class="bi bi-eye"></i>
-                <% end %>
+              <td class="no-row-click">
                 <%= link_to edit_loan_path(loan), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                   <i class="bi bi-pencil"></i>
                 <% end %>
@@ -77,7 +74,7 @@
         <% if @paid_off_loans.any? %>
           <tr class="highlight"><td colspan="7"><strong>Paid off Loans</strong></td></tr>
           <% @paid_off_loans.each do |loan| %>
-            <tr>
+            <tr data-controller="clickable-row" data-clickable-row-url-value="<%= loan_path(loan) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
                 <div class="d-flex justify-content-between">
                   <%= loan.loan_name %>
@@ -95,10 +92,7 @@
               <td><%= number_to_currency(loan.total_paid_dollars) %></td>
               <td><%= number_to_currency(loan.total_principal_paid_dollars) %></td>
               <td><%= number_to_currency(loan.total_interest_paid_dollars) %></td>
-              <td>
-                <%= link_to loan_path(loan), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
-                  <i class="bi bi-eye"></i>
-                <% end %>
+              <td class="no-row-click">
                 <%= link_to edit_loan_path(loan), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                   <i class="bi bi-pencil"></i>
                 <% end %>

@@ -22,6 +22,8 @@ setup:
 # Start the application
 start:
 	@echo "Using container engine: $(DOCKER_CMD)"
+	@echo "Cleaning up precompiled assets..."
+	@bin/rails assets:clobber
 	@echo "Starting database..."
 	@$(DOCKER_CMD) compose up -d
 	@echo "Starting Rails server..."

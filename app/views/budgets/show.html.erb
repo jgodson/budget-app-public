@@ -17,6 +17,10 @@
             </p>
           <% end %>
           <p>
+            <strong>Category:</strong>
+            <%= @budget.category.name %>
+          </p>
+          <p>
             <strong>Budgeted Amount:</strong>
             <%= number_to_currency(@budget.budgeted_amount / 100.0) %>
           </p>

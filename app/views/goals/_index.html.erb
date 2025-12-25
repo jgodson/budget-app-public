@@ -26,7 +26,7 @@
         <% if @active_goals.any? %>
           <tr class="highlight"><td colspan="6"><strong>Active Goals</strong></td></tr>
           <% @active_goals.each do |goal| %>
-            <tr>
+            <tr data-controller="clickable-row" data-clickable-row-url-value="<%= goal_path(goal) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
                 <div class="d-flex justify-content-between">
                   <%= goal.goal_name %>
@@ -39,14 +39,11 @@
                   <% end %>
                 </div>
               </td>
-              <td><%= link_to goal.category.name, category_path(goal.category) %></td>
+              <td class="no-row-click"><%= link_to goal.category.name, category_path(goal.category) %></td>
               <td><%= number_to_currency(goal.amount_dollars) %></td>
               <td><%= number_to_currency(goal.total_contributed_dollars) %></td>
               <td><%= number_to_currency(goal.amount_left_dollars) %></td>
-              <td>
-                <%= link_to goal_path(goal), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
-                  <i class="bi bi-eye"></i>
-                <% end %>
+              <td class="no-row-click">
                 <%= link_to edit_goal_path(goal), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                   <i class="bi bi-pencil"></i>
                 <% end %>
@@ -64,7 +61,7 @@
         <% if @archived_goals.any? %>
           <tr class="highlight"><td colspan="6"><strong>Archived Goals</strong></td></tr>
           <% @archived_goals.each do |goal| %>
-            <tr>
+            <tr data-controller="clickable-row" data-clickable-row-url-value="<%= goal_path(goal) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
                 <div class="d-flex justify-content-between">
                   <%= goal.goal_name %>
@@ -73,14 +70,11 @@
                   </span>
                 </div>
               </td>
-              <td><%= link_to goal.category.name, category_path(goal.category) %></td>
+              <td class="no-row-click"><%= link_to goal.category.name, category_path(goal.category) %></td>
               <td><%= number_to_currency(goal.amount_dollars) %></td>
               <td><%= number_to_currency(goal.total_contributed_dollars) %></td>
               <td><%= number_to_currency(goal.amount_left_dollars) %></td>
-              <td>
-                <%= link_to goal_path(goal), class: 'btn btn-info btn-sm', title: 'Details', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
-                  <i class="bi bi-eye"></i>
-                <% end %>
+              <td class="no-row-click">
                 <%= link_to edit_goal_path(goal), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                   <i class="bi bi-pencil"></i>
                 <% end %>
