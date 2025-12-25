@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 18:56:49
+
+- 493567c no, actually fix the assets
+
 ## Sync - 2025-12-24 18:15:41
 
 - 868233d try to make popper work in production
