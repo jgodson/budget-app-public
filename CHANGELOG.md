@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 19:37:07
+
+- 7435327 load popper before bootstrap
+
 ## Sync - 2025-12-24 19:18:57
 
 - cf99717 no, actually fix the assets v2
