@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 19:18:57
+
+- cf99717 no, actually fix the assets v2
+
 ## Sync - 2025-12-24 18:56:49
 
 - 493567c no, actually fix the assets
