@@ -6,7 +6,7 @@
 //= link_tree ../../javascript .js
 //= link_tree ../../../vendor/javascript .js
 //= link flatpickr/dist/flatpickr.min.js
-//= link bootstrap/dist/js/bootstrap.esm.js
+//= link bootstrap/dist/js/bootstrap.bundle.min.js
 //= link @popperjs/core/dist/esm/popper.js
 //= link chart.js/dist/chart.umd.js
 //= link @kurkle/color/dist/color.esm.js

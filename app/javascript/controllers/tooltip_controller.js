@@ -1,9 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
-import { Tooltip } from "bootstrap"
 
 export default class extends Controller {
   connect() {
-    this.tooltip = new Tooltip(this.element, {
+    this.tooltip = new window.bootstrap.Tooltip(this.element, {
       container: 'body',
       trigger: 'hover focus' // Explicitly set trigger
     })

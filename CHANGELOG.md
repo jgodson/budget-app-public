@@ -1,3 +1,7 @@
+## Sync - 2025-12-24 21:10:25
+
+- b0de0ff switch to bootstrap.min.js bundle
+
 ## Sync - 2025-12-24 19:37:07
 
 - 7435327 load popper before bootstrap
