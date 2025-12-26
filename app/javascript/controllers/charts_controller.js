@@ -61,7 +61,7 @@ export default class extends Controller {
             label: function(context) {
               let label = context.dataset.label || '';
               if (label) { label += ': '; }
-              let value = context.parsed.y !== undefined && context.parsed.y !== null ? context.parsed.y : (context.parsed.x !== undefined ? context.parsed.x : context.parsed);
+              let value = context.raw;
               label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
               return label;
             }

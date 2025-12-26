@@ -17,4 +17,4 @@ The transaction pattern files (`lib/shared/transaction_category_patterns.rb` and
 **Original Repository:**
 This public version is automatically generated from a private repository to ensure no personal financial data is exposed.
 
-**Last Sync:** 2025-12-25 18:56:19
+**Last Sync:** 2025-12-26 08:15:07

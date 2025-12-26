@@ -1,3 +1,7 @@
+## Sync - 2025-12-26 08:15:07
+
+- b8fd47a Fix incorrect chart tooltip values by using raw data context
+
 ## Sync - 2025-12-25 18:56:19
 
 - 004e78c more style tweaks and dark mode fixes
