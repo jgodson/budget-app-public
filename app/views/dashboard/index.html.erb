@@ -1,19 +1,32 @@
-<div class="container-fluid mb-4">
-  <div class="d-flex align-items-center mb-4">
-    <h2 class="m-0">Overview</h2>
-    <% if @available_years.present? %>
-      <%= form_with url: dashboard_path, method: :get, local: true, class: "m-0 ps-2" do %>
-          <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select fs-3", onchange: "this.form.submit();" %>
+<div class="mb-4">
+  <!-- Header & Navigation -->
+  <div class="d-flex justify-content-center align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <% if @prev_year_valid %>
+        <%= link_to root_path(year: @selected_year - 1), id: 'prev-year-link', class: 'btn btn-outline-secondary me-3' do %>
+          <i class="bi bi-chevron-left"></i>
+        <% end %>
+      <% else %>
+        <button class="btn btn-outline-secondary me-3" disabled id="prev-year-disabled" onclick="triggerShake()"><i class="bi bi-chevron-left"></i></button>
       <% end %>
-    <% end %>
-    <%= link_to 'View Monthly Overview', monthly_overview_path(year: @selected_year), class: 'btn btn-secondary ms-auto' %>
+      
+      <h3 class="m-0" style="min-width: 150px; text-align: center; display: inline-block;"><%= @selected_year %></h3>
+      
+      <% if @next_year_valid %>
+        <%= link_to root_path(year: @selected_year + 1), id: 'next-year-link', class: 'btn btn-outline-secondary ms-3' do %>
+          <i class="bi bi-chevron-right"></i>
+        <% end %>
+      <% else %>
+        <button class="btn btn-outline-secondary ms-3" disabled id="next-year-disabled" onclick="triggerShake()"><i class="bi bi-chevron-right"></i></button>
+      <% end %>
+    </div>
   </div>
 
   <!-- Charts Section -->
   <div class="row mb-4">
 
 
-    <div class="col-md-4">
+    <div class="col-xl-4 mb-4 mb-xl-0">
       <div class="card h-100" data-controller="chart-switcher">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="card-title m-0" data-chart-switcher-target="title">Yearly Overview</h5>
@@ -63,18 +76,15 @@
               data-controller="charts"
               data-charts-type-value="doughnut"
               data-charts-data-value="<%= @overview_chart_data.to_json %>"
+              data-charts-center-label-value="Net Total"
+              data-charts-center-text-value="<%= number_to_currency(@yearly_net_total) %>"
+              data-charts-center-color-value="<%= @yearly_net_total >= 0 ? '#198754' : '#dc3545' %>"
               data-charts-options-value="<%= {
                 plugins: { legend: { position: 'bottom' } },
                 maintainAspectRatio: false,
                 cutout: '80%'
               }.to_json %>"
             ></canvas>
-            <div class="text-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); pointer-events: none;">
-              <h5 class="m-0 text-muted">Net Total</h5>
-              <div class="fw-bold <%= @yearly_net_total >= 0 ? 'text-success' : 'text-danger' %>" style="font-size: 1.3rem;">
-                <%= number_to_currency(@yearly_net_total) %>
-              </div>
-            </div>
           </div>
           
           <!-- Income Chart -->
@@ -124,7 +134,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-xl-8">
       <div class="card h-100">
         <div class="card-header">
           <h5 class="card-title m-0">Monthly Breakdown</h5>
@@ -154,8 +164,13 @@
     </div>
   </div>
 
-  <div class="horizontal-scroll">
-    <table class="table table-bordered table-hover">
+  <div class="card shadow-sm mb-4">
+    <div class="card-header">
+      <h5 class="card-title m-0">Yearly Category Breakdown</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="horizontal-scroll">
+        <table class="table table-bordered table-hover align-middle mb-0">
       <thead>
         <tr>
           <th>
@@ -432,8 +447,65 @@
       </tfoot>
     </table>
   </div>
+  </div>
+  </div>
 
     <%= render 'loans/index', loans: @loans, active_loans: @active_loans, paid_off_loans: @paid_off_loans, dashboard: true %>
     <%= render 'goals/index', goals: @goals, dashboard: true %>
+  </div>
+  </div>
+  </div>
+
+  <script>
+    function triggerShake() {
+      const mainContent = document.querySelector('main') || document.body;
+      mainContent.classList.add('shake');
+      setTimeout(() => {
+        mainContent.classList.remove('shake');
+      }, 300);
+    }
+
+    if (typeof window.lastYearNavTime === 'undefined') {
+      window.lastYearNavTime = 0;
+    }
+
+    window.handleYearNavKeydown = function(event) {
+      if (event.repeat) return;
+
+      const now = Date.now();
+      if (now - window.lastYearNavTime < 500) return; 
+
+      if (event.key === 'ArrowLeft') {
+        const link = document.getElementById('prev-year-link');
+        const disabled = document.getElementById('prev-year-disabled');
+        if (link) {
+          window.lastYearNavTime = now;
+          if (window.Turbo) {
+            window.Turbo.visit(link.href);
+          } else {
+            link.click();
+          }
+        } else if (disabled) {
+          triggerShake();
+        }
+      } else if (event.key === 'ArrowRight') {
+        const link = document.getElementById('next-year-link');
+        const disabled = document.getElementById('next-year-disabled');
+        if (link) {
+          window.lastYearNavTime = now;
+          if (window.Turbo) {
+            window.Turbo.visit(link.href);
+          } else {
+            link.click();
+          }
+        } else if (disabled) {
+          triggerShake();
+        }
+      }
+    };
+
+    document.removeEventListener('keydown', window.handleYearNavKeydown);
+    document.addEventListener('keydown', window.handleYearNavKeydown);
+  </script>
 </div>
 

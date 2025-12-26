@@ -1,17 +1,19 @@
-<div class="container<%= dashboard ? "-fluid" : "" %> mb-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Goals</h2>
-    <% unless dashboard %>
-      <%= link_to 'Add New Goal', new_goal_path, class: 'btn btn-primary' %>
-    <% end %>
-  </div>
-
-  <% if @goals.empty? %>
-    <div id="empty-state" class="text-center mt-4">
-      <h3>No goals found</h3>
+<div class="mb-4">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title m-0">Goals</h5>
+      <% unless dashboard %>
+        <%= link_to 'Add New Goal', new_goal_path, class: 'btn btn-primary btn-sm' %>
+      <% end %>
     </div>
-  <% else %>
-    <table class="table table-bordered table-hover mt-4 align-middle">
+    <div class="card-body">
+      <% if @goals.empty? %>
+        <div id="empty-state" class="text-center py-5">
+          <h3 class="text-muted">No goals found</h3>
+        </div>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle mb-0">
       <thead>
         <tr class="text-center">
           <th>Goal Name</th>
@@ -87,5 +89,8 @@
         <% end %>
       </tbody>
     </table>
+    </div>
   <% end %>
+    </div>
+  </div>
 </div>

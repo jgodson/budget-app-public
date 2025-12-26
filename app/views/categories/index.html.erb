@@ -1,15 +1,18 @@
-<div class="container mb-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Categories</h2>
-    <%= link_to 'Add New Category', new_category_path, class: 'btn btn-primary' %>
-  </div>
-
-  <% if @categories.empty? %>
-    <div class="text-center mt-4">
-      <h3>No categories found</h3>
+<div class="mb-4">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title m-0">Categories</h5>
+      <%= link_to 'Add New Category', new_category_path, class: 'btn btn-primary btn-sm' %>
     </div>
-  <% else %>
-    <table class="table table-bordered table-hover mt-4 align-middle">
+    <div class="card-body">
+      <% if @categories.empty? %>
+        <div class="text-center py-5">
+          <h3 class="text-muted">No categories found</h3>
+        </div>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle mb-0">
+
       <tbody>
         <% CategoryTypes::CATEGORY_TYPES.keys.map(&:to_s).each do |type| %>
           <% if @categories.select { |category| category.category_type == type }.empty? %>
@@ -49,5 +52,8 @@
         <% end %>
       </tbody>
     </table>
+    </div>
   <% end %>
+    </div>
+  </div>
 </div>

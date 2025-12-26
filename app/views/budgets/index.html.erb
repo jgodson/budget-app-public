@@ -1,25 +1,21 @@
-<div class="container-fluid mb-4">
-  <div class="d-flex align-items-center mb-4">
-    <h2>Budgets</h2>
-    <% if @available_years.present? %>
-      <%= form_with url: budgets_path, method: :get, local: true, class: "m-0 ps-2" do %>
-          <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select fs-3", onchange: "this.form.submit();" %>
-      <% end %>
-    <% end %>
-    <div class="dropdown ms-auto">
-      <button class="btn btn-primary dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        Actions
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
-        <li><%= link_to "Add Budget", new_budget_path(year: @selected_year), class: "dropdown-item" %></li>
-        <li><%= link_to "Import Budgets", import_form_budgets_path, class: "dropdown-item" %></li>
-        <li><%= button_to "Copy Yearly Budgets to #{@next_year}", copy_yearly_budgets_budgets_path(year: @selected_year), method: :post, class: "dropdown-item", data: { confirm: "Are you sure you want to copy all yearly budgets to #{@next_year}?" } %></li>
-      </ul>
+<div class="mb-4">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title m-0">Budgets</h5>
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          Actions
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
+          <li><%= link_to "Add Budget", new_budget_path(year: @selected_year), class: "dropdown-item" %></li>
+          <li><%= link_to "Import Budgets", import_form_budgets_path, class: "dropdown-item" %></li>
+          <li><%= button_to "Copy Yearly Budgets to #{@next_year}", copy_yearly_budgets_budgets_path(year: @selected_year), method: :post, class: "dropdown-item", data: { confirm: "Are you sure you want to copy all yearly budgets to #{@next_year}?" } %></li>
+        </ul>
+      </div>
     </div>
-  </div>
-
-  <% if @budgets.present? %>
-    <div class="horizontal-scroll">
+    <div class="card-body p-0">
+      <% if @budgets.present? %>
+        <div class="horizontal-scroll">
       <table class="table table-bordered table-hover align-middle">
         <tbody>
           <% income_categories = @categories.select { |c| c.category_type == 'income' && c.parent_category.nil? } %>
@@ -312,11 +308,13 @@
           <% end %>
         </tbody>
       </table>
+        </div>
+      <% else %>
+        <div class="text-center py-5">
+          <h3 class="text-muted">No budgets found</h3>
+          <p class="text-muted">Try adding new budgets or importing them.</p>
+        </div>
+      <% end %>
     </div>
-  <% else %>
-    <div class="text-center mt-4">
-      <h3>No budgets found</h3>
-      <p>Try adjusting your filters or adding new budgets.</p>
-    </div>
-  <% end %>
+  </div>
 </div>

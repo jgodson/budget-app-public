@@ -12,59 +12,19 @@
 
   <%= stylesheet_link_tag "flatpickr/dist/themes/dark.css", id: "flatpickr-dark-theme", disabled: true %>
 
-  <body class="d-flex flex-column min-vh-100" data-controller="theme">
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg">
-      <div class="container">
-        <a class="navbar-brand" href="<%= root_path %>">
-          <h3>Budget App</h3>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link <%= "active" if current_page?(root_path) %>" href="<%= root_path %>">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <%= "active" if current_page?(budgets_path) %>" href="<%= budgets_path %>">Budgets</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <%= "active" if current_page?(transactions_path) %>" href="<%= transactions_path %>">Transactions</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <%= "active" if current_page?(loans_path) %>" href="<%= loans_path %>">Loans</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <%= "active" if current_page?(goals_path) %>" href="<%= goals_path %>">Goals</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link <%= "active" if current_page?(categories_path) %>" href="<%= categories_path %>">Categories</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="themeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-gear"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdown">
-                <li><a class="dropdown-item" href="#" data-action="click->theme#toggle">Toggle Light/Dark Mode</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>  
+  <body class="d-flex min-vh-100" data-controller="theme">
+    <%= render 'layouts/sidebar' %>
 
-    <!-- Flash Messages -->
-    <%= render 'layouts/flash_messages' %>
+    <main class="flex-grow-1 overflow-auto" style="height: 100vh; margin-left: 280px;">
+      <div class="container-fluid p-4">
+        <!-- Flash Messages -->
+        <%= render 'layouts/flash_messages' %>
 
-    <!-- Main Content -->
-    <div class="container-fluid mt-4">
         <!-- Show Model Errors -->
         <%= render 'layouts/model_errors' %>
-      <%= yield %>
-    </div>
+        
+        <%= yield %>
+      </div>
+    </main>
   </body>
 </html>

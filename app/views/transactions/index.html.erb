@@ -1,44 +1,45 @@
-<div class="container mb-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Transactions</h2>
-    <div class="dropdown">
-      <button class="btn btn-primary dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        Actions
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
-        <li><%= link_to "Add Transaction", new_transaction_path, class: "dropdown-item" %></li>
-        <li><%= link_to "Import Transactions", import_form_transactions_path, class: "dropdown-item" %></li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <%= form_with url: transactions_path, method: :get, local: true do %>
-    <div class="row mb-3 justify-content-evenly">
-      <div class="col-md-2 pb-2">
-        <%= label_tag :year, "Select Year:" %>
-        <%= select_tag :year, options_for_select(@available_years, @selected_year.to_i), class: "form-select", onchange: "this.form.submit();" %>
-      </div>
-      <div class="col-md-3 pb-2">
-        <%= label_tag :month, "Select Month:" %>
-        <%= select_tag :month, options_for_select([['', '']] + Date::MONTHNAMES.compact.each_with_index.map { |name, index| [name, index + 1] }, @selected_month.to_i), class: "form-select", onchange: "this.form.submit();" %>
-      </div>
-      <div class="col-md-5 pb-2">
-        <%= label_tag :category, "Select Category:" %>
-        <%= select_tag :category, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @selected_category.to_i), class: "form-select", onchange: "this.form.submit();" %>
-      </div>
-      <div class="col-md-6 pb-2">
-        <%= label_tag :description, "Filter by Description:" %>
-        <%= text_field_tag :description, params[:description], class: "form-control", oninput: "filterDescription()", onkeydown: "if (event.key === 'Enter') event.preventDefault()" %>
-      </div>
-      <div class="col-md-4 pb-2">
-        <%= label_tag :group_by, "Group by:" %>
-        <%= select_tag :group_by, options_for_select(@group_by_options.map { |g| [g.titleize, g] }, @selected_group_by), class: "form-select", onchange: "this.form.submit();" %>
+<div class="mb-4">
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="card-title m-0">Transactions</h5>
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          Actions
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
+          <li><%= link_to "Add Transaction", new_transaction_path, class: "dropdown-item" %></li>
+          <li><%= link_to "Import Transactions", import_form_transactions_path, class: "dropdown-item" %></li>
+        </ul>
       </div>
     </div>
-  <% end %>
+    <div class="card-body">
+      <!-- Filters -->
+      <%= form_with url: transactions_path, method: :get, local: true do %>
+        <div class="row g-3">
+          <div class="col-lg-auto pb-2">
+            <%= label_tag :year, "Select Year:", class: "form-label" %>
+            <%= select_tag :year, options_for_select(@available_years, @selected_year.to_i), class: "form-select", onchange: "this.form.submit();" %>
+          </div>
+          <div class="col-lg-3 pb-2">
+            <%= label_tag :month, "Select Month:", class: "form-label" %>
+            <%= select_tag :month, options_for_select([['', '']] + Date::MONTHNAMES.compact.each_with_index.map { |name, index| [name, index + 1] }, @selected_month.to_i), class: "form-select", onchange: "this.form.submit();" %>
+          </div>
+          <div class="col-lg-3 pb-2">
+            <%= label_tag :category, "Select Category:", class: "form-label" %>
+            <%= select_tag :category, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @selected_category.to_i), class: "form-select", onchange: "this.form.submit();" %>
+          </div>
+          <div class="col-lg-3 pb-2">
+            <%= label_tag :group_by, "Group by:", class: "form-label" %>
+            <%= select_tag :group_by, options_for_select(@group_by_options.map { |g| [g.titleize, g] }, @selected_group_by), class: "form-select", onchange: "this.form.submit();" %>
+          </div>
+          <div class="col-12 pb-2">
+            <%= label_tag :description, "Filter by Description:", class: "form-label" %>
+            <%= text_field_tag :description, params[:description], class: "form-control", oninput: "filterDescription()", onkeydown: "if (event.key === 'Enter') event.preventDefault()" %>
+          </div>
+        </div>
+      <% end %>
 
-  <div class="table-responsive mt-4">
+      <div class="table-responsive mt-4">
     <table class="table table-bordered table-hover align-middle">
       <% @grouped_transactions.each do |date, transactions| %>
           <% header = @selected_group_by.include?('month') ? date.strftime("%B %Y") : "#{@selected_month.present? ? Date::MONTHNAMES[@selected_month] : ""} #{date}" %>
@@ -117,9 +118,11 @@
     </table>
   </div>
 
-  <div id="empty-state" class="text-center mt-4" style="<% if @transactions.present?%>display: none;<% end %>">
-    <h3>No transactions found</h3>
-    <p>Try adjusting your filters or adding new transactions.</p>
+      <div id="empty-state" class="text-center py-5" style="<% if @transactions.present?%>display: none;<% end %>">
+        <h3 class="text-muted">No transactions found</h3>
+        <p class="text-muted">Try adjusting your filters or adding new transactions.</p>
+      </div>
+    </div>
   </div>
 </div>
 

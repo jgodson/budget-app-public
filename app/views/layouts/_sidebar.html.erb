@@ -1,0 +1,98 @@
+<div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style="width: 280px; height: 100vh; position: fixed; top: 0; left: 0; z-index: 1000; border-right: 1px solid rgba(0,0,0,0.1);">
+  <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none px-2">
+    <i class="bi bi-wallet2 fs-2 me-2 text-primary"></i>
+    <span class="fs-4 fw-bold">Budget App</span>
+  </a>
+  
+  <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted text-uppercase text-center fw-bold" style="font-size: 0.7rem; opacity: 0.6; letter-spacing: 0.05rem;">
+    Year
+  </h6>
+  <div class="px-2 mb-3">
+    <%= form_with url: request.path, method: :get, local: true, class: "d-flex" do |f| %>
+      <% request.query_parameters.except(:year).each do |key, value| %>
+        <%= hidden_field_tag key, value %>
+      <% end %>
+      
+      <div class="input-group">
+        <% if @available_years.include?(@selected_year - 1) %>
+          <%= link_to url_for(request.params.merge(year: @selected_year - 1)), class: "btn btn-outline-secondary d-flex align-items-center" do %>
+            <i class="bi bi-chevron-left"></i>
+          <% end %>
+        <% else %>
+          <button class="btn btn-outline-secondary d-flex align-items-center" disabled>
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        <% end %>
+        
+        <%= select_tag :year, options_for_select(@available_years, @selected_year), class: "form-select text-center fw-bold year-select", onchange: "this.form.submit();", style: "border-radius: 0; font-size: 1.1rem; text-align-last: center; border-left: 0; border-right: 0;" %>
+        
+        <% if @available_years.include?(@selected_year + 1) %>
+          <%= link_to url_for(request.params.merge(year: @selected_year + 1)), class: "btn btn-outline-secondary d-flex align-items-center" do %>
+            <i class="bi bi-chevron-right"></i>
+          <% end %>
+        <% else %>
+          <button class="btn btn-outline-secondary d-flex align-items-center" disabled>
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <ul class="nav nav-pills flex-column mb-auto">
+    <li class="nav-item">
+      <a href="<%= root_path(year: @selected_year) %>" 
+         class="nav-link d-inline-flex align-items-center w-100 border-0 bg-transparent <%= current_page?(root_path) || current_page?(dashboard_path) || current_page?(monthly_overview_path) ? 'active' : 'link-body-emphasis' %>">
+        <i class="bi bi-speedometer2 me-2"></i> 
+        <span>Dashboard</span>
+      </a>
+      <div class="show" id="dashboard-collapse">
+        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+          <li><a href="<%= root_path(year: @selected_year) %>" class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= 'bg-primary-subtle text-primary fw-bold' if current_page?(root_path) || current_page?(dashboard_path) %>"><i class="bi bi-calendar3 me-2"></i> Yearly Overview</a></li>
+          <li><a href="<%= monthly_overview_path(year: @selected_year, month: params[:month]) %>" class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= 'bg-primary-subtle text-primary fw-bold' if current_page?(monthly_overview_path) %>"><i class="bi bi-calendar-month me-2"></i> Monthly Overview</a></li>
+        </ul>
+      </div>
+    </li>
+    <li class="nav-item mt-1">
+      <a href="<%= budgets_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(budgets_path) ? 'active' : 'link-body-emphasis' %>" aria-current="page">
+        <i class="bi bi-cash-stack me-2"></i>
+        Budgets
+      </a>
+    </li>
+    <li class="nav-item mt-1">
+      <a href="<%= transactions_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(transactions_path) ? 'active' : 'link-body-emphasis' %>">
+        <i class="bi bi-receipt me-2"></i>
+        Transactions
+      </a>
+    </li>
+    <li class="nav-item mt-1">
+      <a href="<%= loans_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(loans_path) ? 'active' : 'link-body-emphasis' %>">
+        <i class="bi bi-bank me-2"></i>
+        Loans
+      </a>
+    </li>
+    <li class="nav-item mt-1">
+      <a href="<%= goals_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(goals_path) ? 'active' : 'link-body-emphasis' %>">
+        <i class="bi bi-trophy me-2"></i>
+        Goals
+      </a>
+    </li>
+    <li class="nav-item mt-1">
+      <a href="<%= categories_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(categories_path) ? 'active' : 'link-body-emphasis' %>">
+        <i class="bi bi-tags me-2"></i>
+        Categories
+      </a>
+    </li>
+  </ul>
+  <hr>
+  <div>
+    <div class="form-check form-switch d-flex align-items-center ps-0">
+      <i class="bi bi-moon-stars-fill me-2 text-secondary"></i>
+      <label class="form-check-label flex-grow-1" for="themeToggle">Dark Mode</label>
+      <input class="form-check-input ms-auto" type="checkbox" role="switch" id="themeToggle" 
+             data-theme-target="checkbox"
+             data-action="change->theme#toggle"
+             style="cursor: pointer;">
+    </div>
+  </div>
+</div>

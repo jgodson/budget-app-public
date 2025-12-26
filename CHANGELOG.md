@@ -1,3 +1,7 @@
+## Sync - 2025-12-25 18:56:19
+
+- 004e78c more style tweaks and dark mode fixes
+
 ## Sync - 2025-12-25 15:18:28
 
 - beaa3ef style tweaks for headers, categories, subcategories and in-table headers

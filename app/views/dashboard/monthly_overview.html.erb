@@ -1,22 +1,80 @@
-<div class="container-fluid mb-4">
+<div class="mb-4">
   <!-- Header & Navigation -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-center align-items-center mb-4">
     <div class="d-flex align-items-center">
-      <%= link_to monthly_overview_path(year: @prev_month.year, month: @prev_month.month), class: 'btn btn-outline-secondary me-3' do %>
-        <i class="bi bi-chevron-left"></i>
+      <% if @prev_month_valid %>
+        <%= link_to monthly_overview_path(year: @prev_month.year, month: @prev_month.month), id: 'prev-month-link', class: 'btn btn-outline-secondary me-3' do %>
+          <i class="bi bi-chevron-left"></i>
+        <% end %>
+      <% else %>
+        <button class="btn btn-outline-secondary me-3" disabled id="prev-month-disabled" onclick="triggerShake()"><i class="bi bi-chevron-left"></i></button>
       <% end %>
       
-      <h2 class="m-0"><%= @selected_date.strftime("%B %Y") %></h2>
+      <h3 class="m-0" style="min-width: 220px; text-align: center; display: inline-block;"><%= @selected_date.strftime("%B %Y") %></h3>
       
-      <%= link_to monthly_overview_path(year: @next_month.year, month: @next_month.month), class: 'btn btn-outline-secondary ms-3' do %>
-        <i class="bi bi-chevron-right"></i>
+      <% if @next_month_valid %>
+        <%= link_to monthly_overview_path(year: @next_month.year, month: @next_month.month), id: 'next-month-link', class: 'btn btn-outline-secondary ms-3' do %>
+          <i class="bi bi-chevron-right"></i>
+        <% end %>
+      <% else %>
+        <button class="btn btn-outline-secondary ms-3" disabled id="next-month-disabled" onclick="triggerShake()"><i class="bi bi-chevron-right"></i></button>
       <% end %>
-    </div>
-    
-    <div>
-      <%= link_to 'Back to Dashboard', dashboard_path, class: 'btn btn-secondary' %>
     </div>
   </div>
+
+  <script>
+    function triggerShake() {
+      const mainContent = document.querySelector('main') || document.body;
+      mainContent.classList.add('shake');
+      setTimeout(() => {
+        mainContent.classList.remove('shake');
+      }, 300);
+    }
+
+    if (typeof window.lastNavTime === 'undefined') {
+      window.lastNavTime = 0;
+    }
+
+    // Define the handler function globally so we can remove it to prevent duplicates
+    window.handleMonthNavKeydown = function(event) {
+      if (event.repeat) return;
+
+      const now = Date.now();
+      if (now - window.lastNavTime < 500) return; 
+
+      if (event.key === 'ArrowLeft') {
+        const link = document.getElementById('prev-month-link');
+        const disabled = document.getElementById('prev-month-disabled');
+        if (link) {
+          window.lastNavTime = now;
+          if (window.Turbo) {
+            window.Turbo.visit(link.href);
+          } else {
+            link.click();
+          }
+        } else if (disabled) {
+          triggerShake();
+        }
+      } else if (event.key === 'ArrowRight') {
+        const link = document.getElementById('next-month-link');
+        const disabled = document.getElementById('next-month-disabled');
+        if (link) {
+          window.lastNavTime = now;
+          if (window.Turbo) {
+            window.Turbo.visit(link.href);
+          } else {
+            link.click();
+          }
+        } else if (disabled) {
+          triggerShake();
+        }
+      }
+    };
+
+    // Clean up previous listener if it exists (though exact reference might be lost on reload, this helps for back/forward cache)
+    document.removeEventListener('keydown', window.handleMonthNavKeydown);
+    document.addEventListener('keydown', window.handleMonthNavKeydown);
+  </script>
 
   <div class="row">
     <!-- Charts Column (Left) -->

@@ -6,6 +6,9 @@ class DashboardController < ApplicationController
     @available_years << Date.current.year
     @available_years = @available_years.uniq.sort.reverse
 
+    @prev_year_valid = @available_years.include?(@selected_year - 1)
+    @next_year_valid = @available_years.include?(@selected_year + 1)
+
     # Fetch all categories including their subcategories
     @categories = Category.includes(:subcategories).order(:name)
 
@@ -41,6 +44,9 @@ class DashboardController < ApplicationController
     
     @prev_month = @selected_date - 1.month
     @next_month = @selected_date + 1.month
+
+    @prev_month_valid = @available_years.include?(@prev_month.year)
+    @next_month_valid = @available_years.include?(@next_month.year)
 
     @categories = Category.includes(:subcategories).order(:name)
     
