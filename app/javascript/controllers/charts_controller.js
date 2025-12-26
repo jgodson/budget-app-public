@@ -13,6 +13,8 @@ export default class extends Controller {
   }
 
   connect() {
+    if (document.documentElement.hasAttribute("data-turbo-preview")) return
+
     this.renderChart()
     this.themeChangeListener = (event) => {
       if (this.chart) {

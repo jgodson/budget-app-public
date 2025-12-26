@@ -1,3 +1,7 @@
+## Sync - 2025-12-26 16:09:47
+
+- 8273c97 stop 'double initialization' for charts
+
 ## Sync - 2025-12-26 16:00:25
 
 - d01852f better seed script, highlight budget overrides on yearly overview
