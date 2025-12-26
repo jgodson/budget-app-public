@@ -91,7 +91,7 @@ body {
     --bs-table-border-color: #373b3e;
     
     td, th {
-      color: inherit !important;
+      color: inherit;
     }
     
     &.table-hover tbody tr:hover > * {
@@ -289,4 +289,12 @@ button.nav-link {
   align-items: center !important;
   justify-content: center !important;
   vertical-align: middle !important;
+}
+
+.bg-budget-override {
+  background-color: rgba(255, 193, 7, 0.15) !important;
+}
+
+[data-bs-theme="dark"] .bg-budget-override {
+  background-color: rgba(255, 193, 7, 0.1) !important;
 }

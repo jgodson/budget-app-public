@@ -174,6 +174,7 @@ class DashboardController < ApplicationController
       category: category,
       budgeted_amount: calculate_budgeted_amount(category, budgets_by_category),
       monthly_transactions: calculate_monthly_transactions(category, transactions_by_category_and_month),
+      monthly_budgets: calculate_monthly_budgets(category, budgets_by_category),
       total_transactions: 0,
       subcategories: []
     }
@@ -185,6 +186,7 @@ class DashboardController < ApplicationController
           category: subcategory,
           budgeted_amount: calculate_budgeted_amount(subcategory, budgets_by_category),
           monthly_transactions: calculate_monthly_transactions(subcategory, transactions_by_category_and_month),
+          monthly_budgets: calculate_monthly_budgets(subcategory, budgets_by_category),
           total_transactions: 0
         }
         # Total transactions for subcategory
@@ -197,6 +199,14 @@ class DashboardController < ApplicationController
         data[:budgeted_amount] += sub_data[:budgeted_amount]
         (1..12).each do |month|
           data[:monthly_transactions][month] += sub_data[:monthly_transactions][month]
+          
+          # Accumulate monthly budget amounts for the parent category
+          data[:monthly_budgets][month][:amount] += sub_data[:monthly_budgets][month][:amount]
+          
+          # Mark parent as overridden if any subcategory is overridden
+          if sub_data[:monthly_budgets][month][:is_override]
+            data[:monthly_budgets][month][:is_override] = true
+          end
         end
       end
     end
@@ -211,6 +221,20 @@ class DashboardController < ApplicationController
     # Find yearly budget (month is nil)
     yearly_budget = budgets_by_category[category.id]&.find { |b| b.month.nil? }
     yearly_budget ? yearly_budget.budgeted_amount.to_i : 0
+  end
+
+  def calculate_monthly_budgets(category, budgets_by_category)
+    cat_budgets = budgets_by_category[category.id] || []
+    yearly_budget = cat_budgets.find { |b| b.month.nil? }&.budgeted_amount.to_i || 0
+    
+    (1..12).each_with_object({}) do |month, hash|
+      monthly_override = cat_budgets.find { |b| b.month == month }
+      if monthly_override
+        hash[month] = { amount: monthly_override.budgeted_amount, is_override: true }
+      else
+        hash[month] = { amount: yearly_budget, is_override: false }
+      end
+    end
   end
 
   def calculate_monthly_transactions(category, transactions_by_category_and_month)

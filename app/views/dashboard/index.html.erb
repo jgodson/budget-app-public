@@ -238,8 +238,10 @@
             <td class="bg-light"><%= number_to_currency(category_hash[:budgeted_amount] / 100.0) %></td>
             <% (1..12).each do |month| %>
               <% actual = category_hash[:monthly_transactions][month] %>
-              <% budgeted = category_hash[:budgeted_amount] %>
-              <td class="<%= income_status_class(actual, budgeted) %>">
+              <% budget_data = category_hash[:monthly_budgets][month] %>
+              <% budgeted = budget_data[:amount] %>
+              <% override_class = budget_data[:is_override] ? 'bg-budget-override' : '' %>
+              <td class="<%= income_status_class(actual, budgeted) %> <%= override_class %>">
                 <%= number_to_currency(actual / 100.0) %>
               </td>
             <% end %>
@@ -259,8 +261,10 @@
               <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
               <% (1..12).each do |month| %>
                 <% actual = sub_hash[:monthly_transactions][month] %>
-                <% budgeted = sub_hash[:budgeted_amount] %>
-                <td class="<%= income_status_class(actual, budgeted) %>">
+                <% budget_data = sub_hash[:monthly_budgets][month] %>
+                <% budgeted = budget_data[:amount] %>
+                <% override_class = budget_data[:is_override] ? 'bg-budget-override' : '' %>
+                <td class="<%= income_status_class(actual, budgeted) %> <%= override_class %>">
                   <%= number_to_currency(actual / 100.0) %>
                 </td>
               <% end %>
@@ -293,8 +297,10 @@
             <td class="bg-light"><%= number_to_currency(category_hash[:budgeted_amount] / 100.0) %></td>
             <% (1..12).each do |month| %>
               <% actual = category_hash[:monthly_transactions][month] %>
-              <% budgeted = category_hash[:budgeted_amount] %>
-              <td class="<%= expense_status_class(actual, budgeted) %>">
+              <% budget_data = category_hash[:monthly_budgets][month] %>
+              <% budgeted = budget_data[:amount] %>
+              <% override_class = budget_data[:is_override] ? 'bg-budget-override' : '' %>
+              <td class="<%= expense_status_class(actual, budgeted) %> <%= override_class %>">
                 <%= number_to_currency(actual / 100.0) %>
               </td>
             <% end %>
@@ -314,8 +320,10 @@
               <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
               <% (1..12).each do |month| %>
                 <% actual = sub_hash[:monthly_transactions][month] %>
-                <% budgeted = sub_hash[:budgeted_amount] %>
-                <td class="<%= expense_status_class(actual, budgeted) %>">
+                <% budget_data = sub_hash[:monthly_budgets][month] %>
+                <% budgeted = budget_data[:amount] %>
+                <% override_class = budget_data[:is_override] ? 'bg-budget-override' : '' %>
+                <td class="<%= expense_status_class(actual, budgeted) %> <%= override_class %>">
                   <%= number_to_currency(actual / 100.0) %>
                 </td>
               <% end %>
@@ -347,8 +355,10 @@
             <td class="bg-light"><%= number_to_currency(category_hash[:budgeted_amount] / 100.0) %></td>
             <% (1..12).each do |month| %>
               <% actual = category_hash[:monthly_transactions][month] %>
-              <% budgeted = category_hash[:budgeted_amount] %>
-              <td class="<%= income_status_class(actual, budgeted) %>">
+              <% budget_data = category_hash[:monthly_budgets][month] %>
+              <% budgeted = budget_data[:amount] %>
+              <% override_class = budget_data[:is_override] ? 'bg-budget-override' : '' %>
+              <td class="<%= income_status_class(actual, budgeted) %> <%= override_class %>">
                 <%= number_to_currency(actual / 100.0) %>
               </td>
             <% end %>
@@ -368,8 +378,10 @@
               <td class="bg-light"><%= number_to_currency(sub_hash[:budgeted_amount] / 100.0) %></td>
               <% (1..12).each do |month| %>
                 <% actual = sub_hash[:monthly_transactions][month] %>
-                <% budgeted = sub_hash[:budgeted_amount] %>
-                <td class="<%= income_status_class(actual, budgeted) %>">
+                <% budget_data = sub_hash[:monthly_budgets][month] %>
+                <% budgeted = budget_data[:amount] %>
+                <% override_class = budget_data[:is_override] ? 'bg-budget-override' : '' %>
+                <td class="<%= income_status_class(actual, budgeted) %> <%= override_class %>">
                   <%= number_to_currency(actual / 100.0) %>
                 </td>
               <% end %>

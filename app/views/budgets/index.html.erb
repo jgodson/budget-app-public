@@ -42,14 +42,17 @@
                 <% (1..12).each do |month_index| %>
                   <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
                   <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                  <% any_subcategory_override = false %>
                   <% subcategory_budgets = category.subcategories.sum do |subcategory| %>
                     <% subcategory_monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                    <% any_subcategory_override = true if subcategory_monthly_budget %>
                     <% subcategory_yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
                     <% subcategory_monthly_budget ? subcategory_monthly_budget.budgeted_amount : (subcategory_yearly_budget ? subcategory_yearly_budget.budgeted_amount : 0) %>
                   <% end %>
                   <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
                   <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
                   <% target_budget = monthly_budget || yearly_budget %>
+                  <% is_override = monthly_budget.present? || any_subcategory_override %>
                   <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                     <% if monthly_budget %>
                       <span class="text-info"><%= number_to_currency(total_budgeted_amount / 100.0) %></span>
@@ -137,14 +140,17 @@
                 <% (1..12).each do |month_index| %>
                   <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
                   <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                  <% any_subcategory_override = false %>
                   <% subcategory_budgets = category.subcategories.sum do |subcategory| %>
                     <% subcategory_monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                    <% any_subcategory_override = true if subcategory_monthly_budget %>
                     <% subcategory_yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
                     <% subcategory_monthly_budget ? subcategory_monthly_budget.budgeted_amount : (subcategory_yearly_budget ? subcategory_yearly_budget.budgeted_amount : 0) %>
                   <% end %>
                   <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
                   <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
                   <% target_budget = monthly_budget || yearly_budget %>
+                  <% is_override = monthly_budget.present? || any_subcategory_override %>
                   <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                     <% if monthly_budget %>
                       <span class="text-info"><%= number_to_currency(total_budgeted_amount / 100.0) %></span>
@@ -232,14 +238,17 @@
                 <% (1..12).each do |month_index| %>
                   <% monthly_budget = @budgets.find { |b| b.category == category && b.month == month_index } %>
                   <% yearly_budget = @budgets.find { |b| b.category == category && b.month.nil? } %>
+                  <% any_subcategory_override = false %>
                   <% subcategory_budgets = category.subcategories.sum do |subcategory| %>
                     <% subcategory_monthly_budget = @budgets.find { |b| b.category == subcategory && b.month == month_index } %>
+                    <% any_subcategory_override = true if subcategory_monthly_budget %>
                     <% subcategory_yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
                     <% subcategory_monthly_budget ? subcategory_monthly_budget.budgeted_amount : (subcategory_yearly_budget ? subcategory_yearly_budget.budgeted_amount : 0) %>
                   <% end %>
                   <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
                   <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
                   <% target_budget = monthly_budget || yearly_budget %>
+                  <% is_override = monthly_budget.present? || any_subcategory_override %>
                   <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                     <% if monthly_budget %>
                       <span class="text-info"><%= number_to_currency(total_budgeted_amount / 100.0) %></span>

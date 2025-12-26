@@ -101,13 +101,10 @@ end
 
 savings_goals_categories = [emergency_fund_category, vacation_category, new_car_category]
 
-# 5. Loop through months
-(0..months_to_seed).each do |i|
-  current_month = start_date + i.months
-  year = current_month.year
-  month = current_month.month
-  
-  # Create Budgets
+# 5. Create Yearly Budgets
+puts "Creating Yearly Budgets..."
+years_to_seed = (start_date.year..end_date.year).to_a
+years_to_seed.each do |year|
   expense_categories.each do |category|
     amount = case category.name
       when 'Rent' then to_cents(2000)
@@ -118,6 +115,51 @@ savings_goals_categories = [emergency_fund_category, vacation_category, new_car_
       when 'Dining Out' then to_cents(400)
       when 'Health' then to_cents(100)
       when 'Shopping' then to_cents(200)
+      else to_cents(100)
+    end
+    
+    Budget.find_or_create_by!(category: category, year: year, month: nil) do |budget|
+      budget.budgeted_amount = amount
+    end
+  end
+
+  income_categories.each do |category|
+    amount = case category.name
+      when 'Salary' then to_cents(5000)
+      when 'Freelance' then to_cents(1000)
+      else to_cents(500)
+    end
+    Budget.find_or_create_by!(category: category, year: year, month: nil) do |budget|
+      budget.budgeted_amount = amount
+    end
+  end
+
+  savings_goals_categories.each do |category|
+    Budget.find_or_create_by!(category: category, year: year, month: nil) do |budget|
+      budget.budgeted_amount = to_cents(300)
+    end
+  end
+end
+
+# 6. Loop through months
+(0..months_to_seed).each do |i|
+  current_month = start_date + i.months
+  year = current_month.year
+  month = current_month.month
+  
+  # Create Budgets (Monthly Overrides)
+  expense_categories.each do |category|
+    next if rand > 0.3 # Only create monthly overrides for 30% of categories
+
+    amount = case category.name
+      when 'Rent' then to_cents(2000)
+      when 'Groceries' then to_cents(600 + rand(-100..200))
+      when 'Utilities' then to_cents(200 + rand(-50..50))
+      when 'Entertainment' then to_cents(300 + rand(-100..100))
+      when 'Transport' then to_cents(150 + rand(-50..50))
+      when 'Dining Out' then to_cents(400 + rand(-100..100))
+      when 'Health' then to_cents(100)
+      when 'Shopping' then to_cents(200 + rand(-100..300))
       else to_cents(100)
     end
     

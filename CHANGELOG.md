@@ -1,3 +1,7 @@
+## Sync - 2025-12-26 16:00:25
+
+- d01852f better seed script, highlight budget overrides on yearly overview
+
 ## Sync - 2025-12-26 08:15:07
 
 - b8fd47a Fix incorrect chart tooltip values by using raw data context
