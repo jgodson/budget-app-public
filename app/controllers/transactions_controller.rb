@@ -7,10 +7,12 @@ class TransactionsController < ApplicationController
     @selected_year = params[:year]&.to_i || Date.current.year
     @selected_month = params[:month].presence&.to_i
     @selected_category = params[:category].presence&.to_i
+    @selected_source = params[:source].presence
     @selected_group_by = params[:group_by] || GROUP_BY_OPTIONS[0]
     @group_by_options = GROUP_BY_OPTIONS
 
     @available_years = Transaction.distinct.pluck(:date).map { |date| date.year }.uniq.sort.reverse
+    @available_sources = Transaction.distinct.pluck(:import_source).sort
 
     year_range = Date.new(@selected_year, 1, 1)..Date.new(@selected_year, 12, 31)
     @transactions = Transaction.where(date: year_range)
@@ -25,6 +27,10 @@ class TransactionsController < ApplicationController
 
     if @selected_category.present?
       @transactions = @transactions.where(category_id: @selected_category)
+    end
+
+    if @selected_source.present?
+      @transactions = @transactions.where(import_source: @selected_source)
     end
 
     # Group transactions by selected group_by option
@@ -57,6 +63,13 @@ class TransactionsController < ApplicationController
     @transaction = Transaction.new(transaction_params)
     @transaction.amount = (params[:transaction][:amount_dollars].to_f * 100).round
     @transaction.description = @transaction.description.presence || @transaction.category.name
+
+    if @transaction.description.start_with?('Contribution to')
+      @transaction.import_source = 'Goal Contribution'
+    else
+      @transaction.import_source = 'Manual'
+    end
+
     if @transaction.save
       redirect_to transactions_path, notice: 'Transaction was successfully created.'
     else
@@ -109,6 +122,12 @@ class TransactionsController < ApplicationController
       
       if service.present?
         @preview_data = service.preview
+        @import_service_name = service.class.name.demodulize
+                                      .sub(/^ImportTransactions/, '')
+                                      .sub(/Service$/, '')
+                                      .underscore
+                                      .humanize
+                                      .titleize
       else
         flash.now[:alert] = "The file does not appear to be valid for import."
         render turbo_stream: turbo_stream.replace("flash_messages", partial: "layouts/flash_messages")
@@ -152,13 +171,14 @@ class TransactionsController < ApplicationController
     end
 
     selected_transactions = params[:selected_transactions].map { |t| JSON.parse(t) }
-    import_selected_transactions(selected_transactions)
+    import_source = params[:import_service].presence || "Unknown Import"
+    import_selected_transactions(selected_transactions, import_source)
     redirect_to transactions_path, notice: "Transactions imported successfully."
   end
 
   private
 
-  def import_selected_transactions(selected_transactions)
+  def import_selected_transactions(selected_transactions, import_source = "Existing")
     extracted_categories = selected_transactions.map { |b| b['category'] }
     selected_transactions.each do |transaction_data|
       unique_id = transaction_data['unique_id']
@@ -182,6 +202,7 @@ class TransactionsController < ApplicationController
         date: transaction_data['date'],
         amount: transaction_data['amount'],
         description: transaction_data['description'],
+        import_source: import_source,
       )
     end
   end

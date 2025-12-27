@@ -20,6 +20,7 @@ class LoanPayment < ApplicationRecord
       amount: paid_amount,
       date: payment_date,
       description: "Loan payment for #{loan.loan_name}",
+      import_source: 'Loan Payment',
     )
   end
 end

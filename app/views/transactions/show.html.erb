@@ -10,6 +10,7 @@
           <p><strong>Amount:</strong> <%= number_to_currency(@transaction.amount / 100.0) %></p>
           <p><strong>Date:</strong> <%= @transaction.date.strftime("%B %d, %Y") %></p>
           <p><strong>Description:</strong> <%= @transaction.description %></p>
+          <p><strong>Source:</strong> <%= transaction_source_badge(@transaction) %></p>
           
           <% if @transaction.loan_payment.present? %>
             <hr>

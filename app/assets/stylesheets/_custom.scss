@@ -298,3 +298,36 @@ button.nav-link {
 [data-bs-theme="dark"] .bg-budget-override {
   background-color: rgba(255, 193, 7, 0.1) !important;
 }
+
+// Responsive Sidebar
+@media (min-width: 992px) {
+  .sidebar-responsive {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  .main-content {
+    margin-left: 280px;
+  }
+  
+  .mobile-navbar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .sidebar-responsive {
+    /* Let Offcanvas classes handle this */
+  }
+}

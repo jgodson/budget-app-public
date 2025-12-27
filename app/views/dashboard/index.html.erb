@@ -246,7 +246,7 @@
               </td>
             <% end %>
             <% actual_total = category_hash[:total_transactions] %>
-            <% budgeted_total = category_hash[:budgeted_amount] * 12 %>
+            <% budgeted_total = category_hash[:total_budgeted_amount] %>
             <td class="<%= income_status_class(actual_total, budgeted_total) %>">
               <%= number_to_currency(actual_total / 100.0) %>
             </td>
@@ -269,7 +269,7 @@
                 </td>
               <% end %>
               <% actual_total = sub_hash[:total_transactions] %>
-              <% budgeted_total = sub_hash[:budgeted_amount] * 12 %>
+              <% budgeted_total = sub_hash[:total_budgeted_amount] %>
               <td class="<%= income_status_class(actual_total, budgeted_total) %>">
                 <%= number_to_currency(actual_total / 100.0) %>
               </td>
@@ -305,7 +305,7 @@
               </td>
             <% end %>
             <% actual_total = category_hash[:total_transactions] %>
-            <% budgeted_total = category_hash[:budgeted_amount] * 12 %>
+            <% budgeted_total = category_hash[:total_budgeted_amount] %>
             <td class="<%= expense_status_class(actual_total, budgeted_total) %>">
               <%= number_to_currency(actual_total / 100.0) %>
             </td>
@@ -328,7 +328,7 @@
                 </td>
               <% end %>
               <% actual_total = sub_hash[:total_transactions] %>
-              <% budgeted_total = sub_hash[:budgeted_amount] %>
+              <% budgeted_total = sub_hash[:total_budgeted_amount] %>
               <td class="<%= expense_status_class(actual_total, budgeted_total) %>">
                 <%= number_to_currency(actual_total / 100.0) %>
               </td>
@@ -363,7 +363,7 @@
               </td>
             <% end %>
             <% actual_total = category_hash[:total_transactions] %>
-            <% budgeted_total = category_hash[:budgeted_amount] * 12 %>
+            <% budgeted_total = category_hash[:total_budgeted_amount] %>
             <td class="<%= income_status_class(actual_total, budgeted_total) %>">
               <%= number_to_currency(actual_total / 100.0) %>
             </td>
@@ -386,7 +386,7 @@
                 </td>
               <% end %>
               <% actual_total = sub_hash[:total_transactions] %>
-              <% budgeted_total = sub_hash[:budgeted_amount] * 12 %>
+              <% budgeted_total = sub_hash[:total_budgeted_amount] %>
               <td class="<%= income_status_class(actual_total, budgeted_total) %>">
                 <%= number_to_currency(actual_total / 100.0) %>
               </td>

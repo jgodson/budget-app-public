@@ -16,23 +16,27 @@
       <!-- Filters -->
       <%= form_with url: transactions_path, method: :get, local: true do %>
         <div class="row g-3">
-          <div class="col-lg-auto pb-2">
+          <div class="col-sm-6 col-lg-auto pb-2">
             <%= label_tag :year, "Select Year:", class: "form-label" %>
             <%= select_tag :year, options_for_select(@available_years, @selected_year.to_i), class: "form-select", onchange: "this.form.submit();" %>
           </div>
-          <div class="col-lg-3 pb-2">
+          <div class="col-sm-6 col-lg-2 pb-2">
             <%= label_tag :month, "Select Month:", class: "form-label" %>
             <%= select_tag :month, options_for_select([['', '']] + Date::MONTHNAMES.compact.each_with_index.map { |name, index| [name, index + 1] }, @selected_month.to_i), class: "form-select", onchange: "this.form.submit();" %>
           </div>
-          <div class="col-lg-3 pb-2">
+          <div class="col-sm-6 col-lg-3 pb-2">
             <%= label_tag :category, "Select Category:", class: "form-label" %>
             <%= select_tag :category, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @selected_category.to_i), class: "form-select", onchange: "this.form.submit();" %>
           </div>
-          <div class="col-lg-3 pb-2">
+          <div class="col-sm-6 col-lg-2 pb-2">
+            <%= label_tag :source, "Select Source:", class: "form-label" %>
+            <%= select_tag :source, options_for_select([['', '']] + @available_sources, @selected_source), class: "form-select", onchange: "this.form.submit();" %>
+          </div>
+          <div class="col-sm-6 col-lg-2 pb-2">
             <%= label_tag :group_by, "Group by:", class: "form-label" %>
             <%= select_tag :group_by, options_for_select(@group_by_options.map { |g| [g.titleize, g] }, @selected_group_by), class: "form-select", onchange: "this.form.submit();" %>
           </div>
-          <div class="col-12 pb-2">
+          <div class="col-sm-6 col-lg-3 pb-2">
             <%= label_tag :description, "Filter by Description:", class: "form-label" %>
             <%= text_field_tag :description, params[:description], class: "form-control", oninput: "filterDescription()", onkeydown: "if (event.key === 'Enter') event.preventDefault()" %>
           </div>
@@ -45,7 +49,7 @@
           <% header = @selected_group_by.include?('month') ? date.strftime("%B %Y") : "#{@selected_month.present? ? Date::MONTHNAMES[@selected_month] : ""} #{date}" %>
           <tbody>
             <tr class="parent-<%= header.parameterize %> parent-group table-light no-hover-highlight">
-              <td colspan="2"><h3 class="m-0"><%= header %></h3></td>
+              <td colspan="3"><h3 class="m-0"><%= header %></h3></td>
               <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
               <td>
                 <h5 class="parent-total-amount fw-bold m-0">
@@ -62,19 +66,21 @@
               <% transactions.each do |category, transactions| %>
                 <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
                   <tr class="table-light no-hover-highlight">
-                    <td colspan="2"><h5 class="fw-bold m-0 text-center"><%= category.name %></h5></td>
+                    <td colspan="3"><h5 class="fw-bold m-0 text-center"><%= category.name %></h5></td>
                     <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
                     <td><h5 class="child-total-amount fw-bold m-0"><%= number_to_currency(transactions.sum(&:amount) / 100.0) %></h5></td>
                   </tr>
                   <tr class="text-center highlight">
-                    <td><strong>Date</strong></td>
+                    <td style="width: 200px;"><strong>Date</strong></td>
+                    <td style="width: 160px;"><strong>Source</strong></td>
                     <td><strong>Description</strong></td>
-                    <td><strong>Amount</strong></td>
-                    <td class="text-center"><strong>Actions</strong></td>
+                    <td style="width: 200px;"><strong>Amount</strong></td>
+                    <td style="width: 100px;" class="text-center"><strong>Actions</strong></td>
                   </tr>
                   <% transactions.each do |transaction| %>
                     <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
                       <td><%= transaction.date.strftime("%d %B %Y") %></td>
+                      <td class="text-center"><%= transaction_source_badge(transaction) %></td>
                       <td class="transaction-description"><%= transaction.description %></td>
                       <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
                       <td class="no-row-click">
@@ -91,15 +97,16 @@
               <% end %>
             <% else %>
               <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
-                <tr class="text-center table-light no-hover-highlight">
-                  <td><strong>Date</strong></td>
-                  <td><strong>Description</strong></td>
-                  <td><strong>Amount</strong></td>
-                  <td class="text-center"><strong>Actions</strong></td>
-                </tr>
-                <% transactions.each do |transaction| %>
+                                                <tr class="text-center table-light no-hover-highlight">
+                                                  <td style="width: 200px;"><strong>Date</strong></td>
+                                                  <td style="width: 160px;"><strong>Source</strong></td>
+                                                  <td><strong>Description</strong></td>
+                                                  <td style="width: 200px;"><strong>Amount</strong></td>
+                                                  <td style="width: 200px;" class="text-center"><strong>Actions</strong></td>
+                                                </tr>                <% transactions.each do |transaction| %>
                   <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
                     <td><%= transaction.date.strftime("%d %B %Y") %></td>
+                    <td class="text-center"><%= transaction_source_badge(transaction) %></td>
                     <td class="transaction-description"><%= transaction.description %></td>
                     <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
                     <td class="no-row-click">

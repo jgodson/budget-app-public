@@ -173,7 +173,8 @@ end
     date: Date.new(year, month, 1),
     description: "Monthly Salary",
     amount: to_cents(5000 + rand(-100..100)),
-    category: income_categories.first
+    category: income_categories.first,
+    import_source: "Manual"
   )
 
   if [true, false].sample
@@ -181,7 +182,8 @@ end
       date: Date.new(year, month, rand(5..25)),
       description: "Freelance Project",
       amount: to_cents(rand(500..1500)),
-      category: income_categories.second
+      category: income_categories.second,
+      import_source: "Income Csv"
     )
   end
 
@@ -192,7 +194,8 @@ end
         date: Date.new(year, month, rand(1..28)),
         description: "Transfer to #{cat.name}",
         amount: to_cents(rand(100..500)),
-        category: cat
+        category: cat,
+        import_source: "Goal Contribution"
       )
     end
   end
@@ -203,7 +206,8 @@ end
     date: Date.new(year, month, 1),
     description: "Monthly Rent",
     amount: to_cents(2000),
-    category: expense_categories.find { |c| c.name == 'Rent' }
+    category: expense_categories.find { |c| c.name == 'Rent' },
+    import_source: "Manual"
   )
 
   # Other variable expenses
@@ -220,11 +224,13 @@ end
              else rand(10..100)
              end
 
+    source = ["Manual", "Amex", "Rbc Visa"].sample
     Transaction.create!(
       date: date,
       description: Faker::Commerce.product_name,
       amount: to_cents(amount),
-      category: category
+      category: category,
+      import_source: source
     )
   end
 
@@ -235,19 +241,11 @@ end
     amount = to_cents(450)
     interest = (car_loan.balance * 0.05 / 12).round # Simple interest approx
     
-    trx = Transaction.create!(
-      date: payment_date,
-      description: "Car Loan Payment",
-      amount: amount,
-      category: car_loan.category
-    )
-
     LoanPayment.create!(
       loan: car_loan,
       paid_amount: amount,
       interest_amount: interest,
-      payment_date: payment_date,
-      associated_transaction_id: trx.id
+      payment_date: payment_date
     )
   end
 end

@@ -176,8 +176,12 @@ class DashboardController < ApplicationController
       monthly_transactions: calculate_monthly_transactions(category, transactions_by_category_and_month),
       monthly_budgets: calculate_monthly_budgets(category, budgets_by_category),
       total_transactions: 0,
+      total_budgeted_amount: 0,
       subcategories: []
     }
+    
+    # Calculate initial total_budgeted_amount for main category (if no subcategories, this is accurate)
+    data[:total_budgeted_amount] = data[:monthly_budgets].values.sum { |b| b[:amount] }
 
     # Sum up subcategories data
     if category.subcategories.any?
@@ -187,8 +191,13 @@ class DashboardController < ApplicationController
           budgeted_amount: calculate_budgeted_amount(subcategory, budgets_by_category),
           monthly_transactions: calculate_monthly_transactions(subcategory, transactions_by_category_and_month),
           monthly_budgets: calculate_monthly_budgets(subcategory, budgets_by_category),
-          total_transactions: 0
+          total_transactions: 0,
+          total_budgeted_amount: 0
         }
+        
+        # Calculate total budgeted for subcategory
+        sub_data[:total_budgeted_amount] = sub_data[:monthly_budgets].values.sum { |b| b[:amount] }
+        
         # Total transactions for subcategory
         sub_data[:total_transactions] = sub_data[:monthly_transactions].values.sum
 
@@ -197,6 +206,8 @@ class DashboardController < ApplicationController
 
         # Add subcategory amounts to parent category totals
         data[:budgeted_amount] += sub_data[:budgeted_amount]
+        data[:total_budgeted_amount] += sub_data[:total_budgeted_amount]
+        
         (1..12).each do |month|
           data[:monthly_transactions][month] += sub_data[:monthly_transactions][month]
           

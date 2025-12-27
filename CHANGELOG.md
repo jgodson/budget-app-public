@@ -1,3 +1,8 @@
+## Sync - 2025-12-27 12:36:44
+
+- ff7aa77 Add source for transactions, responsive sidebar
+- 9cd1f2b fix total budget comparision calculation
+
 ## Sync - 2025-12-26 16:09:47
 
 - 8273c97 stop 'double initialization' for charts

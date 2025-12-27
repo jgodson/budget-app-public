@@ -1,8 +1,16 @@
-<div class="d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary" style="width: 280px; height: 100vh; position: fixed; top: 0; left: 0; z-index: 1000; border-right: 1px solid rgba(0,0,0,0.1);">
-  <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none px-2">
+<div class="offcanvas-lg offcanvas-start d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary sidebar-responsive" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+  <div class="offcanvas-header d-lg-none px-0 pt-0 pb-3">
+    <a href="/" class="d-flex align-items-center mb-0 me-auto link-body-emphasis text-decoration-none">
+      <i class="bi bi-wallet2 fs-2 me-2 text-primary"></i>
+      <span class="fs-4 fw-bold">Budget App</span>
+    </a>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+  </div>
+
+  <div class="d-none d-lg-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none px-2">
     <i class="bi bi-wallet2 fs-2 me-2 text-primary"></i>
     <span class="fs-4 fw-bold">Budget App</span>
-  </a>
+  </div>
   
   <h6 class="sidebar-heading px-3 mt-3 mb-1 text-muted text-uppercase text-center fw-bold" style="font-size: 0.7rem; opacity: 0.6; letter-spacing: 0.05rem;">
     Year

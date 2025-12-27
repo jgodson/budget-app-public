@@ -1,6 +1,7 @@
 <%= turbo_stream.replace "import_preview" do %>
   <div class="container mt-4">
     <%= form_with url: import_transactions_path, local: true do |form| %>
+      <%= hidden_field_tag :import_service, @import_service_name %>
       <% if @preview_data[:new_categories].present? %>
         <div class="mb-3">
           <h2>Expense categories to create</h2>

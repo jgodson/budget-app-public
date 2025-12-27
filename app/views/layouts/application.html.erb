@@ -12,10 +12,23 @@
 
   <%= stylesheet_link_tag "flatpickr/dist/themes/dark.css", id: "flatpickr-dark-theme", disabled: true %>
 
-  <body class="d-flex min-vh-100" data-controller="theme">
+  <body class="d-flex flex-column vh-100" data-controller="theme">
+    
+    <!-- Mobile Navbar -->
+    <nav class="navbar bg-body-tertiary d-lg-none border-bottom sticky-top">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand fw-bold ms-2 d-flex align-items-center" href="/">
+          <i class="bi bi-wallet2 text-primary me-2"></i>Budget App
+        </a>
+      </div>
+    </nav>
+
     <%= render 'layouts/sidebar' %>
 
-    <main class="flex-grow-1 overflow-auto" style="height: 100vh; margin-left: 280px;">
+    <main class="flex-grow-1 overflow-auto main-content">
       <div class="container-fluid p-4">
         <!-- Flash Messages -->
         <%= render 'layouts/flash_messages' %>
