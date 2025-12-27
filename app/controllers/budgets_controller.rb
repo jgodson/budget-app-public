@@ -18,6 +18,11 @@ class BudgetsController < ApplicationController
   def edit
     @budget = Budget.find(params[:id])
     @categories = Category.all.order(:name)
+    @related_months = Budget.where(
+      year: @budget.year,
+      category_id: @budget.category_id,
+      budgeted_amount: @budget.budgeted_amount
+    ).monthly.pluck(:month)
   end
 
   def new
@@ -28,20 +33,71 @@ class BudgetsController < ApplicationController
   end
 
   def create
-    @budget = Budget.new(budget_params)
-    @budget.budgeted_amount = (params[:budget][:budgeted_amount_dollars].to_f * 100).round
-    if @budget.save
-      redirect_to budgets_path(year: @budget.year), notice: 'Budget was successfully created.'
+    months = params[:budget][:months]
+
+    if months.present?
+      saved_count = 0
+      errors = []
+
+      months.each do |m|
+        budget = Budget.find_or_initialize_by(
+          year: params[:budget][:year],
+          category_id: params[:budget][:category_id],
+          month: m
+        )
+        budget.budgeted_amount = (params[:budget][:budgeted_amount_dollars].to_f * 100).round
+
+        if budget.save
+          saved_count += 1
+        else
+          errors << "Month #{m}: #{budget.errors.full_messages.join(', ')}"
+        end
+      end
+
+      if errors.empty?
+        redirect_to budgets_path(year: params[:budget][:year]), notice: "#{saved_count} budget(s) successfully created."
+      else
+        flash[:model_errors] = errors
+        redirect_to new_budget_path(year: params[:budget][:year], category_id: params[:budget][:category_id])
+      end
     else
-      flash[:model_errors] = @budget.errors.full_messages
-      redirect_to new_budget_path(year: @budget.year)
+      @budget = Budget.new(budget_params.except(:months))
+      @budget.budgeted_amount = (params[:budget][:budgeted_amount_dollars].to_f * 100).round
+      if @budget.save
+        redirect_to budgets_path(year: @budget.year), notice: 'Budget was successfully created.'
+      else
+        flash[:model_errors] = @budget.errors.full_messages
+        redirect_to new_budget_path(year: @budget.year)
+      end
     end
   end
 
   def update
     @budget = Budget.find(params[:id])
-    @budget.budgeted_amount = (params[:budget][:budgeted_amount_dollars].to_f * 100).round
-    if @budget.update(budget_params.except(:budgeted_amount_dollars))
+    months = params[:budget][:months] || []
+    
+    # Prepare attributes
+    new_attrs = budget_params.except(:months, :budgeted_amount_dollars)
+    new_amount = (params[:budget][:budgeted_amount_dollars].to_f * 100).round
+    
+    primary_month = months.shift # Returns first or nil
+    
+    @budget.assign_attributes(new_attrs)
+    @budget.month = primary_month
+    @budget.budgeted_amount = new_amount
+    
+    if @budget.save
+      if months.any?
+        months.each do |m|
+          other_budget = Budget.find_or_initialize_by(
+            year: @budget.year,
+            category_id: @budget.category_id,
+            month: m
+          )
+          other_budget.budgeted_amount = new_amount
+          other_budget.save
+        end
+      end
       redirect_to budgets_path(year: @budget.year), notice: 'Budget was successfully updated.'
     else
       flash[:model_errors] = @budget.errors.full_messages
@@ -171,6 +227,6 @@ class BudgetsController < ApplicationController
   end
 
   def budget_params
-    params.require(:budget).permit(:category_id, :year, :month)
+    params.require(:budget).permit(:category_id, :year, :month, months: [])
   end
 end

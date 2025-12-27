@@ -1,3 +1,7 @@
+## Sync - 2025-12-27 14:07:06
+
+- 3c5802c Allow for easier budget overrides when multiple months
+
 ## Sync - 2025-12-27 12:36:44
 
 - ff7aa77 Add source for transactions, responsive sidebar

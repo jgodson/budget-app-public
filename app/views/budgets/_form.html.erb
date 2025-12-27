@@ -10,9 +10,23 @@
       <%= form.text_field :year, class: "form-control", data: { controller: "datepicker", datepicker_type_value: "year" } %>
     </div>
 
-    <div class="form-group mb-3">
-      <%= form.label :month, "Month (optional)", class: 'form-label' %>
-      <%= form.text_field :month, class: "form-control", data: { controller: "datepicker", datepicker_type_value: "month" } %>
+    <div class="form-group mb-3" data-controller="budget-form">
+      <div class="form-check">
+        <%= check_box_tag "yearly_budget", "1", @budget.month.nil?, id: "yearly_budget_checkbox", class: "form-check-input", data: { budget_form_target: "yearly", action: "change->budget-form#toggleYearly" } %>
+        <%= label_tag "yearly_budget_checkbox", "Yearly Budget", class: "form-check-label fw-bold" %>
+      </div>
+      <div class="form-text mt-0 mb-3 ms-4">Existing monthly overrides will still apply.</div>
+
+      <div class="fw-bold mb-2">Select specific months for overrides</div>
+      <div class="d-flex flex-wrap ms-4">
+        <% (1..12).each do |month_num| %>
+          <% is_checked = @budget.month == month_num || (@related_months&.include?(month_num)) %>
+          <div class="form-check me-3 mb-2">
+            <%= check_box_tag "budget[months][]", month_num, is_checked, id: "budget_month_#{month_num}", class: "form-check-input", data: { budget_form_target: "month", action: "change->budget-form#toggleMonth" } %>
+            <%= label_tag "budget_month_#{month_num}", Date::MONTHNAMES[month_num], class: "form-check-label" %>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <div class="form-group mb-3">
