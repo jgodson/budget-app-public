@@ -1,3 +1,12 @@
+## Sync - 2025-12-28 18:17:44
+
+- e7561c4 add suggested budget on new/edit pages
+- 3bfb9c9 continue UI refresh with new/edit pages
+- eb15683 Icons for list page actions
+- a3434a3 refresh show pages
+- 022a806 spruce up goals and loans
+- 3210521 Add margin top to Back button for vertical alignment
+
 ## Sync - 2025-12-28 18:15:29
 
 - 314901e add suggested budget on new/edit pages
