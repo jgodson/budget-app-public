@@ -1,3 +1,7 @@
+## Sync - 2025-12-28 18:55:56
+
+- cd562c8 change budget suggestion to amount vs spending
+
 ## Sync - 2025-12-28 18:17:44
 
 - e7561c4 add suggested budget on new/edit pages
