@@ -3,67 +3,136 @@
     <div class="col-md-8 offset-md-2">
       <div class="card">
         <div class="card-header h4 d-flex justify-content-between align-items-center">
-          Goal: <%= @goal.goal_name %>
           <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-link text-dark p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            Goal: <%= @goal.goal_name %>
+          </div>
+          <div class="d-flex align-items-center gap-2">
             <% if @goal.archived? %>
-              <span class="badge bg-secondary m-0">Archived <%= @goal.archived_at.year %></span>
+              <span class="badge bg-secondary">Archived <%= @goal.archived_at.year %></span>
             <% end %>
 
             <% if @goal.total_contributed >= @goal.amount %>
-              <span class="badge bg-success ms-o ms-2">Goal Complete</span>
+              <span class="badge bg-success">Goal Complete</span>
             <% end %>
 
-            <span class="badge bg-primary m-0 ms-2">
-              <%= number_to_percentage(@goal.percent_complete, precision: 2) %>
-            </span>
+            <% unless @goal.archived? %>
+              <%= link_to new_transaction_path({category_id: @goal.category, description: "Contribution to #{@goal.goal_name} goal"}), class: 'btn btn-sm btn-success', title: 'Add Contribution', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                <i class="bi bi-plus-lg"></i>
+              <% end %>
+            <% end %>
+
+            <%= link_to edit_goal_path(@goal), class: 'btn btn-sm btn-warning', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+              <i class="bi bi-pencil"></i>
+            <% end %>
+
+            <% if @goal.archived? %>
+              <%= link_to unarchive_goal_path(@goal), title: 'Unarchive', data: { turbo_method: :patch, turbo_confirm: "Are you sure you want to unarchive #{@goal.goal_name}?", controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-secondary' do %>
+                <i class="bi bi-box-arrow-up"></i>
+              <% end %>
+            <% else %>
+              <%= link_to archive_goal_path(@goal), title: 'Archive', data: { turbo_method: :patch, turbo_confirm: "Are you sure you want to archive #{@goal.goal_name}?", controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-secondary' do %>
+                <i class="bi bi-archive"></i>
+              <% end %>
+            <% end %>
+
+            <%= link_to goal_path(@goal), title: 'Delete', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-danger' do %>
+              <i class="bi bi-trash"></i>
+            <% end %>
           </div>
         </div>
         <div class="card-body">
-          <p>
-            <strong>Category: </strong>
-            <%= link_to @goal.category.name, category_path(@goal.category) %>
-          </p>
-          <p>
-            <strong>Total Contributions: </strong>
-            <%= number_to_currency(@goal.total_contributed_dollars) %>
-            <strong> / </strong>
-            <%= number_to_currency(@goal.amount / 100.0) %>
-          </p>
+          <div class="d-flex align-items-center mb-4">
+            <span class="text-muted text-uppercase small fw-bold me-3">Category</span>
+            <%= link_to category_path(@goal.category), class: "text-decoration-none" do %>
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 shadow-sm">
+                <i class="bi bi-tag-fill me-2 text-success"></i><%= @goal.category.name %>
+              </span>
+            <% end %>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <strong>Progress:</strong>
+              <small class="text-muted"><%= number_to_percentage(@goal.percent_complete, precision: 1) %></small>
+            </div>
+            <div class="progress" style="height: 20px;">
+              <div class="progress-bar <%= @goal.complete? ? 'bg-success' : '' %>" role="progressbar" style="width: <%= @goal.percent_complete %>%; background-color: <%= @goal.complete? ? '' : 'rgba(25, 135, 84, 0.5)' %>;" aria-valuenow="<%= @goal.percent_complete %>" aria-valuemin="0" aria-valuemax="100">
+                <%= number_to_percentage(@goal.percent_complete, precision: 1) %>
+              </div>
+            </div>
+            <div class="text-end text-muted small mt-1">
+              <%= number_to_currency(@goal.total_contributed_dollars) %> / <%= number_to_currency(@goal.amount / 100.0) %>
+            </div>
+          </div>
+
+          <div class="row mb-4 g-3">
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Total Contributions</h6>
+                  <h4 class="card-title mb-0 fw-bold text-success"><%= number_to_currency(@goal.total_contributed_dollars) %></h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Goal Amount</h6>
+                  <h4 class="card-title mb-0 fw-bold"><%= number_to_currency(@goal.amount / 100.0) %></h4>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <% if @goal.total_contributed_dollars > 0 %>
-            <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th>Year</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @goal.total_contributed_by_year.each do |year, amount| %>
+            <div class="card mb-4">
+              <div class="card-header h5">
+                Contributions Over Time
+              </div>
+              <div class="card-body" style="height: 300px;">
+                <canvas
+                  data-controller="charts"
+                  data-charts-type-value="line"
+                  data-charts-data-value="<%= @contributions_chart_data.to_json %>"
+                  data-charts-options-value="<%= {
+                    plugins: { legend: { display: true, position: 'bottom' } },
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, suggestedMax: @goals_chart_max } },
+                    interaction: {
+                      mode: 'index',
+                      intersect: false,
+                    }
+                  }.to_json %>"
+                ></canvas>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped">
+                <thead>
                   <tr>
-                    <td><%= year %></td>
-                    <td><%= number_to_currency(amount / 100.0) %></td>
+                    <th>Year</th>
+                    <th>Amount</th>
                   </tr>
-                <% end %>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <% @goal.total_contributed_by_year.each do |year, amount| %>
+                    <tr>
+                      <td><%= year %></td>
+                      <td><%= number_to_currency(amount / 100.0) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
           <% else %>
             <p>
               No contributions towards this goal yet.
             </p>
           <% end %>
-
-          <div class="text-end">
-            <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-            <%= link_to 'Edit', edit_goal_path(@goal), class: 'btn btn-warning' %>
-            <%= link_to 'Delete', goal_path(@goal), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
-            <% if @goal.archived? %>
-              <%= link_to 'Unarchive', unarchive_goal_path(@goal), data: { turbo_method: :patch, turbo_confirm: "Are you sure you want to unarchive #{@goal.goal_name}?" }, class: 'btn btn-secondary' %>
-            <% else %>
-              <%= link_to 'Add Contribution', new_transaction_path({category_id: @goal.category, description: "Contribution to #{@goal.goal_name} goal"}), class: 'btn btn-success' %>
-              <%= link_to 'Archive', archive_goal_path(@goal), data: { turbo_method: :patch, turbo_confirm: "Are you sure you want to archive #{@goal.goal_name}?" }, class: 'btn btn-secondary' %>
-            <% end %>
-          </div>
         </div>
       </div>
     </div>

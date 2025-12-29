@@ -1,7 +1,7 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card">
+      <div class="card shadow">
         <div class="card-header h4 fw-bold">
           Import Budgets
         </div>
@@ -9,11 +9,16 @@
           <%= turbo_frame_tag "import_preview" do %>
             <%= form_with url: import_preview_budgets_path, local: true, multipart: true do |form| %>
               <div class="mb-3">
-                <%= form.label :file, "Select File" %>
+                <%= form.label :file, "Select File", class: "form-label" %>
                 <%= form.file_field :file, class: "form-control" %>
               </div>
               <div class="text-end">
-                <%= form.submit "Preview Import", class: "btn btn-primary" %>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                  <i class="bi bi-arrow-left"></i> Back
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-upload"></i> Preview Import
+                </button>
               </div>
             <% end %>
           <% end %>

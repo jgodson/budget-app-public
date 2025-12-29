@@ -11,8 +11,71 @@ class BudgetsController < ApplicationController
 
   def show
     @budget = Budget.find(params[:id])
-    year_range = Date.new(@budget.year, 1, 1)..Date.new(@budget.year, 12, 31)
-    @transactions = @budget.category.transactions.where(date: year_range).order(date: :asc)
+    
+    # Determine period
+    if @budget.month.present?
+      start_date = Date.new(@budget.year, @budget.month, 1)
+      end_date = start_date.end_of_month
+      @period_label = start_date.strftime("%B %Y")
+    else
+      start_date = Date.new(@budget.year, 1, 1)
+      end_date = Date.new(@budget.year, 12, 31)
+      @period_label = @budget.year.to_s
+    end
+
+    # Transactions for the specific period
+    @transactions = @budget.category.transactions.where(date: start_date..end_date).order(date: :asc)
+    
+    # Fetch all budget records for this year/category to handle overrides
+    budgets_for_year = Budget.where(year: @budget.year, category_id: @budget.category_id)
+    @yearly_budget = budgets_for_year.find { |b| b.month.nil? }
+    @budget_overrides = budgets_for_year.select { |b| b.month.present? }.sort_by(&:month)
+
+    # Stats
+    @total_spent = @transactions.sum(:amount)
+    
+    if @budget.month.nil?
+      # Yearly view: Sum of (Override OR Base Monthly Amount) for all 12 months
+      base_monthly_amount = @budget.budgeted_amount
+      @budgeted_amount = (1..12).sum do |m|
+        override = @budget_overrides.find { |b| b.month == m }
+        override ? override.budgeted_amount : base_monthly_amount
+      end
+    else
+      # Monthly view: Just the specific budget amount
+      @budgeted_amount = @budget.budgeted_amount
+    end
+
+    @remaining = @budgeted_amount - @total_spent
+    @pct_used = @budgeted_amount > 0 ? (@total_spent.to_f / @budgeted_amount * 100) : 0
+
+    # Chart Data (Monthly Spending for the Budget Year vs Prior Year)
+    @current_year_data = (1..12).map do |month|
+      s = Date.new(@budget.year, month, 1)
+      e = s.end_of_month
+      @budget.category.transactions.where(date: s..e).sum(:amount) / 100.0
+    end
+
+    @prior_year_data = (1..12).map do |month|
+      s = Date.new(@budget.year - 1, month, 1)
+      e = s.end_of_month
+      @budget.category.transactions.where(date: s..e).sum(:amount) / 100.0
+    end
+
+    # Budget Data for the Chart
+    @budget_data = (1..12).map do |m|
+      monthly_budget = @budget_overrides.find { |b| b.month == m }
+      if monthly_budget
+        monthly_budget.budgeted_amount / 100.0
+      elsif @yearly_budget
+        @yearly_budget.budgeted_amount / 100.0
+      else
+        0
+      end
+    end
+
+    max_val = [@current_year_data.max, @prior_year_data.max, @budget_data.max].max
+    @chart_max = (max_val * 1.2).round
   end
 
   def edit
@@ -28,7 +91,8 @@ class BudgetsController < ApplicationController
   def new
     @selected_year = params[:year].nil? ? Date.today.year : params[:year].to_i
     category = params[:category_id].nil? ? nil : Category.find(params[:category_id].to_i)
-    @budget = Budget.new(year: @selected_year, category:)
+    month = params[:month].present? ? params[:month].to_i : nil
+    @budget = Budget.new(year: @selected_year, category: category, month: month)
     @categories = Category.all.order(:name)
   end
 

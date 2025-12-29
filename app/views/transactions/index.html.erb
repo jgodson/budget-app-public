@@ -7,8 +7,12 @@
           Actions
         </button>
         <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
-          <li><%= link_to "Add Transaction", new_transaction_path, class: "dropdown-item" %></li>
-          <li><%= link_to "Import Transactions", import_form_transactions_path, class: "dropdown-item" %></li>
+          <li><%= link_to new_transaction_path, class: "dropdown-item" do %>
+            <i class="bi bi-plus-lg me-2"></i>Add Transaction
+          <% end %></li>
+          <li><%= link_to import_form_transactions_path, class: "dropdown-item" do %>
+            <i class="bi bi-upload me-2"></i>Import Transactions
+          <% end %></li>
         </ul>
       </div>
     </div>

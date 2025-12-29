@@ -283,13 +283,7 @@ button.nav-link {
   border-color: var(--bs-border-color);
 }
 
-// Fix for Badge vertical alignment
-.badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  vertical-align: middle !important;
-}
+
 
 .bg-budget-override {
   background-color: rgba(255, 193, 7, 0.15) !important;

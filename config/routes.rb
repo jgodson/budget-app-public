@@ -24,6 +24,9 @@ Rails.application.routes.draw do
 
   resources :categories do
     resources :subcategories, controller: 'categories'
+    member do
+      get :average_spending
+    end
   end
   get 'categories/:id/destroy', to: 'categories#destroy_confirm', as: 'destroy_category'
 

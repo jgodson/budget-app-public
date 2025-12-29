@@ -1,39 +1,43 @@
 <%= turbo_stream.replace "import_preview" do %>
-  <div class="container mt-4">
+  <div>
     <%= form_with url: import_budgets_path, local: true do |form| %>
       <% grouped_categories = @preview_data[:new_categories].group_by(&:category_type) %>
 
       <% if grouped_categories['income'].present? %>
-        <div class="mb-3">
-          <h2>Income Categories to Create</h2>
-          <ul>
+        <div class="alert alert-info mb-3">
+          <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Income Categories to Create</h5>
+          <div class="d-flex flex-wrap gap-2">
             <% grouped_categories['income'].each do |category| %>
-              <li><%= category.name %></li>
+              <span class="badge bg-primary"><%= category.name %></span>
             <% end %>
-          </ul>
+          </div>
         </div>
       <% end %>
 
       <% if grouped_categories['expense'].present? %>
-        <div class="mb-3">
-          <h2>Expense Categories to Create</h2>
-          <ul>
+        <div class="alert alert-info mb-3">
+          <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Expense Categories to Create</h5>
+          <div class="d-flex flex-wrap gap-2">
             <% grouped_categories['expense'].each do |category| %>
-              <li><%= category.name %></li>
+              <span class="badge bg-primary"><%= category.name %></span>
             <% end %>
-          </ul>
+          </div>
         </div>
       <% end %>
 
-      <div class="mb-3">
-        <h3>Budgets found for <%= @preview_data[:items][0][:year] %></h3>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSelectAll(true)">Select All</button>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSelectAll(false)">Select None</button>
-        <div class="table-responsive mt-2">
-          <table class="table table-bordered">
-            <thead>
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="m-0">Budgets found for <%= @preview_data[:items][0][:year] %></h5>
+          <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary" onclick="toggleSelectAll(true)">Select All</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="toggleSelectAll(false)">Select None</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
               <tr>
-                <th>Select</th>
+                <th class="text-center" style="width: 50px;">Select</th>
                 <th>Category</th>
                 <th>Amount</th>
                 <th>Status</th>
@@ -42,13 +46,13 @@
             <tbody id="budgets">
               <% @preview_data[:items].each_with_index do |budget_data, index| %>
                 <tr>
-                  <td>
-                    <%= check_box_tag "selected_budgets[]", budget_data.to_json, budget_data[:status] == :new, class: "budget-checkbox" %>
+                  <td class="text-center">
+                    <%= check_box_tag "selected_budgets[]", budget_data.to_json, budget_data[:status] == :new, class: "budget-checkbox form-check-input" %>
                   </td>
                   <td>
                     <%= select_tag "budget_category_#{budget_data[:unique_id]}",
                       options_for_select(@categories.map { |c| ["#{c.name}#{c.new_record? ? ' (new)' : ''}", c.name] }, budget_data[:category].name),
-                      class: "form-select" %>
+                      class: "form-select form-select-sm" %>
                   </td>
                   <td><%= number_to_currency(budget_data[:amount] / 100.0) %></td>
                   <td>
@@ -63,8 +67,10 @@
         </div>
       </div>
 
-      <div class="mb-3 text-end">
-        <%= form.submit "Import Selected", class: "btn btn-primary" %>
+      <div class="text-end">
+        <%= button_tag type: 'submit', class: "btn btn-success" do %>
+          <i class="bi bi-check-lg me-1"></i> Import Selected
+        <% end %>
       </div>
     <% end %>
   </div>

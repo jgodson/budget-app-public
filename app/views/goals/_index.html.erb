@@ -3,7 +3,9 @@
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="card-title m-0">Goals</h5>
       <% unless dashboard %>
-        <%= link_to 'Add New Goal', new_goal_path, class: 'btn btn-primary btn-sm' %>
+        <%= link_to new_goal_path, class: 'btn btn-primary btn-sm' do %>
+          <i class="bi bi-plus-lg me-1"></i>Add New Goal
+        <% end %>
       <% end %>
     </div>
     <div class="card-body">
@@ -30,18 +32,25 @@
           <% @active_goals.each do |goal| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= goal_path(goal) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
-                <div class="d-flex justify-content-between">
-                  <%= goal.goal_name %>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span><%= goal.goal_name %></span>
                   <% if goal.complete? %>
-                    <span class="badge bg-success m-0">100%</span>
+                    <small class="text-success">100%</small>
                   <% else %>
-                    <span class="badge bg-primary m-0">
-                      <%= number_to_percentage(goal.percent_complete, precision: 2) %>
-                    </span>
+                    <small class="text-muted"><%= number_to_percentage(goal.percent_complete, precision: 1) %></small>
                   <% end %>
                 </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar <%= goal.complete? ? 'bg-success' : '' %>" role="progressbar" style="width: <%= goal.percent_complete %>%; background-color: <%= goal.complete? ? '' : 'rgba(25, 135, 84, 0.5)' %>;" aria-valuenow="<%= goal.percent_complete %>" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
               </td>
-              <td class="no-row-click"><%= link_to goal.category.name, category_path(goal.category) %></td>
+              <td class="no-row-click">
+                <%= link_to category_path(goal.category), class: "text-decoration-none" do %>
+                  <span class="badge rounded-pill bg-light text-dark border px-3 py-2 shadow-sm">
+                    <i class="bi bi-tag-fill me-2 text-success"></i><%= goal.category.name %>
+                  </span>
+                <% end %>
+              </td>
               <td><%= number_to_currency(goal.amount_dollars) %></td>
               <td><%= number_to_currency(goal.total_contributed_dollars) %></td>
               <td><%= number_to_currency(goal.amount_left_dollars) %></td>
@@ -65,14 +74,21 @@
           <% @archived_goals.each do |goal| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= goal_path(goal) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
-                <div class="d-flex justify-content-between">
-                  <%= goal.goal_name %>
-                  <span class="badge bg-primary m-0">
-                    <%= number_to_percentage(goal.percent_complete, precision: 2) %>
-                  </span>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span><%= goal.goal_name %></span>
+                  <small class="text-muted"><%= number_to_percentage(goal.percent_complete, precision: 1) %></small>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar" role="progressbar" style="width: <%= goal.percent_complete %>%; background-color: rgba(25, 135, 84, 0.5);" aria-valuenow="<%= goal.percent_complete %>" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
               </td>
-              <td class="no-row-click"><%= link_to goal.category.name, category_path(goal.category) %></td>
+              <td class="no-row-click">
+                <%= link_to category_path(goal.category), class: "text-decoration-none" do %>
+                  <span class="badge rounded-pill bg-light text-dark border px-3 py-2 shadow-sm">
+                    <i class="bi bi-tag-fill me-2 text-success"></i><%= goal.category.name %>
+                  </span>
+                <% end %>
+              </td>
               <td><%= number_to_currency(goal.amount_dollars) %></td>
               <td><%= number_to_currency(goal.total_contributed_dollars) %></td>
               <td><%= number_to_currency(goal.amount_left_dollars) %></td>

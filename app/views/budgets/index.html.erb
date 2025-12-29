@@ -7,9 +7,15 @@
           Actions
         </button>
         <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
-          <li><%= link_to "Add Budget", new_budget_path(year: @selected_year), class: "dropdown-item" %></li>
-          <li><%= link_to "Import Budgets", import_form_budgets_path, class: "dropdown-item" %></li>
-          <li><%= button_to "Copy Yearly Budgets to #{@next_year}", copy_yearly_budgets_budgets_path(year: @selected_year), method: :post, class: "dropdown-item", data: { confirm: "Are you sure you want to copy all yearly budgets to #{@next_year}?" } %></li>
+          <li><%= link_to new_budget_path(year: @selected_year), class: "dropdown-item" do %>
+            <i class="bi bi-plus-lg me-2"></i>Add Budget
+          <% end %></li>
+          <li><%= link_to import_form_budgets_path, class: "dropdown-item" do %>
+            <i class="bi bi-upload me-2"></i>Import Budgets
+          <% end %></li>
+          <li><%= button_to copy_yearly_budgets_budgets_path(year: @selected_year), method: :post, class: "dropdown-item", data: { confirm: "Are you sure you want to copy all yearly budgets to #{@next_year}?" } do %>
+            <i class="bi bi-files me-2"></i>Copy Yearly Budgets to <%= @next_year %>
+          <% end %></li>
         </ul>
       </div>
     </div>
@@ -53,7 +59,7 @@
                   <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
                   <% target_budget = monthly_budget || yearly_budget %>
                   <% is_override = monthly_budget.present? || any_subcategory_override %>
-                  <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= monthly_budget ? edit_budget_path(target_budget) : budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'Edit override' : 'View yearly' %>"<% end %>>
+                  <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                     <% if monthly_budget %>
                       <span class="text-info"><%= number_to_currency(total_budgeted_amount / 100.0) %></span>
                     <% else %>
@@ -66,7 +72,7 @@
     <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
-    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+    <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
@@ -88,7 +94,7 @@
                     <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
                     <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
                     <% target_budget = monthly_budget || yearly_budget %>
-                    <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= monthly_budget ? edit_budget_path(target_budget) : budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'Edit override' : 'View yearly' %>"<% end %>>
+                    <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                       <% if monthly_budget %>
                         <span class="text-info"><%= number_to_currency(budgeted_amount / 100.0) %></span>
                       <% else %>
@@ -101,7 +107,7 @@
     <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
-    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+    <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
@@ -151,7 +157,7 @@
                   <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
                   <% target_budget = monthly_budget || yearly_budget %>
                   <% is_override = monthly_budget.present? || any_subcategory_override %>
-                  <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= monthly_budget ? edit_budget_path(target_budget) : budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'Edit override' : 'View yearly' %>"<% end %>>
+                  <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                     <% if monthly_budget %>
                       <span class="text-info"><%= number_to_currency(total_budgeted_amount / 100.0) %></span>
                     <% else %>
@@ -164,7 +170,7 @@
     <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
-    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+    <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
@@ -186,7 +192,7 @@
                     <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
                     <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
                     <% target_budget = monthly_budget || yearly_budget %>
-                    <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= monthly_budget ? edit_budget_path(target_budget) : budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'Edit override' : 'View yearly' %>"<% end %>>
+                    <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                       <% if monthly_budget %>
                         <span class="text-info"><%= number_to_currency(budgeted_amount / 100.0) %></span>
                       <% else %>
@@ -199,7 +205,7 @@
     <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
-    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+    <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
@@ -249,7 +255,7 @@
                   <% total_budgeted_amount = budgeted_amount + subcategory_budgets %>
                   <% target_budget = monthly_budget || yearly_budget %>
                   <% is_override = monthly_budget.present? || any_subcategory_override %>
-                  <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= monthly_budget ? edit_budget_path(target_budget) : budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'Edit override' : 'View yearly' %>"<% end %>>
+                  <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                     <% if monthly_budget %>
                       <span class="text-info"><%= number_to_currency(total_budgeted_amount / 100.0) %></span>
                     <% else %>
@@ -262,7 +268,7 @@
     <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
-    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+    <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
@@ -284,7 +290,7 @@
                     <% yearly_budget = @budgets.find { |b| b.category == subcategory && b.month.nil? } %>
                     <% budgeted_amount = monthly_budget ? monthly_budget.budgeted_amount : (yearly_budget ? yearly_budget.budgeted_amount : 0) %>
                     <% target_budget = monthly_budget || yearly_budget %>
-                    <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= monthly_budget ? edit_budget_path(target_budget) : budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'Edit override' : 'View yearly' %>"<% end %>>
+                    <td <% if target_budget %>data-controller="clickable-row tooltip" data-clickable-row-url-value="<%= budget_path(target_budget) %>" data-action="click->clickable-row#click" style="cursor: pointer;" data-bs-toggle="tooltip" title="<%= monthly_budget ? 'View override' : 'View yearly' %>"<% end %>>
                       <% if monthly_budget %>
                         <span class="text-info"><%= number_to_currency(budgeted_amount / 100.0) %></span>
                       <% else %>
@@ -297,7 +303,7 @@
     <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
-    <%= link_to yearly_budget, data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+    <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>

@@ -1,49 +1,53 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card">
+      <div class="card shadow">
         <div class="card-header h4 fw-bold">
           New Loan Payment
         </div>
         <div class="card-body">
           <%= form_with model: @loan_payment, local: true, html: { class: 'form-horizontal', data: { controller: 'form', action: 'submit->form#submit' } } do |form| %>
-            <div class="mb-3">
-              <%= form.label :loan_id, "Select Loan", class: "form-label" %>
-              <%= form.collection_select :loan_id, @loans, :id, :loan_name, { prompt: "Choose a loan" }, { class: "form-select" } %>
+            <div class="form-floating mb-3">
+              <%= form.collection_select :loan_id, @loans, :id, :loan_name, { prompt: "Choose a loan" }, { class: "form-select", placeholder: "Select Loan" } %>
+              <%= form.label :loan_id, "Select Loan" %>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label">Current Balance</label>
-              <div class="input-group">
-                <span class="input-group-text">$</span>
-                <input type="number" id="current-balance" readonly class="form-control" />
+            <div class="input-group mb-3">
+              <span class="input-group-text">$</span>
+              <div class="form-floating">
+                <input type="number" id="current-balance" readonly class="form-control" placeholder="Current Balance" />
+                <label for="current-balance">Current Balance</label>
               </div>
             </div>
 
-            <div class="mb-3">
-              <%= form.label :new_balance_dollars, "New Balance", class: "form-label" %>
-              <div class="input-group">
-                <span class="input-group-text">$</span>
-                <%= form.text_field :new_balance_dollars, class: 'form-control', id: 'new-balance', data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
+            <div class="input-group mb-3">
+              <span class="input-group-text">$</span>
+              <div class="form-floating">
+                <%= form.text_field :new_balance_dollars, class: 'form-control', id: 'new-balance', placeholder: "New Balance", data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
+                <%= form.label :new_balance_dollars, "New Balance" %>
               </div>
             </div>
 
-            <div class="mb-3">
-              <%= form.label :paid_amount_dollars, "Amount Paid", class: "form-label" %>
-              <div class="input-group">
-                <span class="input-group-text">$</span>
-                <%= form.text_field :paid_amount_dollars, class: 'form-control', id: 'paid-amount', data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
+            <div class="input-group mb-3">
+              <span class="input-group-text">$</span>
+              <div class="form-floating">
+                <%= form.text_field :paid_amount_dollars, class: 'form-control', id: 'paid-amount', placeholder: "Amount Paid", data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
+                <%= form.label :paid_amount_dollars, "Amount Paid" %>
               </div>
             </div>
 
-            <div class="mb-3">
-              <%= form.label :payment_date, "Payment Date", class: "form-label" %>
-              <%= form.date_field :payment_date, class: "form-control", data: { controller: "datepicker", datepicker_type_value: "day" } %>
+            <div class="form-floating mb-3">
+              <%= form.date_field :payment_date, class: "form-control", placeholder: "Payment Date", data: { controller: "datepicker", datepicker_type_value: "day" } %>
+              <%= form.label :payment_date, "Payment Date" %>
             </div>
 
             <div class="text-end">
-              <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-              <%= form.submit "Record Payment", class: "btn btn-primary" %>
+              <button type="button" class="btn btn-secondary" onclick="history.back()">
+                <i class="bi bi-arrow-left"></i> Back
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg"></i> Record Payment
+              </button>
             </div>
           <% end %>
         </div>

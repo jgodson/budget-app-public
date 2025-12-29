@@ -3,7 +3,9 @@
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="card-title m-0">Loans</h5>
       <% unless dashboard %>
-        <%= link_to 'Add New Loan', new_loan_path, class: 'btn btn-primary btn-sm' %>
+        <%= link_to new_loan_path, class: 'btn btn-primary btn-sm' do %>
+          <i class="bi bi-plus-lg me-1"></i>Add New Loan
+        <% end %>
       <% end %>
     </div>
     <div class="card-body">
@@ -33,11 +35,12 @@
           <% @active_loans.each do |loan| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= loan_path(loan) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
-                <div class="d-flex justify-content-between">
-                  <%= loan.loan_name %>
-                  <span class="badge bg-primary m-0">
-                    <%= number_to_percentage(loan.percent_complete, precision: 2) %>
-                  </span>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span><%= loan.loan_name %></span>
+                  <small class="text-muted"><%= number_to_percentage(loan.percent_complete, precision: 1) %></small>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar" role="progressbar" style="width: <%= loan.percent_complete %>%; background-color: rgba(25, 135, 84, 0.5);" aria-valuenow="<%= loan.percent_complete %>" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
               </td>
               <td><%= number_to_currency(loan.balance_dollars) %></td>
@@ -78,9 +81,12 @@
           <% @paid_off_loans.each do |loan| %>
             <tr data-controller="clickable-row" data-clickable-row-url-value="<%= loan_path(loan) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
               <td>
-                <div class="d-flex justify-content-between">
-                  <%= loan.loan_name %>
-                  <span class="badge bg-success m-0">100%</span>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span><%= loan.loan_name %></span>
+                  <small class="text-muted">100%</small>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
               </td>
               <td><%= number_to_currency(loan.balance_dollars) %></td>

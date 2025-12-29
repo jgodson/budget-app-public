@@ -1,62 +1,213 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center h4 fw-bold">
-          <span>Budget Details</span>
-        </div>
-        <div class="card-body">
-          <p>
-            <strong>Year:</strong>
-            <%= @budget.year %>
-          </p>
-          <% if @budget.month.present? %>
-            <p>
-              <strong>Month:</strong>
-              <%= Date::MONTHNAMES[@budget.month] %>
-            </p>
-          <% end %>
-          <p>
-            <strong>Category:</strong>
-            <%= @budget.category.name %>
-          </p>
-          <p>
-            <strong>Budgeted Amount:</strong>
-            <%= number_to_currency(@budget.budgeted_amount / 100.0) %>
-          </p>
-
-          <% if @transactions.any? %>
-            <h2>Transactions</h2>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Amount</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @transactions.each do |transaction| %>
-                  <tr>
-                    <td><%= transaction.date %></td>
-                    <td><%= number_to_currency(transaction.amount / 100.0) %></td>
-                    <td><%= transaction.description %></td>
-                  </tr>
-                <% end %>
-              </tbody>
-            </table>
-          <% else %>
-            <p class="text-muted">No transactions available.</p>
-          <% end %>
-
-          <div class="text-center">
-            <%= link_to 'Add New Transaction', new_transaction_path(budget_id: @budget.id), class: 'btn btn-success' %>
+      <div class="card mb-4">
+        <div class="card-header h4 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-link text-body p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            Budget Details
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <%= link_to edit_budget_path(@budget), class: 'btn btn-sm btn-warning', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+              <i class="bi bi-pencil"></i>
+            <% end %>
+            <%= link_to budget_path(@budget), title: 'Delete', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-danger' do %>
+              <i class="bi bi-trash"></i>
+            <% end %>
           </div>
         </div>
-        <div class="card-footer text-end">
-          <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-          <%= link_to 'Edit', edit_budget_path(@budget), class: 'btn btn-warning' %>
-          <%= link_to 'Delete', budget_path(@budget), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-4">
+            <span class="text-muted text-uppercase small fw-bold me-3">Category</span>
+            <span class="badge rounded-pill bg-light text-dark border px-3 py-2 shadow-sm">
+              <i class="bi bi-tag-fill me-2 text-primary"></i><%= @budget.category.name %>
+            </span>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Period</div>
+                <div class="h4 mb-0"><%= @period_label %></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Budgeted</div>
+                <div class="h4 mb-0 text-primary"><%= number_to_currency(@budgeted_amount / 100.0) %></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1"><%= budget_spent_label(@budget) %></div>
+                <div class="h4 mb-0 <%= budget_spent_color(@budget) %>"><%= number_to_currency(@total_spent / 100.0) %></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Remaining</div>
+                <div class="h4 mb-0 <%= budget_remaining_color(@budget, @remaining) %>">
+                  <%= number_to_currency(@remaining / 100.0) %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-end mb-1">
+              <span class="fw-bold">Budget Usage</span>
+              <span class="small text-muted"><%= number_to_percentage(@pct_used, precision: 1) %></span>
+            </div>
+            <div class="progress" style="height: 25px;">
+              <div class="progress-bar" role="progressbar" 
+                   style="width: <%= [@pct_used, 100].min %>%; background-color: rgba(25, 135, 84, 0.5);" 
+                   aria-valuenow="<%= @pct_used %>" aria-valuemin="0" aria-valuemax="100">
+                 <%= number_to_percentage(@pct_used, precision: 1) %>
+              </div>
+            </div>
+          </div>
+
+            <div class="mb-4">
+              <h5 class="card-title">Budget Breakdown</h5>
+              <div class="row g-2">
+                <% if @yearly_budget %>
+                  <div class="col-md-4 col-sm-6">
+                    <div class="p-2 border rounded bg-light d-flex justify-content-between align-items-center <%= 'border-primary border-2' if @budget.id == @yearly_budget.id %>">
+                      <%= link_to budget_path(@yearly_budget), class: 'text-decoration-none text-body flex-grow-1' do %>
+                        <span class="fw-bold d-block">Yearly Budget</span>
+                        <span class="text-muted small"><%= number_to_currency(@yearly_budget.budgeted_amount / 100.0) %></span>
+                      <% end %>
+                      <%= link_to edit_budget_path(@yearly_budget), class: 'btn btn-sm btn-link text-warning p-0 ms-2', title: 'Edit Yearly Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                        <i class="bi bi-pencil"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                <% else %>
+                  <div class="col-md-4 col-sm-6">
+                    <%= link_to new_budget_path(year: @budget.year, category_id: @budget.category_id), class: 'text-decoration-none' do %>
+                      <div class="p-2 border rounded bg-light d-flex justify-content-center align-items-center text-muted gap-2 h-100" style="border-style: dashed !important;">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Add Yearly Budget</span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+
+                <% @budget_overrides.each do |override| %>
+                  <div class="col-md-4 col-sm-6">
+                    <div class="p-2 border rounded bg-light d-flex justify-content-between align-items-center <%= 'border-primary border-2' if @budget.id == override.id %>">
+                      <%= link_to budget_path(override), class: 'text-decoration-none text-body flex-grow-1' do %>
+                        <span class="fw-bold d-block"><%= Date::MONTHNAMES[override.month] %></span>
+                        <span class="text-muted small"><%= number_to_currency(override.budgeted_amount / 100.0) %></span>
+                      <% end %>
+                      <%= link_to edit_budget_path(override), class: 'btn btn-sm btn-link text-warning p-0 ms-2', title: 'Edit Override', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                        <i class="bi bi-pencil"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+
+                <% if @budget_overrides.count < 12 %>
+                  <% next_month = (1..12).find { |m| !@budget_overrides.map(&:month).include?(m) } %>
+                  <div class="col-md-4 col-sm-6">
+                    <%= link_to new_budget_path(year: @budget.year, category_id: @budget.category_id, month: next_month), class: 'text-decoration-none' do %>
+                      <div class="p-2 border rounded bg-light d-flex justify-content-center align-items-center text-muted gap-2 h-100" style="border-style: dashed !important;">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Add Monthly Override</span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+
+          <div class="mb-4">
+            <h5 class="card-title">Monthly <%= @budget.category.category_type.humanize.titleize %> Trend</h5>
+            <div style="position: relative; height: 300px;">
+              <canvas id="budgetChart" width="400" height="200"
+                data-controller="charts"
+                data-charts-type-value="line"
+                data-charts-data-value="<%= {
+                  labels: (1..12).map { |m| Date::MONTHNAMES[m] },
+                  datasets: [
+                    {
+                      label: "Budget",
+                      data: @budget_data,
+                      borderColor: '#ffc107',
+                      backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                      tension: 0.1,
+                      fill: false
+                    },
+                    {
+                      label: "Current Year (#{@budget.year})",
+                      data: @current_year_data,
+                      borderColor: '#0d6efd',
+                      backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                      tension: 0.1,
+                      fill: true
+                    },
+                    {
+                      label: "Prior Year (#{@budget.year - 1})",
+                      data: @prior_year_data,
+                      borderColor: '#6c757d',
+                      backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                      borderDash: [5, 5],
+                      tension: 0.1,
+                      fill: false
+                    }
+                  ]
+                }.to_json %>"
+                data-charts-options-value="<%= {
+                  interaction: {
+                    mode: 'index',
+                    intersect: false,
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      suggestedMax: @chart_max
+                    }
+                  }
+                }.to_json %>">
+              </canvas>
+            </div>
+          </div>
+
+          <% if @transactions.any? %>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Transactions</h5>
+              <%= link_to new_transaction_path(budget_id: @budget.id), class: 'btn btn-sm btn-success', title: 'Add Transaction', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                <i class="bi bi-plus-lg"></i>
+              <% end %>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th class="text-end">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @transactions.each do |transaction| %>
+                    <tr>
+                      <td><%= transaction.date.strftime("%b %d") %></td>
+                      <td><%= transaction.description %></td>
+                      <td class="text-end"><%= number_to_currency(transaction.amount / 100.0) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="text-center py-4 text-muted">
+              <p>No transactions found for this period.</p>
+              <%= link_to 'Add Transaction', new_transaction_path(budget_id: @budget.id), class: 'btn btn-primary' %>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

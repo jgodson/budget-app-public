@@ -1,3 +1,11 @@
+## Sync - 2025-12-28 18:15:29
+
+- 314901e add suggested budget on new/edit pages
+- e803310 continue UI refresh with new/edit pages
+- 20d6001 Icons for list page actions
+- af2fb4e refresh show pages
+- d12d997 spruce up goals and loans
+
 ## Sync - 2025-12-27 14:07:06
 
 - 3c5802c Allow for easier budget overrides when multiple months

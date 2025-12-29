@@ -1,21 +1,25 @@
 <%= form_with(model: category, local: true, html: { class: 'form-horizontal' }) do |form| %>
-  <div class="form-group mb-3">
-    <%= form.label :name, class: 'form-label' %>
-    <%= form.text_field :name, class: 'form-control' %>
+  <div class="form-floating mb-3">
+    <%= form.text_field :name, class: 'form-control', placeholder: "Name" %>
+    <%= form.label :name, "Name" %>
   </div>
 
-  <div class="form-group mb-3">
-    <%= form.label :parent_category_id, "Parent Category", class: 'form-label' %>
-    <%= form.collection_select :parent_category_id, @parent_categories, :id, :name, { include_blank: true }, { class: 'form-control' } %>
+  <div class="form-floating mb-3">
+    <%= form.collection_select :parent_category_id, @parent_categories, :id, :name, { include_blank: true }, { class: 'form-select', placeholder: "Parent Category" } %>
+    <%= form.label :parent_category_id, "Parent Category" %>
   </div>
 
-  <div class="form-group mb-3">
-    <%= form.label :category_type, class: 'form-label' %>
-    <%= form.select :category_type, Category.category_types.keys.map { |type| [type.humanize, type] }, {}, { class: 'form-control' } %>
+  <div class="form-floating mb-3">
+    <%= form.select :category_type, Category.category_types.keys.map { |type| [type.humanize, type] }, {}, { class: 'form-select', placeholder: "Category Type" } %>
+    <%= form.label :category_type, "Category Type" %>
   </div>
 
   <div class="form-group text-end">
-    <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-    <%= form.submit(category.persisted? ? "Update" : "Create", class: 'btn btn-primary') %>
+    <button type="button" class="btn btn-secondary" onclick="history.back()">
+      <i class="bi bi-arrow-left me-1"></i>Back
+    </button>
+    <%= form.button class: 'btn btn-primary' do %>
+      <i class="bi bi-check-lg me-1"></i><%= category.persisted? ? "Update" : "Create" %>
+    <% end %>
   </div>
 <% end %>

@@ -8,6 +8,56 @@ class GoalsController < ApplicationController
   end
 
   def show
+    # Chart Data Preparation
+    current_year = Date.current.year
+    prior_year = current_year - 1
+    
+    # Get transactions for the goal's category
+    transactions = @goal.category.transactions
+    
+    # Initialize data arrays for 12 months
+    current_year_data = Array.new(12, 0)
+    prior_year_data = Array.new(12, 0)
+    
+    # Filter and sum transactions
+    transactions.each do |t|
+      month_index = t.date.month - 1
+      amount = t.amount / 100.0
+      
+      if t.date.year == current_year
+        current_year_data[month_index] += amount
+      elsif t.date.year == prior_year
+        prior_year_data[month_index] += amount
+      end
+    end
+    
+    labels = Date::MONTHNAMES.compact # ["January", "February", ...]
+    
+    max_val = [current_year_data.max, prior_year_data.max].max
+    @goals_chart_max = (max_val * 1.2).ceil
+
+    @contributions_chart_data = {
+      labels: labels,
+      datasets: [
+        {
+          label: "#{current_year} Contributions",
+          data: current_year_data,
+          borderColor: '#198754', # Success Green
+          backgroundColor: 'rgba(25, 135, 84, 0.1)',
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: "#{prior_year} Contributions",
+          data: prior_year_data,
+          borderColor: '#6c757d', # Secondary Gray
+          backgroundColor: 'rgba(108, 117, 125, 0.1)',
+          fill: true,
+          tension: 0.4,
+          borderDash: [5, 5]
+        }
+      ]
+    }
   end
 
   def new

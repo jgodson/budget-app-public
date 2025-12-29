@@ -3,35 +3,204 @@
     <div class="col-md-8 offset-md-2">
       <div class="card">
         <div class="card-header h4 d-flex justify-content-between align-items-center">
-          Loan for <%= @loan.loan_name %>
           <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-link text-dark p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            Loan for <%= @loan.loan_name %>
+          </div>
+          <div class="d-flex align-items-center gap-2">
             <% if @loan.paid_off? %>
-              <span class="badge bg-success ms-o ms-2">Paid off <%= @loan.last_payment.payment_date.year %></span>
+              <span class="badge bg-success">Paid off <%= @loan.last_payment.payment_date.year %></span>
             <% end %>
 
-            <span class="badge bg-primary m-0 ms-2">
-              <%= number_to_percentage(@loan.percent_complete, precision: 2) %>
-            </span>
+            <% unless @loan.paid_off? %>
+              <%= link_to new_loan_payment_path(loan_id: @loan), class: 'btn btn-sm btn-success', title: 'Add Payment', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                <i class="bi bi-plus-lg"></i>
+              <% end %>
+            <% end %>
+
+            <%= link_to edit_loan_path(@loan), class: 'btn btn-sm btn-warning', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+              <i class="bi bi-pencil"></i>
+            <% end %>
           </div>
         </div>
         <div class="card-body">
-          <p><strong>Payment Category:</strong> <%= link_to @loan.category.name, category_path(@loan.category) %></p>
-          <p><strong>Balance:</strong> <%= number_to_currency(@loan.balance_dollars) %></p>
-          <p><strong>Total Paid:</strong> <%= number_to_currency(@loan.total_paid_dollars) %></p>
-          <p><strong>Total Principal Paid:</strong> <%= number_to_currency(@loan.total_principal_paid_dollars) %></p>
-          <p><strong>Total Interest Paid:</strong> <%= number_to_currency(@loan.total_interest_paid_dollars) %></p>
+          <div class="d-flex align-items-center mb-4">
+            <span class="text-muted text-uppercase small fw-bold me-3">Payment Category</span>
+            <%= link_to category_path(@loan.category), class: "text-decoration-none" do %>
+              <span class="badge rounded-pill bg-light text-dark border px-3 py-2 shadow-sm">
+                <i class="bi bi-tag-fill me-2 text-primary"></i><%= @loan.category.name %>
+              </span>
+            <% end %>
+          </div>
+          
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <strong>Progress:</strong>
+              <small class="text-muted"><%= number_to_percentage(@loan.percent_complete, precision: 1) %></small>
+            </div>
+            <div class="progress" style="height: 20px;">
+              <div class="progress-bar <%= @loan.paid_off? ? 'bg-success' : '' %>" role="progressbar" style="width: <%= @loan.percent_complete %>%; background-color: <%= @loan.paid_off? ? '' : 'rgba(25, 135, 84, 0.5)' %>;" aria-valuenow="<%= @loan.percent_complete %>" aria-valuemin="0" aria-valuemax="100">
+                <%= number_to_percentage(@loan.percent_complete, precision: 1) %>
+              </div>
+            </div>
+            <div class="text-end text-muted small mt-1">
+              <%= number_to_currency(@loan.total_principal_paid_dollars) %> / <%= number_to_currency(@loan.balance_dollars + @loan.total_principal_paid_dollars) %>
+            </div>
+          </div>
 
-          <div class="text-end">
-            <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-            <%= link_to 'Edit', edit_loan_path(@loan), class: 'btn btn-warning' %>
-            <% unless @loan.paid_off? %>
-              <%= link_to 'Add Payment', new_loan_payment_path(loan_id: @loan), class: 'btn btn-success' %>
+          <div class="row mb-4 g-3">
+            <div class="col-md-3">
+              <div class="card h-100 border-0 shadow-sm bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Balance</h6>
+                  <h4 class="card-title mb-0 fw-bold"><%= number_to_currency(@loan.balance_dollars) %></h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card h-100 border-0 shadow-sm bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Total Paid</h6>
+                  <h4 class="card-title mb-0 fw-bold"><%= number_to_currency(@loan.total_paid_dollars) %></h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card h-100 border-0 shadow-sm bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Principal Paid</h6>
+                  <h4 class="card-title mb-0 fw-bold text-info"><%= number_to_currency(@loan.total_principal_paid_dollars) %></h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card h-100 border-0 shadow-sm bg-light">
+                <div class="card-body text-center">
+                  <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Interest Paid</h6>
+                  <h4 class="card-title mb-0 fw-bold text-warning"><%= number_to_currency(@loan.total_interest_paid_dollars) %></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <p class="mb-1"><strong>Interest vs Principal:</strong></p>
+            <% total_paid = @loan.total_paid_dollars %>
+            <% if total_paid > 0 %>
+              <% principal_pct = (@loan.total_principal_paid_dollars / total_paid * 100).round(1) %>
+              <% interest_pct = (@loan.total_interest_paid_dollars / total_paid * 100).round(1) %>
+              <div class="progress" style="height: 20px;">
+                <div class="progress-bar bg-info" role="progressbar" style="width: <%= principal_pct %>%;" aria-valuenow="<%= principal_pct %>" aria-valuemin="0" aria-valuemax="100" title="Principal: <%= principal_pct %>%">
+                  Principal
+                </div>
+                <div class="progress-bar bg-warning" role="progressbar" style="width: <%= interest_pct %>%;" aria-valuenow="<%= interest_pct %>" aria-valuemin="0" aria-valuemax="100" title="Interest: <%= interest_pct %>%">
+                  Interest
+                </div>
+              </div>
+              <div class="d-flex justify-content-between small text-muted mt-1">
+                  <span>Principal: <%= number_to_percentage(principal_pct, precision: 1) %></span>
+                  <span>Interest: <%= number_to_percentage(interest_pct, precision: 1) %></span>
+              </div>
+            <% else %>
+              <p class="text-muted">No payments yet.</p>
             <% end %>
           </div>
         </div>
       </div>
 
       <% if @loan.loan_payments.any? %>
+        <div class="card mt-4" data-controller="chart-switcher">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title m-0" data-chart-switcher-target="title">Total Payments</h5>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-sm btn-secondary active" 
+                      data-chart-switcher-target="btn" 
+                      data-action="click->chart-switcher#switch" 
+                      data-view-name="total" 
+                      data-title="Total Payments"
+                      data-bs-toggle="tooltip" 
+                      title="Total Payments">
+                Total
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" 
+                      data-chart-switcher-target="btn" 
+                      data-action="click->chart-switcher#switch" 
+                      data-view-name="principal" 
+                      data-title="Principal Paid"
+                      data-bs-toggle="tooltip" 
+                      title="Principal Paid">
+                Principal
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" 
+                      data-chart-switcher-target="btn" 
+                      data-action="click->chart-switcher#switch" 
+                      data-view-name="interest" 
+                      data-title="Interest Paid"
+                      data-bs-toggle="tooltip" 
+                      title="Interest Paid">
+                Interest
+              </button>
+            </div>
+          </div>
+          <div class="card-body" style="height: 300px;">
+            <!-- Total Chart -->
+            <div data-chart-switcher-target="view" data-view-name="total" style="position: relative; height: 100%; width: 100%;">
+              <canvas
+                data-controller="charts"
+                data-charts-type-value="line"
+                data-charts-data-value="<%= @total_payments_chart_data.to_json %>"
+                data-charts-options-value="<%= {
+                  plugins: { legend: { display: true, position: 'bottom' } },
+                  maintainAspectRatio: false,
+                  scales: { y: { beginAtZero: true, suggestedMax: @total_chart_max } },
+                  interaction: {
+                    mode: 'index',
+                    intersect: false,
+                  }
+                }.to_json %>"
+              ></canvas>
+            </div>
+            
+            <!-- Principal Chart -->
+            <div data-chart-switcher-target="view" data-view-name="principal" class="d-none" style="height: 100%; width: 100%;">
+               <canvas
+                data-controller="charts"
+                data-charts-type-value="line"
+                data-charts-data-value="<%= @principal_payments_chart_data.to_json %>"
+                data-charts-options-value="<%= {
+                  plugins: { legend: { display: true, position: 'bottom' } },
+                  maintainAspectRatio: false,
+                  scales: { y: { beginAtZero: true, suggestedMax: @principal_chart_max } },
+                  interaction: {
+                    mode: 'index',
+                    intersect: false,
+                  }
+                }.to_json %>"
+              ></canvas>
+            </div>
+
+            <!-- Interest Chart -->
+            <div data-chart-switcher-target="view" data-view-name="interest" class="d-none" style="height: 100%; width: 100%;">
+               <canvas
+                data-controller="charts"
+                data-charts-type-value="line"
+                data-charts-data-value="<%= @interest_payments_chart_data.to_json %>"
+                data-charts-options-value="<%= {
+                  plugins: { legend: { display: true, position: 'bottom' } },
+                  maintainAspectRatio: false,
+                  scales: { y: { beginAtZero: true, suggestedMax: @interest_chart_max } },
+                  interaction: {
+                    mode: 'index',
+                    intersect: false,
+                  }
+                }.to_json %>"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+
         <div class="card mt-4">
           <div class="card-header h5">
             Payments by year
@@ -39,39 +208,41 @@
           <div class="card-body">
             <% @loan.payments_by_year.each do |year, payments| %>
               <h5 class="ms-2"><%= year %></h5>
-              <table class="table table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Amount Paid</th>
-                    <th>Interest Paid</th>
-                    <th>Principal Paid</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% payments.each do |payment| %>
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead>
                     <tr>
-                      <td><%= payment.payment_date.strftime("%Y-%m-%d") %></td>
-                      <td><%= number_to_currency(payment.paid_amount / 100.0) %></td>
-                      <td><%= number_to_currency(payment.interest_amount / 100.0) %></td>
-                      <td><%= number_to_currency((payment.paid_amount - payment.interest_amount) / 100.0) %></td>
-                      <td>
-                        <%= link_to loan_payment_path(payment), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
-                          <i class="bi bi-trash"></i>
-                        <% end %>
-                      </td>
+                      <th>Date</th>
+                      <th>Amount Paid</th>
+                      <th>Interest Paid</th>
+                      <th>Principal Paid</th>
+                      <th>Actions</th>
                     </tr>
-                  <% end %>
-                  <tr>
-                    <td><strong>Total</strong></td>
-                    <td><strong><%= number_to_currency(@totals_by_year[year][:total_paid] / 100.0) %></strong></td>
-                    <td><strong><%= number_to_currency(@totals_by_year[year][:total_interest] / 100.0) %></strong></td>
-                    <td><strong><%= number_to_currency(@totals_by_year[year][:total_principal] / 100.0) %></strong></td>
-                    <td></td>
-                  </tr>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    <% payments.each do |payment| %>
+                      <tr>
+                        <td><%= payment.payment_date.strftime("%Y-%m-%d") %></td>
+                        <td><%= number_to_currency(payment.paid_amount / 100.0) %></td>
+                        <td><%= number_to_currency(payment.interest_amount / 100.0) %></td>
+                        <td><%= number_to_currency((payment.paid_amount - payment.interest_amount) / 100.0) %></td>
+                        <td>
+                          <%= link_to loan_payment_path(payment), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
+                            <i class="bi bi-trash"></i>
+                          <% end %>
+                        </td>
+                      </tr>
+                    <% end %>
+                    <tr>
+                      <td><strong>Total</strong></td>
+                      <td><strong><%= number_to_currency(@totals_by_year[year][:total_paid] / 100.0) %></strong></td>
+                      <td><strong><%= number_to_currency(@totals_by_year[year][:total_interest] / 100.0) %></strong></td>
+                      <td><strong><%= number_to_currency(@totals_by_year[year][:total_principal] / 100.0) %></strong></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             <% end %>
           </div>
         </div>

@@ -1,60 +1,149 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
-    <div class="col-md-10">
-      <div class="card">
-        <div class="card-header">
-          <h1>Category: <%= @category.name %></h1>
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header h4 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-link text-dark p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            Category Details
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <%= link_to edit_category_path(@category), class: 'btn btn-sm btn-warning', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+              <i class="bi bi-pencil"></i>
+            <% end %>
+            <%= link_to destroy_category_path(@category), title: 'Delete', data: { controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-danger' do %>
+              <i class="bi bi-trash"></i>
+            <% end %>
+          </div>
         </div>
         <div class="card-body">
-          <p>
-            <strong>Category Type:</strong>
-            <%= @category.category_type.humanize %>
-          </p>
+          <div class="d-flex align-items-center mb-4">
+            <span class="text-muted text-uppercase small fw-bold me-3">Name</span>
+            <span class="badge rounded-pill bg-light text-dark border px-3 py-2 shadow-sm">
+              <i class="bi bi-tag-fill me-2 text-primary"></i><%= @category.name %>
+            </span>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Type</div>
+                <div class="h4 mb-0"><%= @category.category_type.humanize %></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1"><%= category_spent_label(@category) %></div>
+                <div class="h4 mb-0 <%= category_amount_color(@category) %>"><%= number_to_currency(@total_spent_ytd / 100.0) %></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Avg Monthly</div>
+                <div class="h4 mb-0 text-primary"><%= number_to_currency(@avg_monthly_spend / 100.0) %></div>
+              </div>
+            </div>
+          </div>
 
           <% if @category.parent_category %>
-            <p>
+            <div class="mb-3">
               <strong>Parent Category:</strong>
-              <%= link_to @category.parent_category.name, category_path(@category.parent_category) %>
-            </p>
+              <%= link_to @category.parent_category.name, category_path(@category.parent_category), class: 'text-decoration-none' %>
+            </div>
           <% end %>
 
           <% if @category.subcategories.any? %>
-            <h2>Subcategories</h2>
-            <ul class="list-group mb-3">
-              <% @category.subcategories.each do |subcategory| %>
-                <li class="list-group-item">
-                  <%= link_to subcategory.name, category_path(subcategory) %>
-                </li>
-              <% end %>
-            </ul>
+            <div class="mb-4">
+              <h5 class="card-title">Subcategories</h5>
+              <div class="list-group">
+                <% @category.subcategories.each do |subcategory| %>
+                  <%= link_to category_path(subcategory), class: 'list-group-item list-group-item-action d-flex justify-content-between align-items-center' do %>
+                    <%= subcategory.name %>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
           <% end %>
 
+          <div class="mb-4">
+            <h5 class="card-title">Monthly <%= @category.category_type.humanize.titleize %> Trend</h5>
+            <div style="position: relative; height: 300px;">
+              <canvas id="categoryChart" width="400" height="200"
+                data-controller="charts"
+                data-charts-type-value="line"
+                data-charts-data-value="<%= {
+                  labels: (1..12).map { |m| Date::MONTHNAMES[m] },
+                  datasets: [
+                    {
+                      label: "Current Year (#{@year})",
+                      data: @current_year_data,
+                      borderColor: '#0d6efd',
+                      backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                      tension: 0.1,
+                      fill: true
+                    },
+                    {
+                      label: "Prior Year (#{@year - 1})",
+                      data: @prior_year_data,
+                      borderColor: '#6c757d',
+                      backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                      borderDash: [5, 5],
+                      tension: 0.1,
+                      fill: false
+                    }
+                  ]
+                }.to_json %>"
+                data-charts-options-value="<%= {
+                  interaction: {
+                    mode: 'index',
+                    intersect: false,
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      suggestedMax: @chart_max
+                    }
+                  }
+                }.to_json %>">
+              </canvas>
+            </div>
+          </div>
+
           <% if @category.transactions.any? %>
-            <h2>Transactions</h2>
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Amount</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @category.transactions.order(date: :desc).each do |transaction| %>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">Recent Transactions</h5>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover table-bordered">
+                <thead class="table-light">
                   <tr>
-                    <td><%= transaction.date %></td>
-                    <td><%= number_to_currency(transaction.amount / 100.0) %></td>
-                    <td><%= transaction.description %></td>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th class="text-end">Amount</th>
                   </tr>
-                <% end %>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <% @category.transactions.order(date: :desc).limit(10).each do |transaction| %>
+                    <tr>
+                      <td><%= transaction.date.strftime("%b %d, %Y") %></td>
+                      <td><%= transaction.description %></td>
+                      <td class="text-end"><%= number_to_currency(transaction.amount / 100.0) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+            <% if @category.transactions.count > 10 %>
+              <div class="text-center mt-2">
+                <small class="text-muted">Showing last 10 transactions</small>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="text-muted">No transactions found.</p>
           <% end %>
-        </div>
-        <div class="card-footer text-end">
-          <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-          <%= link_to 'Edit', edit_category_path(@category), class: 'btn btn-warning' %>
-          <%= link_to 'Delete', destroy_category_path(@category), class: 'btn btn-danger' %>
         </div>
       </div>
     </div>

@@ -1,35 +1,103 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
     <div class="col-md-8">
-      <div class="card">
-        <div class="card-header h4 fw-bold">
-          Transaction Details
+      <div class="card mb-4">
+        <div class="card-header h4 d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-link text-dark p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            Transaction Details
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <% if @transaction.loan_payment.present? %>
+              <button class="btn btn-sm btn-primary" disabled title="Cannot edit loan payment transaction" data-controller="tooltip" data-bs-toggle="tooltip">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" disabled title="Cannot delete loan payment transaction" data-controller="tooltip" data-bs-toggle="tooltip">
+                <i class="bi bi-trash"></i>
+              </button>
+            <% else %>
+              <%= link_to edit_transaction_path(@transaction), class: 'btn btn-sm btn-warning', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+                <i class="bi bi-pencil"></i>
+              <% end %>
+              <%= link_to transaction_path(@transaction), title: 'Delete', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-danger' do %>
+                <i class="bi bi-trash"></i>
+              <% end %>
+            <% end %>
+          </div>
         </div>
         <div class="card-body">
-          <p><strong>Category:</strong> <%= @transaction.category.name %></p>
-          <p><strong>Amount:</strong> <%= number_to_currency(@transaction.amount / 100.0) %></p>
-          <p><strong>Date:</strong> <%= @transaction.date.strftime("%B %d, %Y") %></p>
-          <p><strong>Description:</strong> <%= @transaction.description %></p>
-          <p><strong>Source:</strong> <%= transaction_source_badge(@transaction) %></p>
+          <div class="d-flex align-items-center mb-4">
+            <span class="text-muted text-uppercase small fw-bold me-3">Category</span>
+            <span class="badge rounded-pill bg-light text-dark border px-3 py-2 shadow-sm">
+              <i class="bi bi-tag-fill me-2 text-primary"></i><%= @transaction.category.name %>
+            </span>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Type</div>
+                <div class="h4 mb-0"><%= @transaction.category.category_type.humanize.titleize %></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Date</div>
+                <div class="h4 mb-0"><%= @transaction.date.strftime("%B %d, %Y") %></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 border rounded bg-light text-center h-100">
+                <div class="text-muted small text-uppercase fw-bold mb-1">Amount</div>
+                <div class="h4 mb-0 text-primary"><%= number_to_currency(@transaction.amount / 100.0) %></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <h5 class="card-title">Details</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <span class="text-muted">Description</span>
+                <span class="fw-bold"><%= @transaction.description %></span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <span class="text-muted">Source</span>
+                <span><%= transaction_source_badge(@transaction) %></span>
+              </li>
+            </ul>
+          </div>
           
           <% if @transaction.loan_payment.present? %>
-            <hr>
-            <h5>Associated Loan Payment</h5>
-            <p><strong>Loan:</strong> <%= link_to @transaction.loan_payment.loan.loan_name, loan_path(@transaction.loan_payment.loan) %></p>
-            <p><strong>Paid Amount:</strong> <%= number_to_currency(@transaction.loan_payment.paid_amount / 100.0) %></p>
-            <p><strong>Interest Amount:</strong> <%= number_to_currency(@transaction.loan_payment.interest_amount / 100.0) %></p>
-            <p><strong>Principal Amount:</strong> <%= number_to_currency((@transaction.loan_payment.paid_amount - @transaction.loan_payment.interest_amount) / 100.0) %></p>
-            <p><strong>Payment Date:</strong> <%= @transaction.loan_payment.payment_date.strftime("%B %d, %Y") %></p>
-          <% end %>
-        </div>
-        <div class="card-footer text-end">
-          <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-          <% if @transaction.loan_payment.present? %>
-            <button class="btn btn-primary" disabled>Edit</button>
-            <button class="btn btn-danger" disabled>Delete</button>
-          <% else %>
-            <%= link_to 'Edit', edit_transaction_path(@transaction), class: 'btn btn-primary' %>
-            <%= link_to 'Delete', transaction_path(@transaction), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+            <div class="card bg-light border-0">
+              <div class="card-body">
+                <h5 class="card-title mb-3"><i class="bi bi-bank me-2"></i>Associated Loan Payment</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <small class="text-muted d-block">Loan</small>
+                    <%= link_to @transaction.loan_payment.loan.loan_name, loan_path(@transaction.loan_payment.loan), class: 'fw-bold text-decoration-none' %>
+                  </div>
+                  <div class="col-md-6">
+                    <small class="text-muted d-block">Payment Date</small>
+                    <span class="fw-bold"><%= @transaction.loan_payment.payment_date.strftime("%B %d, %Y") %></span>
+                  </div>
+                  <div class="col-md-4">
+                    <small class="text-muted d-block">Paid Amount</small>
+                    <span class="fw-bold"><%= number_to_currency(@transaction.loan_payment.paid_amount / 100.0) %></span>
+                  </div>
+                  <div class="col-md-4">
+                    <small class="text-muted d-block">Principal</small>
+                    <span class="fw-bold text-success"><%= number_to_currency((@transaction.loan_payment.paid_amount - @transaction.loan_payment.interest_amount) / 100.0) %></span>
+                  </div>
+                  <div class="col-md-4">
+                    <small class="text-muted d-block">Interest</small>
+                    <span class="fw-bold text-warning"><%= number_to_currency(@transaction.loan_payment.interest_amount / 100.0) %></span>
+                  </div>
+                </div>
+              </div>
+            </div>
           <% end %>
         </div>
       </div>

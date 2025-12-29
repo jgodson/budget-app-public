@@ -1,29 +1,33 @@
 <%= form_with(model: transaction, local: true, html: { class: 'form-horizontal', data: { controller: 'form', action: 'submit->form#submit' } }) do |form| %>
-  <div class="mb-3">
-    <%= form.label :category_id, class: 'form-label' %>
-    <%= form.collection_select :category_id, @categories, :id, :name, { prompt: "Choose a category" }, { class: 'form-select' } %>
+  <div class="form-floating mb-3">
+    <%= form.collection_select :category_id, @categories, :id, :name, { prompt: "Choose a category" }, { class: 'form-select', placeholder: 'Category' } %>
+    <%= form.label :category_id, "Category" %>
   </div>
 
-  <div class="form-group mb-3">
-    <%= form.label :date, "Date", class: 'form-label' %>
-    <%= form.text_field :date, class: "form-control", data: { controller: "datepicker", datepicker_type_value: "day" } %>
+  <div class="form-floating mb-3">
+    <%= form.text_field :date, class: "form-control", placeholder: "Date", data: { controller: "datepicker", datepicker_type_value: "day" } %>
+    <%= form.label :date, "Date" %>
   </div>
 
-  <div class="mb-3">
-    <%= form.label :description, class: 'form-label' %>
-    <%= form.text_field :description, class: 'form-control' %>
+  <div class="form-floating mb-3">
+    <%= form.text_field :description, class: 'form-control', placeholder: "Description" %>
+    <%= form.label :description, "Description" %>
   </div>
 
-  <div class="mb-3">
-    <%= form.label :amount_dollars, "Amount", class: 'form-label' %>
-    <div class="input-group">
-      <span class="input-group-text">$</span>
-      <%= form.text_field :amount_dollars, class: 'form-control', data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
+  <div class="input-group mb-3">
+    <span class="input-group-text">$</span>
+    <div class="form-floating">
+      <%= form.text_field :amount_dollars, class: 'form-control', placeholder: "Amount", data: { type: 'number', controller: 'number-input', action: 'blur->number-input#format' } %>
+      <%= form.label :amount_dollars, "Amount" %>
     </div>
   </div>
 
   <div class="text-end">
-    <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-    <%= form.submit(transaction.persisted? ? "Update" : "Create", class: 'btn btn-primary') %>
+    <button type="button" class="btn btn-secondary" onclick="history.back()">
+      <i class="bi bi-arrow-left"></i> Back
+    </button>
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-check-lg"></i> <%= transaction.persisted? ? "Update" : "Create" %>
+    </button>
   </div>
 <% end %>
