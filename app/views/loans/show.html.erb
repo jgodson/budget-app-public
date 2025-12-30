@@ -1,19 +1,15 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
-    <div class="col-md-8 offset-md-2">
+    <div class="col-md-8">
       <div class="card">
         <div class="card-header h4 d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
-            <button type="button" class="btn btn-link text-dark p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
+            <button type="button" class="btn btn-link text-body p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
               <i class="bi bi-arrow-left"></i>
             </button>
             Loan for <%= @loan.loan_name %>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <% if @loan.paid_off? %>
-              <span class="badge bg-success">Paid off <%= @loan.last_payment.payment_date.year %></span>
-            <% end %>
-
             <% unless @loan.paid_off? %>
               <%= link_to new_loan_payment_path(loan_id: @loan), class: 'btn btn-sm btn-success', title: 'Add Payment', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                 <i class="bi bi-plus-lg"></i>
@@ -38,7 +34,12 @@
           <div class="mb-3">
             <div class="d-flex justify-content-between align-items-center mb-1">
               <strong>Progress:</strong>
-              <small class="text-muted"><%= number_to_percentage(@loan.percent_complete, precision: 1) %></small>
+              <div>
+                <% if @loan.paid_off? %>
+                  <small class="text-success me-2 fw-bold">Paid off <%= @loan.last_payment.payment_date.strftime("%B %Y") %></small>
+                <% end %>
+                <small class="text-muted"><%= number_to_percentage(@loan.percent_complete, precision: 1) %></small>
+              </div>
             </div>
             <div class="progress" style="height: 20px;">
               <div class="progress-bar <%= @loan.paid_off? ? 'bg-success' : '' %>" role="progressbar" style="width: <%= @loan.percent_complete %>%; background-color: <%= @loan.paid_off? ? '' : 'rgba(25, 135, 84, 0.5)' %>;" aria-valuenow="<%= @loan.percent_complete %>" aria-valuemin="0" aria-valuemax="100">

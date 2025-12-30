@@ -1,3 +1,7 @@
+## Sync - 2025-12-29 22:16:40
+
+- b540f56 fix back buttons in dark mode, remove badges for loans and goal details pages, other UI tweaks
+
 ## Sync - 2025-12-28 18:55:56
 
 - cd562c8 change budget suggestion to amount vs spending
