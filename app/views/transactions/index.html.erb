@@ -18,7 +18,7 @@
     </div>
     <div class="card-body">
       <!-- Filters -->
-      <%= form_with url: transactions_path, method: :get, local: true do %>
+      <%= form_with url: transactions_path, method: :get, data: { turbo_frame: "transactions_list" } do %>
         <div class="row g-3">
           <div class="col-sm-6 col-lg-auto pb-2">
             <%= label_tag :year, "Select Year:", class: "form-label" %>
@@ -28,9 +28,11 @@
             <%= label_tag :month, "Select Month:", class: "form-label" %>
             <%= select_tag :month, options_for_select([['', '']] + Date::MONTHNAMES.compact.each_with_index.map { |name, index| [name, index + 1] }, @selected_month.to_i), class: "form-select", onchange: "this.form.submit();" %>
           </div>
-          <div class="col-sm-6 col-lg-3 pb-2">
+          <div class="col-sm-6 col-lg-3 pb-2" data-controller="select-filter" data-select-filter-submit-form-value="true">
             <%= label_tag :category, "Select Category:", class: "form-label" %>
-            <%= select_tag :category, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @selected_category.to_i), class: "form-select", onchange: "this.form.submit();" %>
+            <% category_input_id = "category_filter" %>
+            <input type="text" class="form-control" id="<%= category_input_id %>" data-select-filter-target="input" data-action="input->select-filter#filter keydown->select-filter#handleKeydown focus->select-filter#openDropdown blur->select-filter#closeDropdown" />
+            <%= select_tag :category, options_for_select([['', '']] + @categories.map { |c| [c.name, c.id] }, @selected_category.to_i), id: "#{category_input_id}_select", class: "form-select d-none", data: { select_filter_target: "select", action: "change->select-filter#syncInput" } %>
           </div>
           <div class="col-sm-6 col-lg-2 pb-2">
             <%= label_tag :source, "Select Source:", class: "form-label" %>
@@ -47,6 +49,7 @@
         </div>
       <% end %>
 
+      <%= turbo_frame_tag "transactions_list" do %>
       <div class="table-responsive mt-4">
     <table class="table table-bordered table-hover align-middle">
       <% @grouped_transactions.each do |date, transactions| %>
@@ -133,6 +136,7 @@
         <h3 class="text-muted">No transactions found</h3>
         <p class="text-muted">Try adjusting your filters or adding new transactions.</p>
       </div>
+      <% end %>
     </div>
   </div>
 </div>

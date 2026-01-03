@@ -1,8 +1,12 @@
 <div class="card-body">
   <%= form_with model: @budget, local: true, html: { class: 'form-horizontal', data: { controller: 'form budget-suggestions', action: 'submit->form#submit' } } do |form| %>
-    <div class="form-floating mb-3">
-      <%= form.collection_select :category_id, @categories, :id, :name, { prompt: "Choose a category" }, { class: 'form-select', placeholder: "Category", data: { action: "change->budget-suggestions#fetchAverage", budget_suggestions_target: "categorySelect" } } %>
-      <%= form.label :category_id, "Category" %>
+    <% category_input_id = "#{form.object_name}_category_id" %>
+  <div class="mb-3" data-controller="select-filter">
+    <div class="form-floating">
+      <input type="text" class="form-control" placeholder="Category" id="<%= category_input_id %>" data-select-filter-target="input" data-action="input->select-filter#filter keydown->select-filter#handleKeydown focus->select-filter#openDropdown blur->select-filter#closeDropdown" />
+        <%= form.collection_select :category_id, @categories, :id, :name, { include_blank: true }, { class: 'form-select d-none', id: "#{category_input_id}_select", data: { action: "change->budget-suggestions#fetchAverage change->select-filter#syncInput", budget_suggestions_target: "categorySelect", select_filter_target: "select" } } %>
+        <%= form.label :category_id, "Category", for: category_input_id %>
+      </div>
     </div>
 
     <div class="form-floating mb-3">

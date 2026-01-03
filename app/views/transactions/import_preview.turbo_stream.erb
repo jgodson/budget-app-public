@@ -43,11 +43,15 @@
                     <td><%= transaction[:date].strftime("%d %B %Y") %></td>
                     <td><%= transaction[:description] %></td>
                     <td><%= number_to_currency(transaction[:amount] / 100.0) %></td>
-                    <td>
-                      <%= select_tag "transaction_category_#{transaction[:unique_id]}",
+                  <td>
+                    <% category_input_id = "transaction_category_#{transaction[:unique_id]}" %>
+                    <div data-controller="select-filter">
+                      <input type="text" class="form-control form-control-sm mb-1" placeholder="Category" id="<%= category_input_id %>" data-select-filter-target="input" data-action="input->select-filter#filter keydown->select-filter#handleKeydown focus->select-filter#openDropdown blur->select-filter#closeDropdown" />
+                      <%= select_tag category_input_id,
                         options_for_select(@categories.map { |c| ["#{c.name}#{c.new_record? ? ' (new)' : ''}", c.name] }, transaction[:category].name),
-                        class: "form-select form-select-sm" %>
-                    </td>
+                        id: "#{category_input_id}_select", class: "form-select form-select-sm d-none", data: { select_filter_target: "select", action: "change->select-filter#syncInput" } %>
+                    </div>
+                  </td>
                     <td>
                       <span class="badge <%= status_class(transaction[:status]) %>">
                         <%= transaction[:status].to_s.humanize %>

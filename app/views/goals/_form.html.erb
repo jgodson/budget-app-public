@@ -4,10 +4,14 @@
       <%= form.label :goal_name, "Goal Name" %>
   </div>
 
-  <div class="form-floating mb-3">
-      <%= form.collection_select :category_id, @categories, :id, :name, { prompt: "Choose a category" }, { class: "form-select", placeholder: "Transaction Category" } %>
-      <%= form.label :category_id, "Transaction Category" %>
-  </div>
+    <% category_input_id = "#{form.object_name}_category_id" %>
+  <div class="mb-3" data-controller="select-filter">
+    <div class="form-floating">
+      <input type="text" class="form-control" placeholder="Transaction Category" id="<%= category_input_id %>" data-select-filter-target="input" data-action="input->select-filter#filter keydown->select-filter#handleKeydown focus->select-filter#openDropdown blur->select-filter#closeDropdown" />
+        <%= form.collection_select :category_id, @categories, :id, :name, { include_blank: true }, { class: "form-select d-none", id: "#{category_input_id}_select", data: { select_filter_target: "select", action: "change->select-filter#syncInput" } } %>
+        <%= form.label :category_id, "Transaction Category", for: category_input_id %>
+      </div>
+    </div>
 
   <div class="input-group mb-3">
     <span class="input-group-text">$</span>

@@ -26,7 +26,11 @@
               <%= form_with(url: category_path(@category), method: :delete, local: true, html: { class: 'form-horizontal' }) do |form| %>
                 <div class="mb-3">
                   <%= form.label :new_category_id, "Category to assign transactions to (optional)", class: "form-label" %>
-                  <%= form.collection_select :new_category_id, @categories, :id, :name, { include_blank: true }, { class: "form-select" } %>
+              <% category_input_id = "#{form.object_name}_new_category_id" %>
+              <div data-controller="select-filter">
+                <input type="text" class="form-control" placeholder="Category" id="<%= category_input_id %>" data-select-filter-target="input" data-action="input->select-filter#filter keydown->select-filter#handleKeydown focus->select-filter#openDropdown blur->select-filter#closeDropdown" />
+                <%= form.collection_select :new_category_id, @categories, :id, :name, { include_blank: true }, { class: "form-select d-none", id: "#{category_input_id}_select", data: { select_filter_target: "select", action: "change->select-filter#syncInput" } } %>
+              </div>
                 </div>
   
                 <div class="text-end">

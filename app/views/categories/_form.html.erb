@@ -4,9 +4,13 @@
     <%= form.label :name, "Name" %>
   </div>
 
-  <div class="form-floating mb-3">
-    <%= form.collection_select :parent_category_id, @parent_categories, :id, :name, { include_blank: true }, { class: 'form-select', placeholder: "Parent Category" } %>
-    <%= form.label :parent_category_id, "Parent Category" %>
+  <% parent_input_id = "#{form.object_name}_parent_category_id" %>
+  <div class="mb-3" data-controller="select-filter">
+    <div class="form-floating">
+      <input type="text" class="form-control" placeholder="Parent Category" id="<%= parent_input_id %>" data-select-filter-target="input" data-action="input->select-filter#filter keydown->select-filter#handleKeydown focus->select-filter#openDropdown blur->select-filter#closeDropdown" />
+      <%= form.collection_select :parent_category_id, @parent_categories, :id, :name, { include_blank: true }, { class: 'form-select d-none', id: "#{parent_input_id}_select", data: { select_filter_target: "select", action: "change->select-filter#syncInput" } } %>
+      <%= form.label :parent_category_id, "Parent Category", for: parent_input_id %>
+    </div>
   </div>
 
   <div class="form-floating mb-3">

@@ -293,6 +293,17 @@ button.nav-link {
   background-color: rgba(255, 193, 7, 0.1) !important;
 }
 
+.select-filter-clear {
+  color: var(--bs-secondary-color) !important;
+  transition: color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--bs-body-color) !important;
+    text-decoration: none;
+  }
+}
+
 // Responsive Sidebar
 @media (min-width: 992px) {
   .sidebar-responsive {

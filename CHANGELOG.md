@@ -1,3 +1,7 @@
+## Sync - 2026-01-03 11:11:39
+
+- d7cec65 Add search filtering to category dropdowns (#45)
+
 ## Sync - 2025-12-29 22:16:40
 
 - b540f56 fix back buttons in dark mode, remove badges for loans and goal details pages, other UI tweaks
