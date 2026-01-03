@@ -22,11 +22,11 @@
         <div class="row g-3">
           <div class="col-sm-6 col-lg-auto pb-2">
             <%= label_tag :year, "Select Year:", class: "form-label" %>
-            <%= select_tag :year, options_for_select(@available_years, @selected_year.to_i), class: "form-select", onchange: "this.form.submit();" %>
+            <%= select_tag :year, options_for_select(@available_years, @selected_year.to_i), class: "form-select", onchange: "this.form.requestSubmit();" %>
           </div>
           <div class="col-sm-6 col-lg-2 pb-2">
             <%= label_tag :month, "Select Month:", class: "form-label" %>
-            <%= select_tag :month, options_for_select([['', '']] + Date::MONTHNAMES.compact.each_with_index.map { |name, index| [name, index + 1] }, @selected_month.to_i), class: "form-select", onchange: "this.form.submit();" %>
+            <%= select_tag :month, options_for_select([['', '']] + Date::MONTHNAMES.compact.each_with_index.map { |name, index| [name, index + 1] }, @selected_month.to_i), class: "form-select", onchange: "this.form.requestSubmit();" %>
           </div>
           <div class="col-sm-6 col-lg-3 pb-2" data-controller="select-filter" data-select-filter-submit-form-value="true">
             <%= label_tag :category, "Select Category:", class: "form-label" %>
@@ -36,11 +36,11 @@
           </div>
           <div class="col-sm-6 col-lg-2 pb-2">
             <%= label_tag :source, "Select Source:", class: "form-label" %>
-            <%= select_tag :source, options_for_select([['', '']] + @available_sources, @selected_source), class: "form-select", onchange: "this.form.submit();" %>
+            <%= select_tag :source, options_for_select([['', '']] + @available_sources, @selected_source), class: "form-select", onchange: "this.form.requestSubmit();" %>
           </div>
           <div class="col-sm-6 col-lg-2 pb-2">
             <%= label_tag :group_by, "Group by:", class: "form-label" %>
-            <%= select_tag :group_by, options_for_select(@group_by_options.map { |g| [g.titleize, g] }, @selected_group_by), class: "form-select", onchange: "this.form.submit();" %>
+            <%= select_tag :group_by, options_for_select(@group_by_options.map { |g| [g.titleize, g] }, @selected_group_by), class: "form-select", onchange: "this.form.requestSubmit();" %>
           </div>
           <div class="col-sm-6 col-lg-3 pb-2">
             <%= label_tag :description, "Filter by Description:", class: "form-label" %>

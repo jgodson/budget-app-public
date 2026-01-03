@@ -1,3 +1,7 @@
+## Sync - 2026-01-03 12:11:53
+
+- 657ab0e Fix transaction filters to use Turbo instead of full page reload
+
 ## Sync - 2026-01-03 11:11:39
 
 - d7cec65 Add search filtering to category dropdowns (#45)
