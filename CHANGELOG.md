@@ -1,3 +1,8 @@
+## Sync - 2026-01-03 21:08:22
+
+- a32b60d exclude skills and agent files from public repo sync
+- be00ce0 Implement floating flash notifications with auto-close (#48)
+
 ## Sync - 2026-01-03 12:11:53
 
 - 657ab0e Fix transaction filters to use Turbo instead of full page reload

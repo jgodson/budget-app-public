@@ -40,7 +40,7 @@ class CategoriesController < ApplicationController
   def create
     @category = Category.new(category_params)
     if @category.save
-      redirect_to categories_path, notice: "Category created successfully."
+      redirect_to categories_path, notice: "Category created successfully.", status: :see_other
     else
       flash[:model_errors] = @category.errors.full_messages
       redirect_to new_category_path
