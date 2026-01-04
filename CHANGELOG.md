@@ -1,3 +1,7 @@
+## Sync - 2026-01-04 08:52:20
+
+- dc0bf70 modify ignore files and make sure .env.example is included
+
 ## Sync - 2026-01-03 21:08:22
 
 - a32b60d exclude skills and agent files from public repo sync
