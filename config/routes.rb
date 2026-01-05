@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-  root "dashboard#index"
+  root 'dashboard#index'
 
-  get "up" => "rails/health#show", as: :rails_health_check
+  get 'up' => 'rails/health#show', :as => :rails_health_check
+  get 'metrics' => 'metrics#index', :as => :metrics
   get 'dashboard', to: 'dashboard#index', as: 'dashboard'
   get 'dashboard/monthly_overview', to: 'dashboard#monthly_overview', as: 'monthly_overview'
 
@@ -39,6 +40,6 @@ Rails.application.routes.draw do
   end
 
   resources :loans
-  
+
   resources :loan_payments
 end

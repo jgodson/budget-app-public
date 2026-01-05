@@ -47,6 +47,7 @@ gem "bootsnap", require: false
 gem 'bootstrap', '~> 5.3.0'
 gem 'sassc-rails'
 gem 'dotenv-rails', groups: [:development, :test]
+gem 'prometheus-client'
 
 group :development, :test do
   gem "faker"

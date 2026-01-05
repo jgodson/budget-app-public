@@ -1,3 +1,8 @@
+## Sync - 2026-01-04 20:27:29
+
+- 02a6c5f Expose Prometheus metrics endpoint (#50)
+- 15a185a modify ignore files and make sure .env.example is included
+
 ## Sync - 2026-01-04 08:52:20
 
 - dc0bf70 modify ignore files and make sure .env.example is included
