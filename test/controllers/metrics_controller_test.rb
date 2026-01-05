@@ -6,6 +6,6 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match %r{text/plain}, response.content_type
-    assert_match(/http_request_duration_seconds/, response.body)
+    assert_match(/budget_app_http_request_duration_seconds/, response.body)
   end
 end

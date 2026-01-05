@@ -1,3 +1,9 @@
+## Sync - 2026-01-04 21:03:28
+
+- 90b6529 Prefix prometheus metrics
+- b44a2ef Warm metrics before capture
+- a8dbe0b Add prometheus metrics endpoint
+
 ## Sync - 2026-01-04 20:31:01
 
 - 99839b7 add !.env.example back to public .gitignore

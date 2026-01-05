@@ -4,7 +4,7 @@ This document describes the available Prometheus metrics exposed by the `/metric
 
 ## Available Metrics
 
-### `http_request_duration_seconds`
+### `budget_app_http_request_duration_seconds`
 
 A histogram metric measuring HTTP request duration in seconds.
 
@@ -30,22 +30,22 @@ This histogram tracks the time taken to process each HTTP request in the Rails a
 
 Average request duration by controller:
 ```promql
-rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])
+rate(budget_app_http_request_duration_seconds_sum[5m]) / rate(budget_app_http_request_duration_seconds_count[5m])
 ```
 
 Request rate by controller and action:
 ```promql
-rate(http_request_duration_seconds_count[5m])
+rate(budget_app_http_request_duration_seconds_count[5m])
 ```
 
 95th percentile request duration:
 ```promql
-histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+histogram_quantile(0.95, rate(budget_app_http_request_duration_seconds_bucket[5m]))
 ```
 
 Error rate (non-2xx responses):
 ```promql
-rate(http_request_duration_seconds_count{status=~"4..|5.."}[5m])
+rate(budget_app_http_request_duration_seconds_count{status=~"4..|5.."}[5m])
 ```
 
 ## Accessing Metrics

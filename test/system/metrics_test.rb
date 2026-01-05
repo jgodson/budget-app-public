@@ -5,7 +5,7 @@ class MetricsTest < ApplicationSystemTestCase
     visit dashboard_url
     visit metrics_url
 
-    assert_text "http_request_duration_seconds"
+    assert_text "budget_app_http_request_duration_seconds"
     take_screenshot
   end
 end
