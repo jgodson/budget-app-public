@@ -1,3 +1,7 @@
+## Sync - 2026-01-04 20:31:01
+
+- 99839b7 add !.env.example back to public .gitignore
+
 ## Sync - 2026-01-04 20:27:29
 
 - 02a6c5f Expose Prometheus metrics endpoint (#50)
