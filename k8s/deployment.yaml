@@ -43,6 +43,8 @@ spec:
               value: production
             - name: TMPDIR
               value: /rails/tmp/work
+            - name: PROMETHEUS_MULTIPROC_DIR
+              value: /rails/tmp/work/prometheus
             - name: WEB_CONCURRENCY
               value: "2"
             - name: RAILS_MAX_THREADS

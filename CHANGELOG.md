@@ -1,3 +1,7 @@
+## Sync - 2026-01-06 13:27:53
+
+- 515a8db add multiprocess support for prometheus metrics
+
 ## Sync - 2026-01-04 21:03:28
 
 - 90b6529 Prefix prometheus metrics
