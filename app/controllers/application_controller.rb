@@ -14,4 +14,10 @@ class ApplicationController < ActionController::Base
     @available_years << Date.current.year
     @available_years = @available_years.uniq.sort.reverse
   end
+
+  def default_url_options
+    return {} unless @selected_year
+
+    { year: @selected_year }
+  end
 end

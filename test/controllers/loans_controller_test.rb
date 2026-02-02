@@ -19,4 +19,11 @@ class LoansControllerTest < ActionDispatch::IntegrationTest
     get edit_loan_url(@loan)
     assert_response :success
   end
+
+  test "show respects year param in charts" do
+    get loan_url(@loan, year: 2020)
+    assert_response :success
+    assert_includes response.body, "2020 Total"
+    assert_includes response.body, "2019 Total"
+  end
 end

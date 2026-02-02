@@ -1,0 +1,211 @@
+<div class="mt-4" data-controller="amortization-calculator" data-amortization-calculator-loans-value="<%= json_escape(@loan_options.to_json) %>">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+      <h2 class="mb-1">Amortization Calculator</h2>
+      <p class="text-muted mb-0">Model loan payoff scenarios with optional extra payments.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header h5">Loan Inputs</div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label" for="amortization-loan-select">Active Loan</label>
+            <select id="amortization-loan-select" class="form-select" data-amortization-calculator-target="loanSelect" data-action="change->amortization-calculator#applyLoan">
+              <option value="">Custom amount</option>
+              <% @loan_options.each do |loan| %>
+                <option value="<%= loan[:id] %>"><%= loan[:name] %></option>
+              <% end %>
+            </select>
+            <div class="form-text">Select a loan to prefill balance and last payment.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="amortization-amount">Loan Amount</label>
+            <input type="number" id="amortization-amount" min="0" step="0.01" class="form-control" data-amortization-calculator-target="amount" data-action="input->amortization-calculator#recalculate">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="amortization-rate">Interest Rate (APR %)</label>
+            <input type="number" id="amortization-rate" min="0" step="0.01" value="0" class="form-control" data-amortization-calculator-target="rate" data-action="input->amortization-calculator#recalculate">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="amortization-term">Loan Term</label>
+            <div class="input-group">
+              <input type="number" id="amortization-term" min="1" step="1" class="form-control" data-amortization-calculator-target="term" data-action="input->amortization-calculator#recalculate">
+              <select class="form-select" data-amortization-calculator-target="termUnit" data-action="change->amortization-calculator#recalculate">
+                <option value="years" selected>Years</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="amortization-payment">Monthly Payment</label>
+            <input type="number" id="amortization-payment" min="0" step="0.01" class="form-control" data-amortization-calculator-target="payment" data-action="input->amortization-calculator#recalculate">
+            <div class="form-text">Leave blank to calculate from amount, rate, and term.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="amortization-start-date">Start Date</label>
+            <input type="text" id="amortization-start-date" class="form-control" placeholder="YYYY-MM-DD" data-controller="datepicker" data-datepicker-type-value="day" data-amortization-calculator-target="startDate" data-action="change->amortization-calculator#recalculate">
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mt-3">
+        <div class="card-header h6">Extra Payments</div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label" for="amortization-extra-monthly-amount">Extra Monthly Payment</label>
+            <input type="number" id="amortization-extra-monthly-amount" min="0" step="0.01" class="form-control mb-2" data-amortization-calculator-target="extraMonthlyAmount" data-action="input->amortization-calculator#recalculate">
+            <label class="form-label" for="amortization-extra-monthly-start">Start Month</label>
+            <input type="text" id="amortization-extra-monthly-start" class="form-control" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-amortization-calculator-target="extraMonthlyStart" data-action="change->amortization-calculator#recalculate">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="amortization-extra-yearly-amount">Extra Yearly Payment</label>
+            <input type="number" id="amortization-extra-yearly-amount" min="0" step="0.01" class="form-control mb-2" data-amortization-calculator-target="extraYearlyAmount" data-action="input->amortization-calculator#recalculate">
+            <label class="form-label" for="amortization-extra-yearly-start">Start Month</label>
+            <input type="text" id="amortization-extra-yearly-start" class="form-control" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-amortization-calculator-target="extraYearlyStart" data-action="change->amortization-calculator#recalculate">
+          </div>
+
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label mb-0">One-Time Payments</label>
+              <button type="button" class="btn btn-sm btn-outline-primary" data-action="click->amortization-calculator#addOneTimePayment">
+                <i class="bi bi-plus-lg"></i>
+                Add
+              </button>
+            </div>
+            <div class="d-grid gap-2" data-amortization-calculator-target="oneTimeList"></div>
+            <template data-amortization-calculator-target="oneTimeTemplate">
+              <div class="row g-2 align-items-end">
+                <div class="col-5">
+                  <label class="form-label">Month</label>
+                  <input type="text" class="form-control one-time-date" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-action="change->amortization-calculator#recalculate">
+                </div>
+                <div class="col-5">
+                  <label class="form-label">Amount</label>
+                  <input type="number" min="0" step="0.01" class="form-control one-time-amount" data-action="input->amortization-calculator#recalculate">
+                </div>
+                <div class="col-2">
+                  <button type="button" class="btn btn-outline-danger w-100" data-action="click->amortization-calculator#removeOneTimePayment">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </template>
+            <div class="form-text mt-2">One-time payments apply on the selected month.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="alert alert-warning d-none" role="alert" data-amortization-calculator-target="warning"></div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <div class="card h-100 border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Monthly Payment</h6>
+              <h4 class="card-title mb-0 fw-bold" data-amortization-calculator-target="paymentSummary">$0.00</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100 border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Total Paid</h6>
+              <h4 class="card-title mb-0 fw-bold" data-amortization-calculator-target="totalPaid">$0.00</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100 border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Principal Paid</h6>
+              <h4 class="card-title mb-0 fw-bold text-info" data-amortization-calculator-target="principalPaid">$0.00</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card h-100 border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Interest Paid</h6>
+              <h4 class="card-title mb-0 fw-bold text-warning" data-amortization-calculator-target="interestPaid">$0.00</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Expected Payoff</h6>
+              <h4 class="card-title mb-0 fw-bold" data-amortization-calculator-target="payoffDate">-</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm bg-light">
+            <div class="card-body text-center">
+              <h6 class="card-subtitle mb-2 text-muted text-uppercase small">Interest Saved</h6>
+              <h4 class="card-title mb-0 fw-bold text-success" data-amortization-calculator-target="interestSaved">$0.00</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <p class="mb-2"><strong>Interest vs Principal:</strong></p>
+          <div class="progress" style="height: 20px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: 0%;" data-amortization-calculator-target="principalBar">Principal</div>
+            <div class="progress-bar bg-warning" role="progressbar" style="width: 0%;" data-amortization-calculator-target="interestBar">Interest</div>
+          </div>
+          <div class="d-flex justify-content-between small text-muted mt-2">
+            <span data-amortization-calculator-target="principalPercent">Principal: 0%</span>
+            <span data-amortization-calculator-target="interestPercent">Interest: 0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-3">
+        <div class="card-header h5">Term Overview</div>
+        <div class="card-body" style="height: 320px;">
+          <div class="position-relative h-100 w-100">
+            <div class="d-flex flex-column align-items-center justify-content-center text-center h-100 text-muted"
+                 data-amortization-calculator-target="chartEmpty">
+              <i class="bi bi-graph-up fs-2 mb-2"></i>
+              <div>Enter loan details to see the amortization chart.</div>
+            </div>
+            <canvas class="d-none" data-amortization-calculator-target="chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header h5">Yearly Amortization</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Total Paid</th>
+                  <th>Principal</th>
+                  <th>Interest</th>
+                  <th>Ending Balance</th>
+                </tr>
+              </thead>
+              <tbody data-amortization-calculator-target="yearlyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -7,5 +7,7 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js", preload: true
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "bootstrap", to: "bootstrap/dist/js/bootstrap.bundle.min.js", preload: true
 pin "flatpickr", to: "flatpickr/dist/flatpickr.min.js", preload: true
+pin "flatpickr/monthSelect", to: "flatpickr/monthSelect.js"
+pin "flatpickr/dist/plugins/monthSelect", to: "flatpickr/monthSelect.esm.js"
 pin "chart.js", to: "chart.js/dist/chart.umd.js"
 pin "@kurkle/color", to: "@kurkle/color/dist/color.esm.js"

@@ -4,3 +4,17 @@ payment_one:
   interest_amount: 500
   payment_date: <%= Date.today %>
   associated_transaction: rent # Just using an existing transaction to satisfy FK if needed
+
+paid_off_payment:
+  loan: paid_off_loan
+  paid_amount: 7500
+  interest_amount: 250
+  payment_date: <%= Date.today %>
+  associated_transaction: utilities
+
+paid_off_old_payment:
+  loan: paid_off_old_loan
+  paid_amount: 8200
+  interest_amount: 300
+  payment_date: <%= 7.months.ago.to_date %>
+  associated_transaction: insurance

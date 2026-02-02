@@ -22,12 +22,19 @@ class DashboardController < ApplicationController
 
     # Goal data
     @active_goals = Goal.active.includes(:category)
+                        .sort_by { |goal| [-goal.percent_complete, goal.goal_name.to_s.downcase] }
     @archived_goals = Goal.archived.includes(:category)
+                          .sort_by { |goal| [-goal.percent_complete, goal.goal_name.to_s.downcase] }
     @goals = @active_goals + @archived_goals
 
     # Loan data
     @active_loans = Loan.active
+                        .sort_by { |loan| [-loan.percent_complete, loan.loan_name.to_s.downcase] }
     @paid_off_loans = Loan.paid_off
+                              .joins(:loan_payments)
+                              .where(loan_payments: { payment_date: year_range })
+                              .distinct
+                              .sort_by { |loan| [-loan.percent_complete, loan.loan_name.to_s.downcase] }
     @loans = @active_loans + @paid_off_loans
 
     # Calculate Totals

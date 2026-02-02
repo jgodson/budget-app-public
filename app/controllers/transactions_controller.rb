@@ -51,12 +51,14 @@ class TransactionsController < ApplicationController
 
   def show
     @transaction = Transaction.find(params[:id])
+    @return_to = safe_return_to
   end
 
   def new
     @transaction = Transaction.new(any_params)
     @transaction.date = @transaction.date.presence || Date.today
     @categories = Category.all.order(:name)
+    @return_to = safe_return_to
   end
 
   def create
@@ -71,26 +73,28 @@ class TransactionsController < ApplicationController
     end
 
     if @transaction.save
-      redirect_to transactions_path, notice: 'Transaction was successfully created.'
+      redirect_to return_to_path, notice: 'Transaction was successfully created.'
     else
       @categories = Category.all.order(:name)
       flash[:model_errors] = @transaction.errors.full_messages
-      redirect_to new_transaction_path
+      redirect_to new_transaction_path(return_to: safe_return_to)
     end
   end
 
   def edit
     @transaction = Transaction.find(params[:id])
     @categories = Category.all.order(:name)
+    @return_to = safe_return_to
   end
 
   def update
     @transaction = Transaction.find(params[:id])
     @transaction.amount = (params[:transaction][:amount_dollars].to_f * 100).round
     if @transaction.update(transaction_params)
-      redirect_to transactions_path, notice: 'Transaction was successfully updated.'
+      redirect_to return_to_path, notice: 'Transaction was successfully updated.'
     else
       @categories = Category.all.order(:name)
+      @return_to = safe_return_to
       render :edit
     end
   end
@@ -98,10 +102,10 @@ class TransactionsController < ApplicationController
   def destroy
     @transaction = Transaction.find(params[:id])
     if @transaction.destroy
-      redirect_to transactions_path, notice: 'Transaction was successfully deleted.'
+      redirect_to return_to_path, notice: 'Transaction was successfully deleted.'
     else
       flash[:model_errors] = @transaction.errors.full_messages
-      redirect_to transactions_path
+      redirect_to return_to_path
     end
   end
 
@@ -213,5 +217,15 @@ class TransactionsController < ApplicationController
 
   def any_params
     params.permit(:category_id, :date, :description)
+  end
+
+  def safe_return_to
+    return_to = params[:return_to].to_s
+    return_to = nil unless return_to.start_with?('/') && !return_to.start_with?('//')
+    return_to.presence
+  end
+
+  def return_to_path
+    safe_return_to || transactions_path
   end
 end

@@ -4,9 +4,15 @@
       <div class="card mb-4">
         <div class="card-header h4 d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center">
-            <button type="button" class="btn btn-link text-body p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
-              <i class="bi bi-arrow-left"></i>
-            </button>
+            <% if @return_to.present? %>
+              <%= link_to @return_to, class: "btn btn-link text-body p-0 me-3 text-decoration-none", data: { controller: "tooltip", bs_toggle: "tooltip" }, title: "Back" do %>
+                <i class="bi bi-arrow-left"></i>
+              <% end %>
+            <% else %>
+              <button type="button" class="btn btn-link text-body p-0 me-3 text-decoration-none" onclick="history.back()" data-controller="tooltip" data-bs-toggle="tooltip" title="Back">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+            <% end %>
             Transaction Details
           </div>
           <div class="d-flex align-items-center gap-2">
@@ -14,14 +20,14 @@
               <button class="btn btn-sm btn-primary" disabled title="Cannot edit loan payment transaction" data-controller="tooltip" data-bs-toggle="tooltip">
                 <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-sm btn-danger" disabled title="Cannot delete loan payment transaction" data-controller="tooltip" data-bs-toggle="tooltip">
+              <button class="btn btn-sm btn-danger" disabled title="Cannot delete loan payment transaction. Please use the Loan Payments page." data-controller="tooltip" data-bs-toggle="tooltip">
                 <i class="bi bi-trash"></i>
               </button>
             <% else %>
-              <%= link_to edit_transaction_path(@transaction), class: 'btn btn-sm btn-warning', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+              <%= link_to edit_transaction_path(@transaction, return_to: @return_to), class: 'btn btn-sm btn-warning', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                 <i class="bi bi-pencil"></i>
               <% end %>
-              <%= link_to transaction_path(@transaction), title: 'Delete', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-danger' do %>
+              <%= link_to transaction_path(@transaction, return_to: @return_to), title: 'Delete', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-sm btn-danger' do %>
                 <i class="bi bi-trash"></i>
               <% end %>
             <% end %>

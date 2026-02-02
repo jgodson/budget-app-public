@@ -27,7 +27,7 @@ class Transaction < ApplicationRecord
 
   def prevent_destroy_if_associated_with_loan_payment
     if loan_payment.present?
-      errors.add(:base, "Cannot delete a transaction associated with a loan payment")
+      errors.add(:base, "Cannot delete a transaction associated with a loan payment. Please delete the loan payment from the Loan Payments page.")
       throw(:abort)
     end
   end

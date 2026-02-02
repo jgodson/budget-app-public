@@ -53,6 +53,16 @@ class Loan < ApplicationRecord
     loan_payments&.last
   end
 
+  def recent_payments?(since: 6.months.ago.to_date)
+    loan_payments.where("payment_date >= ?", since).exists?
+  end
+
+  def show_recent_payments_action?
+    return loan_payments.any? unless paid_off?
+
+    recent_payments?
+  end
+
   def percent_complete
     return 100 if balance == 0
 

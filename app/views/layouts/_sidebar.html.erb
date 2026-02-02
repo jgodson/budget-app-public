@@ -1,6 +1,6 @@
 <div class="offcanvas-lg offcanvas-start d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary sidebar-responsive" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
   <div class="offcanvas-header d-lg-none px-0 pt-0 pb-3">
-    <a href="/" class="d-flex align-items-center mb-0 me-auto link-body-emphasis text-decoration-none">
+    <a href="<%= root_path %>" class="d-flex align-items-center mb-0 me-auto link-body-emphasis text-decoration-none">
       <i class="bi bi-wallet2 fs-2 me-2 text-primary"></i>
       <span class="fs-4 fw-bold">Budget App</span>
     </a>
@@ -50,7 +50,7 @@
   <ul class="nav nav-pills flex-column mb-auto">
     <li class="nav-item">
       <a href="<%= root_path(year: @selected_year) %>" 
-         class="nav-link d-inline-flex align-items-center w-100 border-0 bg-transparent <%= current_page?(root_path) || current_page?(dashboard_path) || current_page?(monthly_overview_path) ? 'active' : 'link-body-emphasis' %>">
+         class="nav-link d-inline-flex align-items-center w-100 border-0 <%= current_page?(root_path) || current_page?(dashboard_path) || current_page?(monthly_overview_path) ? 'active bg-transparent' : 'link-body-emphasis' %>">
         <i class="bi bi-speedometer2 me-2"></i> 
         <span>Dashboard</span>
       </a>
@@ -62,34 +62,53 @@
       </div>
     </li>
     <li class="nav-item mt-1">
-      <a href="<%= budgets_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(budgets_path) ? 'active' : 'link-body-emphasis' %>" aria-current="page">
+      <a href="<%= budgets_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= controller_name == 'budgets' ? 'active' : 'link-body-emphasis' %>" aria-current="page">
         <i class="bi bi-cash-stack me-2"></i>
         Budgets
       </a>
     </li>
     <li class="nav-item mt-1">
-      <a href="<%= transactions_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(transactions_path) ? 'active' : 'link-body-emphasis' %>">
+      <a href="<%= transactions_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= controller_name == 'transactions' ? 'active' : 'link-body-emphasis' %>">
         <i class="bi bi-receipt me-2"></i>
         Transactions
       </a>
     </li>
     <li class="nav-item mt-1">
-      <a href="<%= loans_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(loans_path) ? 'active' : 'link-body-emphasis' %>">
+      <a href="<%= loans_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= ['loans', 'loan_payments'].include?(controller_name) ? 'active' : 'link-body-emphasis' %>">
         <i class="bi bi-bank me-2"></i>
         Loans
       </a>
     </li>
     <li class="nav-item mt-1">
-      <a href="<%= goals_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(goals_path) ? 'active' : 'link-body-emphasis' %>">
+      <a href="<%= goals_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= controller_name == 'goals' ? 'active' : 'link-body-emphasis' %>">
         <i class="bi bi-trophy me-2"></i>
         Goals
       </a>
     </li>
     <li class="nav-item mt-1">
-      <a href="<%= categories_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= current_page?(categories_path) ? 'active' : 'link-body-emphasis' %>">
+      <a href="<%= categories_path %>" class="nav-link d-inline-flex align-items-center w-100 <%= controller_name == 'categories' ? 'active' : 'link-body-emphasis' %>">
         <i class="bi bi-tags me-2"></i>
         Categories
       </a>
+    </li>
+    <li class="nav-item mt-1">
+      <a href="#tools-collapse"
+         class="nav-link d-inline-flex align-items-center w-100 border-0 <%= current_page?(amortization_calculator_path) ? 'active bg-transparent' : 'link-body-emphasis' %>"
+         data-bs-toggle="collapse"
+         aria-expanded="<%= current_page?(amortization_calculator_path) ? 'true' : 'false' %>">
+        <i class="bi bi-wrench-adjustable me-2"></i>
+        <span>Tools</span>
+      </a>
+      <div class="collapse <%= 'show' if current_page?(amortization_calculator_path) %>" id="tools-collapse">
+        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+          <li>
+            <a href="<%= amortization_calculator_path %>"
+               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= 'bg-primary-subtle text-primary fw-bold' if current_page?(amortization_calculator_path) %>">
+              <i class="bi bi-calculator me-2"></i> Amortization
+            </a>
+          </li>
+        </ul>
+      </div>
     </li>
   </ul>
   <hr>

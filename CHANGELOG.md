@@ -1,3 +1,18 @@
+## Sync - 2026-02-01 21:30:17
+
+- 49c8640 fix active links for new/edit on sidebar. fix turbo navigation on transactions edit and budgets new/edit from tables
+- f56af83 chore(ci): use sqlite, install assets deps, and stabilize system tests (#65)
+- ee40958 Add tools sidebar and amortization calculator (#64)
+- e8d3132 Hide recent payments for paid-off loans (#61)
+- 2642dbb Add return_to handling for transactions (#60)
+- c669607 Respect selected year in loan and goal charts (Vibe Kanban) (#59)
+- ff49a4e Fix year parameter persistence across pages (#58)
+- 0b37414 Improve assets publishing workflow (Vibe Kanban) (#57)
+- b946e31 Improve loan payment deletion messaging and fix deletion logic (#56)
+- fbd4486 Hide inactive paid-off loans from dashboard (#55)
+- 140db01 Sort goals and loans by completion percent (#54)
+- 9e47de5 Sort categories alphabetically on index (#53)
+
 ## Sync - 2026-01-06 13:27:53
 
 - 515a8db add multiprocess support for prometheus metrics

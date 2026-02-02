@@ -1,4 +1,7 @@
 <%= form_with(model: transaction, local: true, html: { class: 'form-horizontal', data: { controller: 'form', action: 'submit->form#submit' } }) do |form| %>
+  <% if @return_to.present? %>
+    <%= hidden_field_tag :return_to, @return_to %>
+  <% end %>
   <% category_input_id = "#{form.object_name}_category_id" %>
   <div class="mb-3" data-controller="select-filter">
     <div class="form-floating">
@@ -27,9 +30,15 @@
   </div>
 
   <div class="text-end">
-    <button type="button" class="btn btn-secondary" onclick="history.back()">
-      <i class="bi bi-arrow-left"></i> Back
-    </button>
+    <% if @return_to.present? %>
+      <%= link_to @return_to, class: "btn btn-secondary" do %>
+        <i class="bi bi-arrow-left"></i> Back
+      <% end %>
+    <% else %>
+      <button type="button" class="btn btn-secondary" onclick="history.back()">
+        <i class="bi bi-arrow-left"></i> Back
+      </button>
+    <% end %>
     <button type="submit" class="btn btn-primary">
       <i class="bi bi-check-lg"></i> <%= transaction.persisted? ? "Update" : "Create" %>
     </button>

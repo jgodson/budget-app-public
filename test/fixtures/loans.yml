@@ -2,3 +2,13 @@ car_loan:
   loan_name: Car Loan
   balance: 500000
   category: expense
+
+paid_off_loan:
+  loan_name: Paid Off Loan
+  balance: 0
+  category: expense_utilities
+
+paid_off_old_loan:
+  loan_name: Paid Off Old Loan
+  balance: 0
+  category: expense_insurance

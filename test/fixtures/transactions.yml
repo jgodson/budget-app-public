@@ -7,3 +7,13 @@ rent:
   date: <%= Date.today %>
   amount: 200000
   category: expense
+
+utilities:
+  date: <%= Date.today %>
+  amount: 5000
+  category: expense_utilities
+
+insurance:
+  date: <%= Date.today %>
+  amount: 6500
+  category: expense_insurance

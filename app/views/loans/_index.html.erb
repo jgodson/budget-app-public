@@ -64,7 +64,7 @@
                 <%= link_to new_loan_payment_path(loan_id: loan), class: 'btn btn-success btn-sm', title: 'Add Payment', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
                   <i class="bi bi-plus-lg"></i>
                 <% end %>
-                <% if loan.loan_payments.any? %>
+                <% if loan.show_recent_payments_action? %>
                   <span data-controller="tooltip" data-bs-toggle="tooltip" title="Recent Payments">
                     <%= link_to '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } do %>
                       <i class="bi bi-clock-history"></i>
@@ -107,7 +107,7 @@
                 <%= link_to loan_path(loan), data: { turbo_method: :delete, turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, class: 'btn btn-danger btn-sm', title: 'Delete' do %>
                   <i class="bi bi-trash"></i>
                 <% end %>
-                <% if loan.loan_payments.any? %>
+                <% if loan.show_recent_payments_action? %>
                   <span data-controller="tooltip" data-bs-toggle="tooltip" title="Recent Payments">
                     <%= link_to '#', class: 'btn btn-secondary btn-sm', data: { bs_toggle: 'modal', bs_target: "#recentPaymentsModal-#{loan.id}" } do %>
                       <i class="bi bi-clock-history"></i>
@@ -127,7 +127,7 @@
 </div>
 
 <% @loans.each do |loan| %>
-  <% if loan.loan_payments.any? %>
+  <% if loan.show_recent_payments_action? %>
     <!-- Modal for Recent Payments -->
     <div class="modal fade" id="recentPaymentsModal-<%= loan.id %>" tabindex="-1" aria-labelledby="recentPaymentsModalLabel-<%= loan.id %>" aria-hidden="true">
       <div class="modal-dialog modal-lg">

@@ -67,16 +67,16 @@
                     <% end %>
                   </td>
                 <% end %>
-                <td onclick="event.stopPropagation()">
+                <td class="no-row-click">
   <% if yearly_budget %>
-    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
     <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
-    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-plus-lg"></i>
     <% end %>
   <% end %>
@@ -102,16 +102,16 @@
                       <% end %>
                     </td>
                   <% end %>
-                  <td onclick="event.stopPropagation()">
+                  <td class="no-row-click">
   <% if yearly_budget %>
-    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
     <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
-    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-plus-lg"></i>
     <% end %>
   <% end %>
@@ -165,16 +165,16 @@
                     <% end %>
                   </td>
                 <% end %>
-                <td onclick="event.stopPropagation()">
+                <td class="no-row-click">
   <% if yearly_budget %>
-    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
     <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
-    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-plus-lg"></i>
     <% end %>
   <% end %>
@@ -200,16 +200,16 @@
                       <% end %>
                     </td>
                   <% end %>
-                  <td onclick="event.stopPropagation()">
+                  <td class="no-row-click">
   <% if yearly_budget %>
-    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
     <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
-    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-plus-lg"></i>
     <% end %>
   <% end %>
@@ -263,16 +263,16 @@
                     <% end %>
                   </td>
                 <% end %>
-                <td onclick="event.stopPropagation()">
+                <td class="no-row-click">
   <% if yearly_budget %>
-    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
     <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
-    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to new_budget_path(category_id: category.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-plus-lg"></i>
     <% end %>
   <% end %>
@@ -298,16 +298,16 @@
                       <% end %>
                     </td>
                   <% end %>
-                  <td onclick="event.stopPropagation()">
+                  <td class="no-row-click">
   <% if yearly_budget %>
-    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to edit_budget_path(yearly_budget), class: 'btn btn-warning btn-sm', title: 'Edit', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-pencil"></i>
     <% end %>
     <%= button_to budget_path(yearly_budget), method: :delete, class: 'btn btn-danger btn-sm', form: { style: 'display:inline-block;' }, data: { turbo_confirm: 'Are you sure?', controller: 'tooltip', bs_toggle: 'tooltip' }, title: 'Delete' do %>
       <i class="bi bi-trash"></i>
     <% end %>
   <% else %>
-    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip' } do %>
+    <%= link_to new_budget_path(category_id: subcategory.id, year: @selected_year), class: 'btn btn-primary btn-sm', title: 'Add Budget', data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo: true } do %>
       <i class="bi bi-plus-lg"></i>
     <% end %>
   <% end %>

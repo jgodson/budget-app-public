@@ -3,13 +3,15 @@ class GoalsController < ApplicationController
 
   def index
     @active_goals = Goal.active.includes(:category)
+                           .sort_by { |goal| [-goal.percent_complete, goal.goal_name.to_s.downcase] }
     @archived_goals = Goal.archived.includes(:category)
+                              .sort_by { |goal| [-goal.percent_complete, goal.goal_name.to_s.downcase] }
     @goals = @active_goals + @archived_goals
   end
 
   def show
     # Chart Data Preparation
-    current_year = Date.current.year
+    current_year = @selected_year || Date.current.year
     prior_year = current_year - 1
     
     # Get transactions for the goal's category

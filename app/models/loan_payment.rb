@@ -1,8 +1,9 @@
 class LoanPayment < ApplicationRecord
   belongs_to :loan
-  belongs_to :associated_transaction, class_name: 'Transaction', dependent: :destroy
+  belongs_to :associated_transaction, class_name: 'Transaction'
 
   before_validation :create_transaction
+  after_destroy :destroy_associated_transaction
 
   validates :paid_amount, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :interest_amount, presence: true, numericality: { only_integer: true }
@@ -13,6 +14,10 @@ class LoanPayment < ApplicationRecord
   end
 
   private
+
+  def destroy_associated_transaction
+    associated_transaction&.destroy
+  end
 
   def create_transaction
     self.associated_transaction = Transaction.create!(

@@ -4,7 +4,7 @@ class Category < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_many :budgets, dependent: :destroy
   has_many :loans, dependent: :destroy
-  has_many :subcategories, class_name: 'Category', foreign_key: 'parent_category_id', dependent: :destroy
+  has_many :subcategories, -> { order(:name) }, class_name: 'Category', foreign_key: 'parent_category_id', dependent: :destroy
   belongs_to :parent_category, class_name: 'Category', optional: true
 
   enum category_type: CATEGORY_TYPES

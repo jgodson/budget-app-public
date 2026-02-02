@@ -10,3 +10,4 @@
 //= link @popperjs/core/dist/esm/popper.js
 //= link chart.js/dist/chart.umd.js
 //= link @kurkle/color/dist/color.esm.js
+//= link flatpickr/monthSelect.esm.js

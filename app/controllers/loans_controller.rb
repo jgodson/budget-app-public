@@ -1,7 +1,9 @@
 class LoansController < ApplicationController
   def index
     @active_loans = Loan.active
+                        .sort_by { |loan| [-loan.percent_complete, loan.loan_name.to_s.downcase] }
     @paid_off_loans = Loan.paid_off
+                          .sort_by { |loan| [-loan.percent_complete, loan.loan_name.to_s.downcase] }
     @loans = @active_loans + @paid_off_loans
   end
 
@@ -9,7 +11,7 @@ class LoansController < ApplicationController
     @loan = Loan.find(params[:id])
 
     # Chart Data Preparation
-    current_year = Date.current.year
+    current_year = @selected_year || Date.current.year
     prior_year = current_year - 1
     
     # Get payments for current and prior year

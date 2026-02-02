@@ -1,19 +1,20 @@
 class CategoriesController < ApplicationController
   def index
-    @categories = Category.includes(:subcategories).where(parent_category_id: nil)
+    @categories = Category.includes(:subcategories).where(parent_category_id: nil).order(:name)
   end
 
   def show
     @category = Category.find(params[:id])
     
     # Default to current year for stats/charts
-    @year = Date.today.year
+    @year = @selected_year
     
     # Stats (YTD)
     start_date = Date.new(@year, 1, 1)
-    end_date = Date.today
+    end_date = @year == Date.current.year ? Date.current : Date.new(@year, 12, 31)
     @total_spent_ytd = @category.transactions.where(date: start_date..end_date).sum(:amount)
-    @avg_monthly_spend = Date.today.month > 0 ? (@total_spent_ytd / Date.today.month.to_f) : 0
+    month_count = @year == Date.current.year ? Date.current.month : 12
+    @avg_monthly_spend = month_count.positive? ? (@total_spent_ytd / month_count.to_f) : 0
     
     # Chart Data (Monthly for Current Year vs Prior Year)
     @current_year_data = (1..12).map do |month|

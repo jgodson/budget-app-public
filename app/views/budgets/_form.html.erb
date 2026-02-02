@@ -1,5 +1,5 @@
 <div class="card-body">
-  <%= form_with model: @budget, local: true, html: { class: 'form-horizontal', data: { controller: 'form budget-suggestions', action: 'submit->form#submit' } } do |form| %>
+  <%= form_with model: @budget, html: { class: 'form-horizontal', data: { controller: 'form budget-suggestions', action: 'submit->form#submit' } } do |form| %>
     <% category_input_id = "#{form.object_name}_category_id" %>
   <div class="mb-3" data-controller="select-filter">
     <div class="form-floating">

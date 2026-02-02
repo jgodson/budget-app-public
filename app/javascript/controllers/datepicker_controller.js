@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import "flatpickr"
+import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect"
 
 export default class extends Controller {
   static values = {
@@ -31,7 +32,10 @@ export default class extends Controller {
     
     switch (type) {
       case 'month':
-        return { dateFormat: "m" };
+        return {
+          altInput: true,
+          plugins: [new monthSelectPlugin({ shorthand: true, dateFormat: "Y-m", altFormat: "F Y" })]
+        };
       case 'year':
         return { dateFormat: "Y" };
       case 'day':
