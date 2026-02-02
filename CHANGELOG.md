@@ -1,3 +1,7 @@
+## Sync - 2026-02-01 21:41:03
+
+- 6009cb0 keep .env.test for public repo .gitignore
+
 ## Sync - 2026-02-01 21:30:17
 
 - 49c8640 fix active links for new/edit on sidebar. fix turbo navigation on transactions edit and budgets new/edit from tables
