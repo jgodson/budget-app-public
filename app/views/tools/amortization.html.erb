@@ -12,46 +12,74 @@
         <div class="card-header h5">Loan Inputs</div>
         <div class="card-body">
           <div class="mb-3">
-            <label class="form-label" for="amortization-loan-select">Active Loan</label>
-            <select id="amortization-loan-select" class="form-select" data-amortization-calculator-target="loanSelect" data-action="change->amortization-calculator#applyLoan">
-              <option value="">Custom amount</option>
-              <% @loan_options.each do |loan| %>
-                <option value="<%= loan[:id] %>"><%= loan[:name] %></option>
-              <% end %>
-            </select>
-            <div class="form-text">Select a loan to prefill balance and last payment.</div>
+            <div class="form-floating">
+              <select id="amortization-loan-select" class="form-select" data-amortization-calculator-target="loanSelect" data-action="change->amortization-calculator#applyLoan">
+                <option value="">Custom amount</option>
+                <% @loan_options.each do |loan| %>
+                  <option value="<%= loan[:id] %>"><%= loan[:name] %></option>
+                <% end %>
+              </select>
+              <label for="amortization-loan-select">Active Loan</label>
+            </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="amortization-amount">Loan Amount</label>
-            <input type="number" id="amortization-amount" min="0" step="0.01" class="form-control" data-amortization-calculator-target="amount" data-action="input->amortization-calculator#recalculate">
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="amortization-rate">Interest Rate (APR %)</label>
-            <input type="number" id="amortization-rate" min="0" step="0.01" value="0" class="form-control" data-amortization-calculator-target="rate" data-action="input->amortization-calculator#recalculate">
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="amortization-term">Loan Term</label>
             <div class="input-group">
-              <input type="number" id="amortization-term" min="1" step="1" class="form-control" data-amortization-calculator-target="term" data-action="input->amortization-calculator#recalculate">
-              <select class="form-select" data-amortization-calculator-target="termUnit" data-action="change->amortization-calculator#recalculate">
-                <option value="years" selected>Years</option>
-                <option value="months">Months</option>
+              <span class="input-group-text">$</span>
+              <div class="form-floating flex-grow-1">
+                <input type="text" id="amortization-amount" class="form-control" placeholder="Loan Amount" data-type="number" data-controller="number-input" data-action="blur->number-input#format input->amortization-calculator#amountEdited input->amortization-calculator#recalculate" data-amortization-calculator-target="amount">
+                <label for="amortization-amount">Loan Amount</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text">%</span>
+              <div class="form-floating flex-grow-1">
+                <input type="text" id="amortization-rate" class="form-control" placeholder="Interest Rate" data-type="number" data-controller="number-input" data-action="blur->number-input#format input->amortization-calculator#rateEdited input->amortization-calculator#recalculate" data-amortization-calculator-target="rate">
+                <label for="amortization-rate">Interest Rate (APR)</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="form-floating">
+                  <input type="text" id="amortization-term-years" class="form-control" placeholder="Years" data-action="input->amortization-calculator#termEdited input->amortization-calculator#recalculate" data-amortization-calculator-target="termYears">
+                  <label for="amortization-term-years">Years</label>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-floating">
+                  <input type="text" id="amortization-term-months" class="form-control" placeholder="Months" data-action="input->amortization-calculator#termEdited input->amortization-calculator#recalculate" data-amortization-calculator-target="termMonths">
+                  <label for="amortization-term-months">Months</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <div class="form-floating flex-grow-1">
+                <input type="text" id="amortization-payment" class="form-control" placeholder="Payment Amount" data-type="number" data-controller="number-input" data-action="blur->number-input#format input->amortization-calculator#paymentEdited input->amortization-calculator#recalculate" data-amortization-calculator-target="payment">
+                <label for="amortization-payment">Payment Amount</label>
+              </div>
+              <select class="form-select" aria-label="Payment frequency" data-amortization-calculator-target="paymentFrequency" data-action="change->amortization-calculator#paymentFrequencyChanged">
+                <option value="monthly" selected>Monthly</option>
+                <option value="biweekly">Biweekly</option>
+                <option value="weekly">Weekly</option>
               </select>
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="amortization-payment">Monthly Payment</label>
-            <input type="number" id="amortization-payment" min="0" step="0.01" class="form-control" data-amortization-calculator-target="payment" data-action="input->amortization-calculator#recalculate">
-            <div class="form-text">Leave blank to calculate from amount, rate, and term.</div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label" for="amortization-start-date">Start Date</label>
-            <input type="text" id="amortization-start-date" class="form-control" placeholder="YYYY-MM-DD" data-controller="datepicker" data-datepicker-type-value="day" data-amortization-calculator-target="startDate" data-action="change->amortization-calculator#recalculate">
+            <div class="form-floating">
+              <input type="text" id="amortization-start-date" class="form-control" placeholder="YYYY-MM-DD" data-controller="datepicker" data-datepicker-type-value="day" data-amortization-calculator-target="startDate" data-action="change->amortization-calculator#recalculate">
+              <label for="amortization-start-date">Start Date</label>
+            </div>
           </div>
         </div>
       </div>
@@ -60,17 +88,31 @@
         <div class="card-header h6">Extra Payments</div>
         <div class="card-body">
           <div class="mb-3">
-            <label class="form-label" for="amortization-extra-monthly-amount">Extra Monthly Payment</label>
-            <input type="number" id="amortization-extra-monthly-amount" min="0" step="0.01" class="form-control mb-2" data-amortization-calculator-target="extraMonthlyAmount" data-action="input->amortization-calculator#recalculate">
-            <label class="form-label" for="amortization-extra-monthly-start">Start Month</label>
-            <input type="text" id="amortization-extra-monthly-start" class="form-control" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-amortization-calculator-target="extraMonthlyStart" data-action="change->amortization-calculator#recalculate">
+            <div class="input-group mb-2">
+              <span class="input-group-text">$</span>
+              <div class="form-floating flex-grow-1">
+                <input type="text" id="amortization-extra-monthly-amount" class="form-control" placeholder="Extra Monthly Payment" data-type="number" data-controller="number-input" data-action="blur->number-input#format input->amortization-calculator#recalculate" data-amortization-calculator-target="extraMonthlyAmount">
+                <label for="amortization-extra-monthly-amount">Extra Monthly Payment</label>
+              </div>
+            </div>
+            <div class="form-floating">
+              <input type="text" id="amortization-extra-monthly-start" class="form-control" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-amortization-calculator-target="extraMonthlyStart" data-action="change->amortization-calculator#recalculate">
+              <label for="amortization-extra-monthly-start">Start Month</label>
+            </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="amortization-extra-yearly-amount">Extra Yearly Payment</label>
-            <input type="number" id="amortization-extra-yearly-amount" min="0" step="0.01" class="form-control mb-2" data-amortization-calculator-target="extraYearlyAmount" data-action="input->amortization-calculator#recalculate">
-            <label class="form-label" for="amortization-extra-yearly-start">Start Month</label>
-            <input type="text" id="amortization-extra-yearly-start" class="form-control" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-amortization-calculator-target="extraYearlyStart" data-action="change->amortization-calculator#recalculate">
+            <div class="input-group mb-2">
+              <span class="input-group-text">$</span>
+              <div class="form-floating flex-grow-1">
+                <input type="text" id="amortization-extra-yearly-amount" class="form-control" placeholder="Extra Yearly Payment" data-type="number" data-controller="number-input" data-action="blur->number-input#format input->amortization-calculator#recalculate" data-amortization-calculator-target="extraYearlyAmount">
+                <label for="amortization-extra-yearly-amount">Extra Yearly Payment</label>
+              </div>
+            </div>
+            <div class="form-floating">
+              <input type="text" id="amortization-extra-yearly-start" class="form-control" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-amortization-calculator-target="extraYearlyStart" data-action="change->amortization-calculator#recalculate">
+              <label for="amortization-extra-yearly-start">Start Month</label>
+            </div>
           </div>
 
           <div>
@@ -85,12 +127,19 @@
             <template data-amortization-calculator-target="oneTimeTemplate">
               <div class="row g-2 align-items-end">
                 <div class="col-5">
-                  <label class="form-label">Month</label>
-                  <input type="text" class="form-control one-time-date" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-action="change->amortization-calculator#recalculate">
+                  <div class="form-floating">
+                    <input type="text" class="form-control one-time-date" placeholder="YYYY-MM" data-controller="datepicker" data-datepicker-type-value="month" data-action="change->amortization-calculator#recalculate">
+                    <label>Month</label>
+                  </div>
                 </div>
                 <div class="col-5">
-                  <label class="form-label">Amount</label>
-                  <input type="number" min="0" step="0.01" class="form-control one-time-amount" data-action="input->amortization-calculator#recalculate">
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <div class="form-floating flex-grow-1">
+                      <input type="text" class="form-control one-time-amount" placeholder="Amount" data-type="number" data-controller="number-input" data-action="blur->number-input#format input->amortization-calculator#recalculate">
+                      <label>Amount</label>
+                    </div>
+                  </div>
                 </div>
                 <div class="col-2">
                   <button type="button" class="btn btn-outline-danger w-100" data-action="click->amortization-calculator#removeOneTimePayment">

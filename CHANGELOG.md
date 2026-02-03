@@ -1,3 +1,8 @@
+## Sync - 2026-02-02 22:04:11
+
+- 9e72d14 UX fixes for calculators (#73)
+- 74214bc Add investment goal calculator (#70)
+
 ## Sync - 2026-02-01 21:41:03
 
 - 6009cb0 keep .env.test for public repo .gitignore

@@ -44,4 +44,5 @@ Rails.application.routes.draw do
   resources :loan_payments
 
   get 'tools/amortization', to: 'tools#amortization', as: 'amortization_calculator'
+  get "tools/investment", to: "tools#investment", as: "investment_calculator"
 end

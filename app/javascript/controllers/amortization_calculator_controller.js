@@ -7,9 +7,10 @@ export default class extends Controller {
     "loanSelect",
     "amount",
     "rate",
-    "term",
-    "termUnit",
+    "termYears",
+    "termMonths",
     "payment",
+    "paymentFrequency",
     "startDate",
     "extraMonthlyAmount",
     "extraMonthlyStart",
@@ -41,16 +42,33 @@ export default class extends Controller {
     if (document.documentElement.hasAttribute("data-turbo-preview")) return
 
     this.currencyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
+    this.inputNumberFormatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     this.percentFormatter = new Intl.NumberFormat('en-US', { style: 'percent', maximumFractionDigits: 1 })
 
     if (!this.startDateTarget.value) {
       this.startDateTarget.value = this.todayISO()
     }
 
-    if (!this.termTarget.value) {
-      this.termTarget.value = 30
-      this.termUnitTarget.value = "years"
+    if (!this.termYearsTarget.value && !this.termMonthsTarget.value) {
+      this.termYearsTarget.value = 5
+      this.termMonthsTarget.value = 0
     }
+
+    if (!this.amountTarget.value) {
+      this.amountTarget.value = this.formatInputNumber(50000)
+    }
+
+    if (!this.rateTarget.value) {
+      this.rateTarget.value = this.formatInputNumber(5)
+    }
+
+    if (!this.paymentFrequencyTarget.dataset.previousFrequency) {
+      this.paymentFrequencyTarget.dataset.previousFrequency = this.paymentFrequencyTarget.value || "monthly"
+    }
+
+    this.paymentMode = false
+    this.isUpdatingPayment = false
+    this.isUpdatingTerm = false
 
     this.recalculate()
 
@@ -65,9 +83,51 @@ export default class extends Controller {
     window.removeEventListener('theme-changed', this.themeChangeListener)
   }
 
+  amountEdited() {
+    this.paymentMode = false
+  }
+
+  rateEdited() {
+    this.paymentMode = false
+  }
+
+  termEdited() {
+    if (this.isUpdatingTerm) return
+    this.paymentMode = false
+    this.normalizeTermInputs()
+  }
+
+  paymentEdited() {
+    if (this.isUpdatingPayment) return
+    this.paymentMode = true
+  }
+
+  paymentFrequencyChanged() {
+    const previousFrequency = this.paymentFrequencyTarget.dataset.previousFrequency || "monthly"
+    const previousFactor = this.frequencyToMonthlyFactor(previousFrequency)
+    const nextFactor = this.frequencyToMonthlyFactor(this.paymentFrequencyTarget.value)
+    const currentAmount = this.parseNumber(this.paymentTarget.value)
+    if (currentAmount <= 0) {
+      this.paymentFrequencyTarget.dataset.previousFrequency = this.paymentFrequencyTarget.value
+      this.paymentMode = false
+      this.paymentTarget.value = ""
+      this.recalculate()
+      return
+    }
+
+    const monthlyEquivalent = currentAmount * previousFactor
+    const nextAmount = monthlyEquivalent / nextFactor
+
+    this.paymentTarget.value = this.formatInputNumber(nextAmount)
+    this.paymentFrequencyTarget.dataset.previousFrequency = this.paymentFrequencyTarget.value
+    this.paymentMode = true
+    this.recalculate()
+  }
+
   applyLoan() {
     const loanId = this.loanSelectTarget.value
     if (!loanId) {
+      this.paymentMode = false
       this.recalculate()
       return
     }
@@ -78,9 +138,22 @@ export default class extends Controller {
       return
     }
 
-    this.amountTarget.value = loan.balance_dollars ? loan.balance_dollars.toFixed(2) : ""
+    if (!this.startDateTarget.value) {
+      this.startDateTarget.value = this.todayISO()
+    }
+
+    if (!this.termYearsTarget.value && !this.termMonthsTarget.value) {
+      this.termYearsTarget.value = 30
+      this.termMonthsTarget.value = 0
+    }
+
+    this.amountTarget.value = loan.balance_dollars ? this.formatInputNumber(loan.balance_dollars) : ""
     if (loan.last_payment_dollars && loan.last_payment_dollars > 0) {
-      this.paymentTarget.value = loan.last_payment_dollars.toFixed(2)
+      this.paymentTarget.value = this.formatInputNumber(loan.last_payment_dollars)
+      this.paymentMode = true
+    } else {
+      this.paymentTarget.value = ""
+      this.paymentMode = false
     }
 
     this.recalculate()
@@ -106,23 +179,45 @@ export default class extends Controller {
 
     const principal = this.parseNumber(this.amountTarget.value)
     const annualRate = this.parseNumber(this.rateTarget.value)
-    const termInput = this.parseNumber(this.termTarget.value)
-    const termUnit = this.termUnitTarget.value
-    const termMonths = termUnit === "months" ? Math.round(termInput) : Math.round(termInput * 12)
+    this.normalizeTermInputs()
+    const termYearsInput = this.parseNumber(this.termYearsTarget.value)
+    const normalizedMonthsInput = this.parseNumber(this.termMonthsTarget.value)
+    let termMonths = Math.max(0, (termYearsInput * 12) + normalizedMonthsInput)
     const startDate = this.parseDate(this.startDateTarget.value)
 
-    if (principal <= 0 || termMonths <= 0 || !startDate) {
+    if (principal <= 0 || !startDate) {
       this.resetOutputs()
       return
     }
 
-    let monthlyPayment = this.parseNumber(this.paymentTarget.value)
+    const paymentFrequencyFactor = this.frequencyToMonthlyFactor(this.paymentFrequencyTarget.value)
+    const paymentAmount = this.parseNumber(this.paymentTarget.value)
+    let monthlyPayment = paymentAmount * paymentFrequencyFactor
     let calculatedPayment = null
     const monthlyRate = annualRate / 100 / 12
 
-    if (monthlyPayment <= 0) {
+    if (this.paymentMode && monthlyPayment > 0) {
+      const computedTermMonths = this.calculateTermMonths(principal, monthlyRate, monthlyPayment)
+      if (!computedTermMonths) {
+        this.showWarning("Payment is not enough to cover interest. Increase payment or reduce rate.")
+        this.resetOutputs()
+        return
+      }
+      termMonths = Math.max(1, Math.ceil(computedTermMonths))
+      this.updateTermValue(termMonths)
+    } else if (termMonths <= 0) {
+      this.resetOutputs()
+      return
+    } else if (monthlyPayment <= 0) {
       calculatedPayment = this.calculatePayment(principal, monthlyRate, termMonths)
       monthlyPayment = calculatedPayment
+    } else {
+      calculatedPayment = this.calculatePayment(principal, monthlyRate, termMonths)
+      monthlyPayment = calculatedPayment
+    }
+
+    if (!this.paymentMode && calculatedPayment) {
+      this.updatePaymentValue(calculatedPayment / paymentFrequencyFactor)
     }
 
     const extras = this.extractExtras()
@@ -185,6 +280,7 @@ export default class extends Controller {
     }
   }
 
+
   buildSchedule({ principal, monthlyRate, monthlyPayment, termMonths, startDate, extras, skipWarning = false }) {
     const schedule = []
     let balance = principal
@@ -229,6 +325,9 @@ export default class extends Controller {
       }
 
       balance -= principalPaid
+      if (balance < 0.01) {
+        balance = 0
+      }
       totalPaid += totalPayment
       totalPrincipal += principalPaid
       totalInterest += interest
@@ -404,9 +503,73 @@ export default class extends Controller {
     return principal * (monthlyRate * rateFactor) / (rateFactor - 1)
   }
 
+  calculateTermMonths(principal, monthlyRate, monthlyPayment) {
+    if (monthlyRate === 0) {
+      return principal / monthlyPayment
+    }
+    if (monthlyPayment <= monthlyRate * principal) {
+      return null
+    }
+    return Math.log(monthlyPayment / (monthlyPayment - (monthlyRate * principal))) / Math.log(1 + monthlyRate)
+  }
+
+  updatePaymentValue(value) {
+    this.isUpdatingPayment = true
+    this.paymentTarget.value = this.formatInputNumber(value)
+    this.isUpdatingPayment = false
+  }
+
+  updateTermValue(termMonths) {
+    this.isUpdatingTerm = true
+    const years = Math.floor(termMonths / 12)
+    const months = Math.max(0, termMonths - (years * 12))
+    this.termYearsTarget.value = String(years)
+    this.termMonthsTarget.value = String(this.normalizeMonths(months))
+    this.isUpdatingTerm = false
+  }
+
+  normalizeMonths(value) {
+    if (!Number.isFinite(value)) return 0
+    return Math.min(11, Math.max(0, Math.round(value)))
+  }
+
+  frequencyToMonthlyFactor(frequency) {
+    switch (frequency) {
+      case "biweekly":
+        return 26 / 12
+      case "weekly":
+        return 52 / 12
+      default:
+        return 1
+    }
+  }
+
+  normalizeTermInputs() {
+    if (this.isUpdatingTerm) return
+    const years = this.parseNumber(this.termYearsTarget.value)
+    if (Number.isFinite(years)) {
+      this.termYearsTarget.value = String(Math.max(0, Math.round(years)))
+    }
+    const months = this.parseNumber(this.termMonthsTarget.value)
+    if (Number.isFinite(months)) {
+      let normalizedYears = Number.isFinite(years) ? Math.max(0, Math.round(years)) : 0
+      const totalMonths = Math.max(0, Math.round(months))
+      normalizedYears += Math.floor(totalMonths / 12)
+      const remainingMonths = totalMonths % 12
+      this.termYearsTarget.value = String(normalizedYears)
+      this.termMonthsTarget.value = String(remainingMonths)
+    }
+  }
+
   parseNumber(value) {
-    const parsed = parseFloat(value)
+    const normalized = value?.toString().replace(/,/g, "")
+    const parsed = parseFloat(normalized)
     return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  formatInputNumber(value) {
+    const parsed = Number.isFinite(value) ? value : this.parseNumber(value)
+    return this.inputNumberFormatter.format(parsed || 0)
   }
 
   parseDate(value) {

@@ -92,19 +92,26 @@
       </a>
     </li>
     <li class="nav-item mt-1">
+      <% tools_active = controller_name == "tools" %>
       <a href="#tools-collapse"
-         class="nav-link d-inline-flex align-items-center w-100 border-0 <%= current_page?(amortization_calculator_path) ? 'active bg-transparent' : 'link-body-emphasis' %>"
+         class="nav-link d-inline-flex align-items-center w-100 border-0 <%= tools_active ? 'active bg-transparent' : 'link-body-emphasis' %>"
          data-bs-toggle="collapse"
-         aria-expanded="<%= current_page?(amortization_calculator_path) ? 'true' : 'false' %>">
+         aria-expanded="<%= tools_active ? 'true' : 'false' %>">
         <i class="bi bi-wrench-adjustable me-2"></i>
         <span>Tools</span>
       </a>
-      <div class="collapse <%= 'show' if current_page?(amortization_calculator_path) %>" id="tools-collapse">
+      <div class="collapse <%= 'show' if tools_active %>" id="tools-collapse">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
           <li>
             <a href="<%= amortization_calculator_path %>"
-               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= 'bg-primary-subtle text-primary fw-bold' if current_page?(amortization_calculator_path) %>">
+               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= action_name == 'amortization' ? 'bg-primary-subtle text-primary fw-bold' : '' %>">
               <i class="bi bi-calculator me-2"></i> Amortization
+            </a>
+          </li>
+          <li>
+            <a href="<%= investment_calculator_path %>"
+               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= action_name == 'investment' ? 'bg-primary-subtle text-primary fw-bold' : '' %>">
+              <i class="bi bi-graph-up-arrow me-2"></i> Investments
             </a>
           </li>
         </ul>

@@ -17,3 +17,8 @@ insurance:
   date: <%= Date.today %>
   amount: 6500
   category: expense_insurance
+
+savings_contribution:
+  date: <%= Date.today - 1.month %>
+  amount: 240000
+  category: savings
