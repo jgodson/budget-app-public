@@ -73,7 +73,7 @@ class TransactionsController < ApplicationController
     end
 
     if @transaction.save
-      redirect_to return_to_path, notice: 'Transaction was successfully created.'
+      redirect_to filtered_return_to_path(@transaction), notice: 'Transaction was successfully created.'
     else
       @categories = Category.all.order(:name)
       flash[:model_errors] = @transaction.errors.full_messages
@@ -227,5 +227,19 @@ class TransactionsController < ApplicationController
 
   def return_to_path
     safe_return_to || transactions_path
+  end
+
+  def filtered_return_to_path(transaction)
+    return transactions_path(category: transaction.category_id, year: transaction.date.year) if safe_return_to.blank?
+
+    uri = URI.parse(safe_return_to)
+    return transactions_path(category: transaction.category_id, year: transaction.date.year) unless uri.path == transactions_path
+
+    params = Rack::Utils.parse_nested_query(uri.query)
+    params["category"] = transaction.category_id
+    params["year"] = transaction.date.year if params["year"].blank?
+
+    query = params.to_query
+    query.present? ? "#{uri.path}?#{query}" : uri.path
   end
 end

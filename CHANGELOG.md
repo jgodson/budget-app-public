@@ -1,3 +1,8 @@
+## Sync - 2026-02-05 07:45:51
+
+- ac9db38 Update UI/UX playbook with issue auto-close
+- 485cbbd Filter transactions list after create (#80)
+
 ## Sync - 2026-02-04 22:31:18
 
 - 63480fe Fix expense colour on monthly overview: reverse diff sign and colour for expenses (#79)
