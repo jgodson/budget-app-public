@@ -2,12 +2,14 @@ require "application_system_test_case"
 
 class AmortizationCalculatorTest < ApplicationSystemTestCase
   test "renders amortization calculator and captures screenshot" do
+    loan = Loan.first
+    loan.update!(apr: 6.25)
     visit amortization_calculator_path
 
-    select Loan.first.loan_name, from: "amortization-loan-select"
+    select loan.loan_name, from: "amortization-loan-select"
+    assert_field "amortization-rate", with: "6.25"
 
     fill_in("amortization-amount", with: "250000")
-    fill_in("amortization-rate", with: "6.25")
     fill_in("amortization-term-years", with: "30")
     fill_in("amortization-term-months", with: "0")
     fill_in("amortization-payment", with: "")

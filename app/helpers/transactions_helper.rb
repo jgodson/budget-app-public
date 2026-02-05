@@ -34,6 +34,17 @@ module TransactionsHelper
     end
   end
 
+  def transaction_type_totals(transactions)
+    totals = { income: 0.0, expense: 0.0, savings: 0.0 }
+    transactions.each do |transaction|
+      type_key = transaction.transaction_type.to_sym
+      next unless totals.key?(type_key)
+
+      totals[type_key] += transaction.amount_dollars
+    end
+    totals
+  end
+
   private
 
   def span_text_for_source(source)

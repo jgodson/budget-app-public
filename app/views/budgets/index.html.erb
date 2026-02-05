@@ -22,7 +22,7 @@
     <div class="card-body p-0">
       <% if @budgets.present? %>
         <div class="horizontal-scroll">
-      <table class="table table-bordered table-hover align-middle">
+      <table class="table table-bordered table-hover align-middle mb-0">
         <tbody>
           <% income_categories = @categories.select { |c| c.category_type == 'income' && c.parent_category.nil? } %>
           <% expense_categories = @categories.select { |c| c.category_type == 'expense' && c.parent_category.nil? } %>
@@ -322,6 +322,36 @@
             </tr>
           <% end %>
         </tbody>
+        <tfoot class="table-group-divider">
+          <tr>
+            <td><strong>Total Income</strong></td>
+            <% (1..12).each do |month| %>
+              <td><%= number_to_currency(@monthly_budget_totals[:income][month] / 100.0) %></td>
+            <% end %>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Total Expenses</strong></td>
+            <% (1..12).each do |month| %>
+              <td><%= number_to_currency(@monthly_budget_totals[:expense][month] / 100.0) %></td>
+            <% end %>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Net Total</strong></td>
+            <% (1..12).each do |month| %>
+              <td><%= number_to_currency(@monthly_net_totals[month] / 100.0).gsub('-', '&#8209;').html_safe %></td>
+            <% end %>
+            <td></td>
+          </tr>
+          <tr>
+            <td><strong>Total Savings</strong></td>
+            <% (1..12).each do |month| %>
+              <td><%= number_to_currency(@monthly_budget_totals[:savings][month] / 100.0) %></td>
+            <% end %>
+            <td></td>
+          </tr>
+        </tfoot>
       </table>
         </div>
       <% else %>

@@ -9,7 +9,8 @@ class ToolsController < ApplicationController
         id: loan.id,
         name: loan.loan_name,
         balance_dollars: loan.balance_dollars,
-        last_payment_dollars: last_payment ? (last_payment.paid_amount / 100.0) : 0
+        last_payment_dollars: last_payment ? (last_payment.paid_amount / 100.0) : 0,
+        apr: loan.apr&.to_f
       }
     end
   end

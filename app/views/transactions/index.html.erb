@@ -17,9 +17,9 @@
         </ul>
       </div>
     </div>
-    <div class="card-body">
+    <div class="card-body p-0">
       <!-- Filters -->
-      <%= form_with url: transactions_path, method: :get, data: { turbo_frame: "transactions_list" } do %>
+      <%= form_with url: transactions_path, method: :get, data: { turbo_frame: "transactions_list" }, class: "p-3" do %>
         <div class="row g-3">
           <div class="col-sm-6 col-lg-auto pb-2">
             <%= label_tag :year, "Select Year:", class: "form-label" %>
@@ -52,44 +52,73 @@
 
       <%= turbo_frame_tag "transactions_list" do %>
       <div class="table-responsive mt-4">
-    <table class="table table-bordered table-hover align-middle">
+    <table class="table table-bordered table-hover align-middle mb-0">
       <% @grouped_transactions.each do |date, transactions| %>
           <% header = @selected_group_by.include?('month') ? date.strftime("%B %Y") : "#{@selected_month.present? ? Date::MONTHNAMES[@selected_month] : ""} #{date}" %>
+          <% parent_transactions = @selected_group_by.include?('category') ? transactions.values.flatten : transactions %>
+          <% parent_totals = transaction_type_totals(parent_transactions) %>
           <tbody>
             <tr class="parent-<%= header.parameterize %> parent-group table-light no-hover-highlight">
               <td colspan="3"><h3 class="m-0"><%= header %></h3></td>
-              <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
-              <td>
-                <h5 class="parent-total-amount fw-bold m-0">
-                  <% if @selected_group_by.include?('category') %>
-                    <%= number_to_currency(transactions.values.flatten.sum(&:amount) / 100.0) %>
-                  <% else %>
-                    <%= number_to_currency(transactions.sum(&:amount) / 100.0) %>
-                  <% end %>
-                </h5>
+              <td class="text-end" style="width: 140px;"><h5 class="fw-bold m-0 transactions-total-value">Totals</h5></td>
+              <td class="text-end" style="width: 140px;" data-amount-totals>
+                <div class="d-flex flex-column align-items-end">
+                  <small class="text-muted">Income</small>
+                  <span class="text-success fw-bold transactions-total-value" data-total-type="income"><%= parent_totals[:income].zero? ? "-" : number_to_currency(parent_totals[:income]) %></span>
+                </div>
+              </td>
+              <td class="text-end" style="width: 140px;" data-amount-totals>
+                <div class="d-flex flex-column align-items-end">
+                  <small class="text-muted">Expenses</small>
+                  <span class="text-danger fw-bold transactions-total-value" data-total-type="expense"><%= parent_totals[:expense].zero? ? "-" : number_to_currency(parent_totals[:expense]) %></span>
+                </div>
+              </td>
+              <td class="text-end" style="width: 140px;" data-amount-totals>
+                <div class="d-flex flex-column align-items-end">
+                  <small class="text-muted">Savings</small>
+                  <span class="text-primary fw-bold transactions-total-value" data-total-type="savings"><%= parent_totals[:savings].zero? ? "-" : number_to_currency(parent_totals[:savings]) %></span>
+                </div>
               </td>
             </tr>
           </tbody>
             <% if @selected_group_by.include?('category') %>
               <% transactions.each do |category, transactions| %>
+                <% child_totals = transaction_type_totals(transactions) %>
                 <tbody class="parent-<%= header.parameterize %> child-group table-group-divider">
                   <tr class="table-light no-hover-highlight">
                     <td colspan="3"><h5 class="fw-bold m-0 text-center"><%= category.name %></h5></td>
-                    <td class="text-end"><h5 class="fw-bold m-0">Total</h5></td>
-                    <td><h5 class="child-total-amount fw-bold m-0"><%= number_to_currency(transactions.sum(&:amount) / 100.0) %></h5></td>
+                    <td class="text-end" style="width: 140px;"><h5 class="fw-bold m-0 transactions-total-value">Totals</h5></td>
+                    <td class="text-end" style="width: 140px;" data-amount-totals>
+                      <div class="d-flex flex-column align-items-end">
+                        <small class="text-muted">Income</small>
+                        <span class="text-success fw-bold transactions-total-value" data-total-type="income"><%= child_totals[:income].zero? ? "-" : number_to_currency(child_totals[:income]) %></span>
+                      </div>
+                    </td>
+                    <td class="text-end" style="width: 140px;" data-amount-totals>
+                      <div class="d-flex flex-column align-items-end">
+                        <small class="text-muted">Expenses</small>
+                        <span class="text-danger fw-bold transactions-total-value" data-total-type="expense"><%= child_totals[:expense].zero? ? "-" : number_to_currency(child_totals[:expense]) %></span>
+                      </div>
+                    </td>
+                    <td class="text-end" style="width: 140px;" data-amount-totals>
+                      <div class="d-flex flex-column align-items-end">
+                        <small class="text-muted">Savings</small>
+                        <span class="text-primary fw-bold transactions-total-value" data-total-type="savings"><%= child_totals[:savings].zero? ? "-" : number_to_currency(child_totals[:savings]) %></span>
+                      </div>
+                    </td>
                   </tr>
                   <tr class="text-center highlight">
                     <td style="width: 200px;"><strong>Date</strong></td>
                     <td style="width: 160px;"><strong>Source</strong></td>
-                    <td><strong>Description</strong></td>
+                    <td colspan="3"><strong>Description</strong></td>
                     <td style="width: 200px;"><strong>Amount</strong></td>
                     <td style="width: 100px;" class="text-center"><strong>Actions</strong></td>
                   </tr>
                   <% transactions.each do |transaction| %>
-                    <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction, return_to: return_to) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
+                    <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction, return_to: return_to) %>" data-action="click->clickable-row#click" data-transaction-type="<%= transaction.transaction_type %>" style="cursor: pointer;">
                       <td><%= transaction.date.strftime("%d %B %Y") %></td>
                       <td class="text-center"><%= transaction_source_badge(transaction) %></td>
-                      <td class="transaction-description"><%= transaction.description %></td>
+                      <td class="transaction-description" colspan="3"><%= transaction.description %></td>
                       <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
                       <td class="no-row-click">
                         <%= link_to edit_transaction_path(transaction, return_to: return_to), class: 'btn btn-warning btn-sm', title: 'Edit', aria: { label: 'Edit' }, data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo_frame: '_top' } do %>
@@ -108,14 +137,14 @@
                                                 <tr class="text-center table-light no-hover-highlight">
                                                   <td style="width: 200px;"><strong>Date</strong></td>
                                                   <td style="width: 160px;"><strong>Source</strong></td>
-                                                  <td><strong>Description</strong></td>
+                                                  <td colspan="3"><strong>Description</strong></td>
                                                   <td style="width: 200px;"><strong>Amount</strong></td>
                                                   <td style="width: 200px;" class="text-center"><strong>Actions</strong></td>
                                                 </tr>                <% transactions.each do |transaction| %>
-                  <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction, return_to: return_to) %>" data-action="click->clickable-row#click" style="cursor: pointer;">
+                  <tr class="transaction-row" data-controller="clickable-row" data-clickable-row-url-value="<%= transaction_path(transaction, return_to: return_to) %>" data-action="click->clickable-row#click" data-transaction-type="<%= transaction.transaction_type %>" style="cursor: pointer;">
                     <td><%= transaction.date.strftime("%d %B %Y") %></td>
                     <td class="text-center"><%= transaction_source_badge(transaction) %></td>
-                    <td class="transaction-description"><%= transaction.description %></td>
+                    <td class="transaction-description" colspan="3"><%= transaction.description %></td>
                     <td class="transaction-amount"><%= number_to_currency(transaction.amount_dollars) %></td>
                     <td class="no-row-click">
                       <%= link_to edit_transaction_path(transaction, return_to: return_to), class: 'btn btn-warning btn-sm', title: 'Edit', aria: { label: 'Edit' }, data: { controller: 'tooltip', bs_toggle: 'tooltip', turbo_frame: '_top' } do %>
@@ -156,36 +185,70 @@
     }, []);
     let hasVisibleTransactions = false;
 
+    const formatCurrency = (value) => (value === 0 ? "-" : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value));
+    const updateTotals = (container, income, expense, savings) => {
+      const incomeNode = container.querySelector('[data-total-type="income"]');
+      const expenseNode = container.querySelector('[data-total-type="expense"]');
+      const savingsNode = container.querySelector('[data-total-type="savings"]');
+
+      if (incomeNode) {
+        incomeNode.textContent = incomeNode.textContent.includes('(in)')
+          ? `+ (in) ${formatCurrency(income)}`
+          : formatCurrency(income);
+      }
+      if (expenseNode) {
+        expenseNode.textContent = expenseNode.textContent.includes('(out)')
+          ? `- (out) ${formatCurrency(expense)}`
+          : formatCurrency(expense);
+      }
+      if (savingsNode) {
+        savingsNode.textContent = savingsNode.textContent.includes('savings')
+          ? `savings ${formatCurrency(savings)}`
+          : formatCurrency(savings);
+      }
+    };
+
     parentGroups.forEach((parentGroup) => {
       const childGroups = document.querySelectorAll(`tbody.${parentGroup.classList[0]}`);
       let hasVisibleTransactionsInParent = false;
-      let parentTotal = 0;
+      let parentIncomeTotal = 0;
+      let parentExpenseTotal = 0;
+      let parentSavingsTotal = 0;
 
       childGroups.forEach((childGroup) => {
         const rows = childGroup.querySelectorAll('tr.transaction-row');
         let hasVisibleTransactionsInChild = false;
-        let childTotal = 0;
+        let incomeTotal = 0;
+        let expenseTotal = 0;
+        let savingsTotal = 0;
 
         rows.forEach((row) => {
           const description = row.querySelector('.transaction-description')?.textContent.toLowerCase();
           const amount = parseFloat(row.querySelector('.transaction-amount')?.textContent.replace(/[^0-9.-]+/g, ""));
+          const transactionType = row.dataset.transactionType;
 
           if (description && description.includes(filter)) {
             row.style.display = '';
             hasVisibleTransactionsInChild = true;
-            childTotal += amount;
+            if (transactionType === "income") {
+              incomeTotal += amount;
+            } else if (transactionType === "expense") {
+              expenseTotal += amount;
+            } else if (transactionType === "savings") {
+              savingsTotal += amount;
+            }
           } else {
             row.style.display = 'none';
           }
         });
 
-        parentTotal += childTotal;
+        parentIncomeTotal += incomeTotal;
+        parentExpenseTotal += expenseTotal;
+        parentSavingsTotal += savingsTotal;
 
-        // Update the total amounts
-        const childTotalElement = childGroup.querySelector('.child-total-amount');
-        if (childTotalElement) {
-          childTotalElement.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(childTotal);
-        }
+        childGroup.querySelectorAll('[data-amount-totals]').forEach((container) => {
+          updateTotals(container, incomeTotal, expenseTotal, savingsTotal);
+        });
 
         // Hide or show the child + parent based on the visibility of transactions
         if (hasVisibleTransactionsInChild) {
@@ -197,8 +260,10 @@
       });
 
       // Update the total amounts
-      const parentTotalElement = parentGroup.querySelector('.parent-total-amount');
-      parentTotalElement.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parentTotal);
+      const parentTotalsContainers = parentGroup.querySelectorAll('[data-amount-totals]');
+      parentTotalsContainers.forEach((container) => {
+        updateTotals(container, parentIncomeTotal, parentExpenseTotal, parentSavingsTotal);
+      });
 
       // Hide or show the parent based on the visibility of transactions
       if (hasVisibleTransactionsInParent) {

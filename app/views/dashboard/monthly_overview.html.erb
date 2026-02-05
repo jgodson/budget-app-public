@@ -198,10 +198,17 @@
                         <td class="text-end fw-bold"><%= number_to_currency(detail[:actual] / 100.0) %></td>
                         <td class="text-end text-muted"><%= number_to_currency(detail[:budget] / 100.0) %></td>
                         <td class="text-end">
-                           <% diff = detail[:actual] - detail[:prev_actual] %>
-                           <span class="<%= diff >= 0 ? 'text-success' : 'text-danger' %>">
-                             <%= diff >= 0 ? '+' : '' %><%= number_to_currency(diff / 100.0) %>
-                           </span>
+                          <% diff = detail[:actual] - detail[:prev_actual] %>
+                          <%# Determine colour and sign based on category type %>
+                          <% diff_class = if diff.zero?
+                              ''
+                            elsif type == 'expense'
+                              diff >= 0 ? 'text-danger' : 'text-success'
+                            else
+                              diff >= 0 ? 'text-success' : 'text-danger'
+                            end %>
+                          <% diff_sign = diff.zero? ? '' : (diff >= 0 ? '+' : '-') %>
+                          <span class="<%= diff_class %>"><%= diff_sign %><%= diff.zero? ? '-' : number_to_currency(diff.abs / 100.0) %></span>
                         </td>
                       </tr>
 
@@ -226,8 +233,17 @@
                           </td>
                           <td class="text-end"><%= number_to_currency(sub[:actual] / 100.0) %></td>
                           <td class="text-end text-muted"><%= number_to_currency(sub[:budget] / 100.0) %></td>
-                          <td class="text-end text-muted small">
-                            <%= number_to_currency((sub[:actual] - sub[:prev_actual]) / 100.0) %>
+                          <td class="text-end small">
+                            <% sub_diff = sub[:actual] - sub[:prev_actual] %>
+                            <% sub_diff_class = if sub_diff.zero?
+                                ''
+                              elsif type == 'expense'
+                                sub_diff >= 0 ? 'text-danger' : 'text-success'
+                              else
+                                sub_diff >= 0 ? 'text-success' : 'text-danger'
+                              end %>
+                            <% sub_diff_sign = sub_diff.zero? ? '' : (sub_diff >= 0 ? '+' : '-') %>
+                            <span class="<%= sub_diff_class %>"><%= sub_diff_sign %><%= sub_diff.zero? ? '-' : number_to_currency(sub_diff.abs / 100.0) %></span>
                           </td>
                         </tr>
                       <% end %>

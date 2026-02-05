@@ -30,6 +30,13 @@
               </span>
             <% end %>
           </div>
+
+          <div class="d-flex align-items-center mb-4">
+            <span class="text-muted text-uppercase small fw-bold me-3">APR</span>
+            <span class="fw-semibold">
+              <%= @loan.apr.present? ? number_to_percentage(@loan.apr, precision: 2, strip_insignificant_zeros: true) : "Not set" %>
+            </span>
+          </div>
           
           <div class="mb-3">
             <div class="d-flex justify-content-between align-items-center mb-1">

@@ -5,6 +5,7 @@ class Loan < ApplicationRecord
   validates :loan_name, presence: true, uniqueness: { scope: :category_id }
   validates :category_id, presence: true, uniqueness: true
   validates :balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :apr, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validate :category_must_be_expense
 
   after_update :update_loan_payments_category, if: :saved_change_to_category_id?

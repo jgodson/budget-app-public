@@ -148,6 +148,11 @@ export default class extends Controller {
     }
 
     this.amountTarget.value = loan.balance_dollars ? this.formatInputNumber(loan.balance_dollars) : ""
+    if (loan.apr !== null && loan.apr !== undefined) {
+      this.rateTarget.value = this.formatInputNumber(loan.apr)
+    } else {
+      this.rateTarget.value = ""
+    }
     if (loan.last_payment_dollars && loan.last_payment_dollars > 0) {
       this.paymentTarget.value = this.formatInputNumber(loan.last_payment_dollars)
       this.paymentMode = true

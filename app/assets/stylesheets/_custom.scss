@@ -200,6 +200,14 @@ body {
   display: none;
 }
 
+.transactions-total-value {
+  font-size: 1rem;
+}
+
+.transaction-amount {
+  text-align: right;
+}
+
 .toggle-subcategories {
   cursor: pointer;
 }

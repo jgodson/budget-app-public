@@ -2,11 +2,12 @@ class BudgetsController < ApplicationController
   include Import
 
   def index
-    @categories = Category.all.order(:name)
+    @categories = Category.includes(:subcategories).order(:name)
     @selected_year = params[:year].nil? ? Date.today.year : params[:year].to_i
-    @budgets = Budget.where(year: @selected_year)
+    @budgets = Budget.where(year: @selected_year).includes(:category)
     @next_year = @selected_year >= Date.today.year ? @selected_year + 1 : Date.today.year + 1
     @available_years = Budget.distinct.pluck(:year).sort.reverse
+    calculate_monthly_budget_totals
   end
 
   def show
@@ -250,6 +251,46 @@ class BudgetsController < ApplicationController
     end
   end
 
+  private
+
+  def calculate_monthly_budget_totals
+    budgets_by_category = @budgets.group_by(&:category_id)
+    @monthly_budget_totals = { income: Hash.new(0), expense: Hash.new(0), savings: Hash.new(0) }
+
+    top_level_categories = @categories.select { |category| category.parent_category.nil? }
+    top_level_categories.each do |category|
+      type = category.category_type.to_sym
+      next unless @monthly_budget_totals.key?(type)
+
+      (1..12).each do |month|
+        @monthly_budget_totals[type][month] += category_month_total(category, month, budgets_by_category)
+      end
+    end
+
+    @monthly_net_totals = Hash.new(0)
+    (1..12).each do |month|
+      @monthly_net_totals[month] = @monthly_budget_totals[:income][month] - @monthly_budget_totals[:expense][month]
+    end
+  end
+
+  def category_month_total(category, month, budgets_by_category)
+    category_amount = budget_for_month(category, month, budgets_by_category)
+    subcategory_amount = category.subcategories.sum do |subcategory|
+      budget_for_month(subcategory, month, budgets_by_category)
+    end
+
+    category_amount + subcategory_amount
+  end
+
+  def budget_for_month(category, month, budgets_by_category)
+    budgets = budgets_by_category[category.id] || []
+    monthly_budget = budgets.find { |b| b.month == month }
+    return monthly_budget.budgeted_amount if monthly_budget
+
+    yearly_budget = budgets.find { |b| b.month.nil? }
+    yearly_budget ? yearly_budget.budgeted_amount : 0
+  end
+
   def import
     if params[:selected_budgets].nil?
       redirect_to import_form_budgets_path, alert: "No budgets selected to import."
@@ -260,8 +301,6 @@ class BudgetsController < ApplicationController
     import_budgets(selected_budgets)
     redirect_to budgets_path(year: selected_budgets[0]['year']), notice: "Budgets imported successfully."
   end
-
-  private
 
   def import_budgets(selected_budgets)
     extracted_categories = selected_budgets.map { |b| b['category'] }

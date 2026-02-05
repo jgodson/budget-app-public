@@ -1,3 +1,11 @@
+## Sync - 2026-02-04 22:31:18
+
+- 63480fe Fix expense colour on monthly overview: reverse diff sign and colour for expenses (#79)
+- de788ba Add budget totals and tighten table spacing (#78)
+- 3a4c4a9 Fix goals row clickable columns (#77)
+- de5f1bf Add APR to loans and amortization prefill (#76)
+- 7516670 Add transaction type totals to headers (#72)
+
 ## Sync - 2026-02-02 22:04:11
 
 - 9e72d14 UX fixes for calculators (#73)
