@@ -26,6 +26,8 @@ start:
 	@bin/rails assets:clobber
 	@echo "Starting database..."
 	@$(DOCKER_CMD) compose up -d
+	@echo "Preparing database..."
+	@bin/rails db:prepare
 	@echo "Starting Rails server..."
 	@bin/rails s
 

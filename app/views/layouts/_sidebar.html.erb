@@ -92,7 +92,7 @@
       </a>
     </li>
     <li class="nav-item mt-1">
-      <% tools_active = controller_name == "tools" %>
+      <% tools_active = controller_path.start_with?("tools/") %>
       <a href="#tools-collapse"
          class="nav-link d-inline-flex align-items-center w-100 border-0 <%= tools_active ? 'active bg-transparent' : 'link-body-emphasis' %>"
          data-bs-toggle="collapse"
@@ -104,14 +104,20 @@
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
           <li>
             <a href="<%= amortization_calculator_path %>"
-               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= action_name == 'amortization' ? 'bg-primary-subtle text-primary fw-bold' : '' %>">
+               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= controller_path == 'tools/calculators' && action_name == 'amortization' ? 'bg-primary-subtle text-primary fw-bold' : '' %>">
               <i class="bi bi-calculator me-2"></i> Amortization
             </a>
           </li>
           <li>
             <a href="<%= investment_calculator_path %>"
-               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= action_name == 'investment' ? 'bg-primary-subtle text-primary fw-bold' : '' %>">
+               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= controller_path == 'tools/calculators' && action_name == 'investment' ? 'bg-primary-subtle text-primary fw-bold' : '' %>">
               <i class="bi bi-graph-up-arrow me-2"></i> Investments
+            </a>
+          </li>
+          <li>
+            <a href="<%= tools_import_export_path %>"
+               class="link-body-emphasis d-inline-flex text-decoration-none rounded py-1 px-4 w-100 <%= controller_path == 'tools/import_exports' ? 'bg-primary-subtle text-primary fw-bold' : '' %>">
+              <i class="bi bi-arrow-left-right me-2"></i> Import / Export
             </a>
           </li>
         </ul>

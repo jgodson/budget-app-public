@@ -1,4 +1,4 @@
-class ToolsController < ApplicationController
+class Tools::CalculatorsController < ApplicationController
   helper_method :max_investment_years
 
   def amortization

@@ -1,3 +1,8 @@
+## Sync - 2026-02-07 08:36:45
+
+- 408baac Move import/export under Tools and add sample package
+- 2d3f19f Add synchronous data portability export/import
+
 ## Sync - 2026-02-05 07:45:51
 
 - ac9db38 Update UI/UX playbook with issue auto-close

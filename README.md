@@ -10,6 +10,7 @@ A comprehensive personal finance management application built with Ruby on Rails
 - **Loan Management**: Track loans and loan payments
 - **Goal Setting**: Set and monitor financial goals
 - **Data Import**: Import transactions and budgets from external sources
+- **Data Portability**: Export/import full workspace data in a portable package format
 - **Reporting**: View monthly financial overviews and analytics
 
 ## System Requirements

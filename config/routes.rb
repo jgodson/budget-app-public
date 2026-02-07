@@ -43,6 +43,12 @@ Rails.application.routes.draw do
 
   resources :loan_payments
 
-  get 'tools/amortization', to: 'tools#amortization', as: 'amortization_calculator'
-  get "tools/investment", to: "tools#investment", as: "investment_calculator"
+  namespace :tools do
+    get "import-export", to: "import_exports#show", as: :import_export
+    post "import-export/export", to: "import_exports#export", as: :import_export_export
+    post "import-export/import", to: "import_exports#import", as: :import_export_import
+  end
+
+  get "tools/amortization", to: "tools/calculators#amortization", as: "amortization_calculator"
+  get "tools/investment", to: "tools/calculators#investment", as: "investment_calculator"
 end
