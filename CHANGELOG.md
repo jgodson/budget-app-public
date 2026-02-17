@@ -1,3 +1,8 @@
+## Sync - 2026-02-17 08:22:25
+
+- 2e391c2 Fix export download Turbo handling and tooltip lifecycle
+- b87fc7d Update sync config to rails-budget-app path
+
 ## Sync - 2026-02-07 08:36:45
 
 - 408baac Move import/export under Tools and add sample package
